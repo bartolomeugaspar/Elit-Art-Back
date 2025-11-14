@@ -1,13 +1,15 @@
-import jwt from 'jsonwebtoken'
+import jwt, { SignOptions } from 'jsonwebtoken'
 import { supabase } from '../config/database'
 import { IUser, IUserInput, hashPassword, comparePassword } from '../models/User'
 
 export class AuthService {
   static generateToken(userId: string, role: string): string {
-    const secret = (process.env.JWT_SECRET || 'secret') as string
-    return jwt.sign({ userId, role }, secret, {
-      expiresIn: process.env.JWT_EXPIRE || '7d',
-    })
+    const secret = process.env.JWT_SECRET || 'secret'
+    return jwt.sign(
+      { userId, role },
+      secret,
+      { expiresIn: process.env.JWT_EXPIRE || '7d' } as SignOptions
+    )
   }
 
   static async register(name: string, email: string, password: string): Promise<{ user: IUser; token: string }> {

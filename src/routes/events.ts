@@ -154,6 +154,64 @@ router.get(
   })
 )
 
+/**
+ * @swagger
+ * /events:
+ *   post:
+ *     summary: Criar novo evento
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - description
+ *               - category
+ *               - date
+ *               - time
+ *               - location
+ *               - image
+ *               - capacity
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               fullDescription:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *                 enum: ['Workshop', 'Exposição', 'Masterclass', 'Networking']
+ *               date:
+ *                 type: string
+ *               time:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *               capacity:
+ *                 type: integer
+ *               price:
+ *                 type: number
+ *               isFree:
+ *                 type: boolean
+ *     responses:
+ *       201:
+ *         description: Evento criado com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão (apenas admin/artist)
+ */
 // Create event (admin/artist only)
 router.post(
   '/',
@@ -192,6 +250,57 @@ router.post(
   })
 )
 
+/**
+ * @swagger
+ * /events/{id}:
+ *   put:
+ *     summary: Atualizar evento
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               date:
+ *                 type: string
+ *               time:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *               capacity:
+ *                 type: integer
+ *               price:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Evento atualizado com sucesso
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão
+ *       404:
+ *         description: Evento não encontrado
+ */
 // Update event (admin/organizer only)
 router.put(
   '/:id',
@@ -204,7 +313,7 @@ router.put(
       return
     }
 
-    if (event.organizer.toString() !== req.userId && req.userRole !== 'admin') {
+    if (event.organizerId !== req.userId && req.userRole !== 'admin') {
       res.status(403).json({ success: false, message: 'Not authorized to update this event' })
       return
     }
@@ -219,6 +328,32 @@ router.put(
   })
 )
 
+/**
+ * @swagger
+ * /events/{id}:
+ *   delete:
+ *     summary: Deletar evento
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Evento deletado com sucesso
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão
+ *       404:
+ *         description: Evento não encontrado
+ */
 // Delete event (admin/organizer only)
 router.delete(
   '/:id',
@@ -231,7 +366,7 @@ router.delete(
       return
     }
 
-    if (event.organizer.toString() !== req.userId && req.userRole !== 'admin') {
+    if (event.organizerId !== req.userId && req.userRole !== 'admin') {
       res.status(403).json({ success: false, message: 'Not authorized to delete this event' })
       return
     }
@@ -245,6 +380,30 @@ router.delete(
   })
 )
 
+/**
+ * @swagger
+ * /events/{id}/register:
+ *   post:
+ *     summary: Registrar em um evento
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       201:
+ *         description: Registrado com sucesso
+ *       401:
+ *         description: Não autenticado
+ *       404:
+ *         description: Evento não encontrado
+ */
 // Register for event
 router.post(
   '/:id/register',
@@ -260,6 +419,30 @@ router.post(
   })
 )
 
+/**
+ * @swagger
+ * /events/registrations/{registrationId}:
+ *   delete:
+ *     summary: Cancelar registro em evento
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: registrationId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Registro cancelado com sucesso
+ *       401:
+ *         description: Não autenticado
+ *       404:
+ *         description: Registro não encontrado
+ */
 // Cancel registration
 router.delete(
   '/registrations/:registrationId',
@@ -274,6 +457,32 @@ router.delete(
   })
 )
 
+/**
+ * @swagger
+ * /events/{id}/registrations:
+ *   get:
+ *     summary: Obter registros de um evento
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Lista de registros
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão
+ *       404:
+ *         description: Evento não encontrado
+ */
 // Get event registrations (organizer/admin only)
 router.get(
   '/:id/registrations',
@@ -286,7 +495,7 @@ router.get(
       return
     }
 
-    if (event.organizer.toString() !== req.userId && req.userRole !== 'admin') {
+    if (event.organizerId !== req.userId && req.userRole !== 'admin') {
       res.status(403).json({ success: false, message: 'Not authorized' })
       return
     }
@@ -301,6 +510,21 @@ router.get(
   })
 )
 
+/**
+ * @swagger
+ * /events/user/my-registrations:
+ *   get:
+ *     summary: Obter meus registros em eventos
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de meus registros
+ *       401:
+ *         description: Não autenticado
+ */
 // Get user registrations
 router.get(
   '/user/my-registrations',
@@ -316,6 +540,46 @@ router.get(
   })
 )
 
+/**
+ * @swagger
+ * /events/{id}/testimonials:
+ *   post:
+ *     summary: Adicionar depoimento sobre um evento
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - rating
+ *               - comment
+ *             properties:
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               comment:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Depoimento adicionado com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       401:
+ *         description: Não autenticado
+ */
 // Add testimonial
 router.post(
   '/:id/testimonials',
@@ -346,6 +610,26 @@ router.post(
   })
 )
 
+/**
+ * @swagger
+ * /events/{id}/testimonials:
+ *   get:
+ *     summary: Obter depoimentos de um evento
+ *     tags:
+ *       - Eventos
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Lista de depoimentos
+ *       404:
+ *         description: Evento não encontrado
+ */
 // Get event testimonials
 router.get(
   '/:id/testimonials',
