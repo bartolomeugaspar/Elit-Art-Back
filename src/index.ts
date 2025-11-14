@@ -1,18 +1,24 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 import { connectDB } from './config/database'
 import { swaggerSpec } from './config/swagger'
 import { errorHandler } from './middleware/errorHandler'
+import { UploadService } from './services/UploadService'
 import authRoutes from './routes/auth'
 import eventRoutes from './routes/events'
 import newsletterRoutes from './routes/newsletter'
+import uploadRoutes from './routes/upload'
 
 dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5000
+
+// Ensure upload directory exists
+UploadService.ensureUploadDir()
 
 // Middleware
 app.use(cors({
@@ -21,6 +27,9 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// Serve static files for uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 // Swagger Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -33,6 +42,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 app.use('/api/auth', authRoutes)
 app.use('/api/events', eventRoutes)
 app.use('/api/newsletter', newsletterRoutes)
+app.use('/api/upload', uploadRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

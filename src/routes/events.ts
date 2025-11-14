@@ -71,7 +71,7 @@ router.post(
     body('date').notEmpty().withMessage('Date is required'),
     body('time').notEmpty().withMessage('Time is required'),
     body('location').trim().notEmpty().withMessage('Location is required'),
-    body('image').trim().notEmpty().withMessage('Image is required'),
+    body('image').trim().notEmpty().withMessage('Image URL is required'),
     body('capacity').isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
   ],
   asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -83,8 +83,8 @@ router.post(
 
     const eventData = {
       ...req.body,
-      organizer: req.userId,
-      availableSpots: req.body.capacity,
+      organizer_id: req.userId,
+      available_spots: req.body.capacity,
     }
 
     const event = await EventService.createEvent(eventData)
