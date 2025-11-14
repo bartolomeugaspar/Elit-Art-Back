@@ -75,7 +75,7 @@ router.post(
       success: true,
       message: 'User registered successfully',
       user: {
-        id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -85,7 +85,50 @@ router.post(
   })
 )
 
-// Login
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Fazer login
+ *     tags:
+ *       - Autenticação
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: joao@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: senha123
+ *     responses:
+ *       200:
+ *         description: Login realizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Email ou senha inválidos
+ */
 router.post(
   '/login',
   [
@@ -106,7 +149,7 @@ router.post(
       success: true,
       message: 'Login successful',
       user: {
-        id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -116,7 +159,30 @@ router.post(
   })
 )
 
-// Get current user
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Obter dados do usuário autenticado
+ *     tags:
+ *       - Autenticação
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dados do usuário
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Não autenticado
+ */
 router.get('/me', authenticate, asyncHandler(async (req: AuthRequest, res: Response) => {
   const user = await AuthService.getUserById(req.userId!)
 
@@ -126,7 +192,51 @@ router.get('/me', authenticate, asyncHandler(async (req: AuthRequest, res: Respo
   })
 }))
 
-// Update profile
+/**
+ * @swagger
+ * /auth/profile:
+ *   put:
+ *     summary: Atualizar perfil do usuário
+ *     tags:
+ *       - Autenticação
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: João Silva
+ *               bio:
+ *                 type: string
+ *                 example: Artista e criador
+ *               phone:
+ *                 type: string
+ *                 example: +244 923 123 456
+ *               profileImage:
+ *                 type: string
+ *                 example: https://example.com/image.jpg
+ *     responses:
+ *       200:
+ *         description: Perfil atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Não autenticado
+ */
 router.put(
   '/profile',
   authenticate,

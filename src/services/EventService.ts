@@ -1,55 +1,97 @@
-import Event, { IEvent } from '../models/Event'
-import Registration, { IRegistration } from '../models/Registration'
-import Testimonial, { ITestimonial } from '../models/Testimonial'
+import { supabase } from '../config/database'
+import { IEvent, IEventInput, calculateAvailableSpots } from '../models/Event'
+import { IRegistration, IRegistrationInput } from '../models/Registration'
+import { ITestimonial, ITestimonialInput } from '../models/Testimonial'
 
 export class EventService {
-  static async createEvent(eventData: Partial<IEvent>): Promise<IEvent> {
-    const event = new Event(eventData)
-    await event.save()
+  static async createEvent(eventData: IEventInput): Promise<IEvent> {
+    const { data: event, error } = await supabase
+      .from('events')
+      .insert(eventData)
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
     return event
   }
 
   static async getEvents(filters?: { category?: string; status?: string }): Promise<IEvent[]> {
-    let query = Event.find()
+    let query = supabase.from('events').select('*')
 
     if (filters?.category) {
-      query = query.where('category').equals(filters.category)
+      query = query.eq('category', filters.category)
     }
 
     if (filters?.status) {
-      query = query.where('status').equals(filters.status)
+      query = query.eq('status', filters.status)
     }
 
-    return await query.populate('organizer', 'name email').sort({ date: 1 })
+    const { data: events, error } = await query.order('date', { ascending: true })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return events || []
   }
 
   static async getEventById(id: string): Promise<IEvent | null> {
-    return await Event.findById(id)
-      .populate('organizer', 'name email')
-      .populate('registrations')
+    const { data: event, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      return null
+    }
+
+    return event
   }
 
   static async updateEvent(id: string, updates: Partial<IEvent>): Promise<IEvent | null> {
-    return await Event.findByIdAndUpdate(id, updates, { new: true })
+    const { data: event, error } = await supabase
+      .from('events')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      return null
+    }
+
+    return event
   }
 
   static async deleteEvent(id: string): Promise<boolean> {
-    const result = await Event.findByIdAndDelete(id)
-    return !!result
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id)
+
+    return !error
   }
 
-  static async searchEvents(query: string): Promise<IEvent[]> {
-    return await Event.find({
-      $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } },
-        { location: { $regex: query, $options: 'i' } },
-      ],
-    })
+  static async searchEvents(searchQuery: string): Promise<IEvent[]> {
+    const { data: events, error } = await supabase
+      .from('events')
+      .select('*')
+      .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`)
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return events || []
   }
 
   static async registerUserForEvent(userId: string, eventId: string): Promise<IRegistration> {
-    const event = await Event.findById(eventId)
+    // Get event
+    const event = await this.getEventById(eventId)
     if (!event) {
       throw new Error('Event not found')
     }
@@ -58,57 +100,104 @@ export class EventService {
       throw new Error('No available spots for this event')
     }
 
-    const existingRegistration = await Registration.findOne({ user: userId, event: eventId })
+    // Check existing registration
+    const { data: existingRegistration } = await supabase
+      .from('registrations')
+      .select('id')
+      .eq('userId', userId)
+      .eq('eventId', eventId)
+      .single()
+
     if (existingRegistration) {
       throw new Error('User already registered for this event')
     }
 
-    const registration = new Registration({
-      user: userId,
-      event: eventId,
-      paymentStatus: event.isFree ? 'completed' : 'pending',
-    })
+    // Create registration
+    const { data: registration, error } = await supabase
+      .from('registrations')
+      .insert({
+        userId,
+        eventId,
+        paymentStatus: event.isFree ? 'completed' : 'pending',
+      })
+      .select()
+      .single()
 
-    await registration.save()
+    if (error) {
+      throw new Error(error.message)
+    }
 
     // Update event attendees
-    event.attendees += 1
-    event.availableSpots = event.capacity - event.attendees
-    await event.save()
+    const newAttendees = event.attendees + 1
+    await this.updateEvent(eventId, {
+      attendees: newAttendees,
+      availableSpots: calculateAvailableSpots(event.capacity, newAttendees),
+    })
 
     return registration
   }
 
   static async cancelRegistration(registrationId: string): Promise<boolean> {
-    const registration = await Registration.findById(registrationId)
-    if (!registration) {
+    // Get registration
+    const { data: registration, error: regError } = await supabase
+      .from('registrations')
+      .select('*')
+      .eq('id', registrationId)
+      .single()
+
+    if (regError || !registration) {
       throw new Error('Registration not found')
     }
 
-    registration.status = 'cancelled'
-    await registration.save()
+    // Update registration status
+    const { error: updateError } = await supabase
+      .from('registrations')
+      .update({ status: 'cancelled' })
+      .eq('id', registrationId)
+
+    if (updateError) {
+      throw new Error(updateError.message)
+    }
 
     // Update event attendees
-    const event = await Event.findById(registration.event)
+    const event = await this.getEventById(registration.eventId)
     if (event) {
-      event.attendees = Math.max(0, event.attendees - 1)
-      event.availableSpots = event.capacity - event.attendees
-      await event.save()
+      const newAttendees = Math.max(0, event.attendees - 1)
+      await this.updateEvent(registration.eventId, {
+        attendees: newAttendees,
+        availableSpots: calculateAvailableSpots(event.capacity, newAttendees),
+      })
     }
 
     return true
   }
 
   static async getEventRegistrations(eventId: string): Promise<IRegistration[]> {
-    return await Registration.find({ event: eventId })
-      .populate('user', 'name email')
-      .sort({ registrationDate: -1 })
+    const { data: registrations, error } = await supabase
+      .from('registrations')
+      .select('*')
+      .eq('eventId', eventId)
+      .order('registrationDate', { ascending: false })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return registrations || []
   }
 
   static async getUserRegistrations(userId: string): Promise<IRegistration[]> {
-    return await Registration.find({ user: userId })
-      .populate('event', 'title date location')
-      .sort({ registrationDate: -1 })
+    const { data: registrations, error } = await supabase
+      .from('registrations')
+      .select('*')
+      .eq('userId', userId)
+      .order('registrationDate', { ascending: false })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return registrations || []
   }
 
   static async addTestimonial(
@@ -117,24 +206,52 @@ export class EventService {
     rating: number,
     comment: string
   ): Promise<ITestimonial> {
-    const testimonial = new Testimonial({
-      author: userId,
-      event: eventId,
-      rating,
-      comment,
-    })
+    const { data: testimonial, error } = await supabase
+      .from('testimonials')
+      .insert({
+        authorId: userId,
+        eventId,
+        rating,
+        comment,
+        isApproved: false,
+      })
+      .select()
+      .single()
 
-    await testimonial.save()
+    if (error) {
+      throw new Error(error.message)
+    }
+
     return testimonial
   }
 
   static async getEventTestimonials(eventId: string): Promise<ITestimonial[]> {
-    return await Testimonial.find({ event: eventId, isApproved: true })
-      .populate('author', 'name profileImage')
-      .sort({ createdAt: -1 })
+    const { data: testimonials, error } = await supabase
+      .from('testimonials')
+      .select('*')
+      .eq('eventId', eventId)
+      .eq('isApproved', true)
+      .order('createdAt', { ascending: false })
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return testimonials || []
   }
 
   static async approveTestimonial(testimonialId: string): Promise<ITestimonial | null> {
-    return await Testimonial.findByIdAndUpdate(testimonialId, { isApproved: true }, { new: true })
+    const { data: testimonial, error } = await supabase
+      .from('testimonials')
+      .update({ isApproved: true })
+      .eq('id', testimonialId)
+      .select()
+      .single()
+
+    if (error) {
+      return null
+    }
+
+    return testimonial
   }
 }

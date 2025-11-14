@@ -1,50 +1,100 @@
 import jwt from 'jsonwebtoken'
-import User, { IUser } from '../models/User'
+import { supabase } from '../config/database'
+import { IUser, IUserInput, hashPassword, comparePassword } from '../models/User'
 
 export class AuthService {
   static generateToken(userId: string, role: string): string {
-    return jwt.sign({ userId, role }, process.env.JWT_SECRET || 'secret', {
+    const secret = (process.env.JWT_SECRET || 'secret') as string
+    return jwt.sign({ userId, role }, secret, {
       expiresIn: process.env.JWT_EXPIRE || '7d',
     })
   }
 
   static async register(name: string, email: string, password: string): Promise<{ user: IUser; token: string }> {
-    const existingUser = await User.findOne({ email })
+    // Check if user already exists
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single()
+
     if (existingUser) {
       throw new Error('Email already registered')
     }
 
-    const user = new User({
-      name,
-      email,
-      password,
-      role: 'user',
-    })
+    // Hash password
+    const hashedPassword = await hashPassword(password)
 
-    await user.save()
+    // Create user
+    const { data: user, error } = await supabase
+      .from('users')
+      .insert({
+        name,
+        email,
+        password: hashedPassword,
+        role: 'user',
+        isEmailVerified: false,
+        isActive: true,
+      })
+      .select()
+      .single()
 
-    const token = this.generateToken(user._id.toString(), user.role)
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    const token = this.generateToken(user.id, user.role)
 
     return { user, token }
   }
 
   static async login(email: string, password: string): Promise<{ user: IUser; token: string }> {
-    const user = await User.findOne({ email }).select('+password')
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single()
 
-    if (!user || !(await user.comparePassword(password))) {
+    if (error || !user) {
       throw new Error('Invalid email or password')
     }
 
-    const token = this.generateToken(user._id.toString(), user.role)
+    const isPasswordValid = await comparePassword(password, user.password)
+    if (!isPasswordValid) {
+      throw new Error('Invalid email or password')
+    }
+
+    const token = this.generateToken(user.id, user.role)
 
     return { user, token }
   }
 
   static async getUserById(userId: string): Promise<IUser | null> {
-    return await User.findById(userId)
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (error) {
+      return null
+    }
+
+    return user
   }
 
   static async updateUser(userId: string, updates: Partial<IUser>): Promise<IUser | null> {
-    return await User.findByIdAndUpdate(userId, updates, { new: true })
+    const { data: user, error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', userId)
+      .select()
+      .single()
+
+    if (error) {
+      return null
+    }
+
+    return user
   }
 }

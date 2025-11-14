@@ -1,46 +1,97 @@
-import Newsletter, { INewsletter } from '../models/Newsletter'
+import { supabase } from '../config/database'
+import { INewsletter, INewsletterInput } from '../models/Newsletter'
 
 export class NewsletterService {
   static async subscribe(email: string): Promise<INewsletter> {
-    let subscriber = await Newsletter.findOne({ email })
+    // Check if subscriber exists
+    const { data: existingSubscriber } = await supabase
+      .from('newsletter')
+      .select('*')
+      .eq('email', email)
+      .single()
 
-    if (subscriber) {
-      if (subscriber.isSubscribed) {
+    if (existingSubscriber) {
+      if (existingSubscriber.isSubscribed) {
         throw new Error('Email already subscribed')
       }
-      subscriber.isSubscribed = true
-      subscriber.subscribedAt = new Date()
-      subscriber.unsubscribedAt = undefined
-      await subscriber.save()
+      // Resubscribe
+      const { data: subscriber, error } = await supabase
+        .from('newsletter')
+        .update({
+          isSubscribed: true,
+          subscribedAt: new Date(),
+          unsubscribedAt: null,
+        })
+        .eq('email', email)
+        .select()
+        .single()
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
       return subscriber
     }
 
-    subscriber = new Newsletter({
-      email,
-      isSubscribed: true,
-      subscribedAt: new Date(),
-    })
+    // Create new subscriber
+    const { data: subscriber, error } = await supabase
+      .from('newsletter')
+      .insert({
+        email,
+        isSubscribed: true,
+        subscribedAt: new Date(),
+      })
+      .select()
+      .single()
 
-    await subscriber.save()
+    if (error) {
+      throw new Error(error.message)
+    }
+
     return subscriber
   }
 
   static async unsubscribe(email: string): Promise<INewsletter | null> {
-    return await Newsletter.findOneAndUpdate(
-      { email },
-      {
+    const { data: subscriber, error } = await supabase
+      .from('newsletter')
+      .update({
         isSubscribed: false,
         unsubscribedAt: new Date(),
-      },
-      { new: true }
-    )
+      })
+      .eq('email', email)
+      .select()
+      .single()
+
+    if (error) {
+      return null
+    }
+
+    return subscriber
   }
 
   static async getSubscribers(): Promise<INewsletter[]> {
-    return await Newsletter.find({ isSubscribed: true })
+    const { data: subscribers, error } = await supabase
+      .from('newsletter')
+      .select('*')
+      .eq('isSubscribed', true)
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return subscribers || []
   }
 
   static async getSubscriberCount(): Promise<number> {
-    return await Newsletter.countDocuments({ isSubscribed: true })
+    const { count, error } = await supabase
+      .from('newsletter')
+      .select('*', { count: 'exact', head: true })
+      .eq('isSubscribed', true)
+
+    if (error) {
+      throw new Error(error.message)
+    }
+
+    return count || 0
   }
 }
