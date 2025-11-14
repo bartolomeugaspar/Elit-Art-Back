@@ -10,9 +10,11 @@ const router = Router()
  * @swagger
  * /auth/register:
  *   post:
- *     summary: Registrar novo usuário
+ *     summary: Registrar novo usuário (apenas admins)
  *     tags:
  *       - Autenticação
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -51,17 +53,32 @@ const router = Router()
  *                   $ref: '#/components/schemas/User'
  *                 token:
  *                   type: string
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Acesso negado - apenas admins podem registrar usuários
  *       400:
  *         description: Dados inválidos
  */
 router.post(
   '/register',
+  authenticate,
   [
     body('name').trim().notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   ],
   asyncHandler(async (req: AuthRequest, res: Response) => {
+    // Check if user is admin
+    const user = await AuthService.getUserById(req.userId!)
+    if (!user || user.role !== 'admin') {
+      res.status(403).json({
+        success: false,
+        message: 'Only admins can register new users',
+      })
+      return
+    }
+
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() })
@@ -69,16 +86,16 @@ router.post(
     }
 
     const { name, email, password } = req.body
-    const { user, token } = await AuthService.register(name, email, password)
+    const { user: newUser, token } = await AuthService.register(name, email, password)
 
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
       },
       token,
     })

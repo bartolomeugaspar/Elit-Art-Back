@@ -33,8 +33,8 @@ export class AuthService {
         email,
         password: hashedPassword,
         role: 'user',
-        isEmailVerified: false,
-        isActive: true,
+        is_email_verified: false,
+        is_active: true,
       })
       .select()
       .single()
