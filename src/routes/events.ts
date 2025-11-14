@@ -6,7 +6,43 @@ import { asyncHandler } from '../middleware/errorHandler'
 
 const router = Router()
 
-// Get all events
+/**
+ * @swagger
+ * /events:
+ *   get:
+ *     summary: Listar todos os eventos
+ *     tags:
+ *       - Eventos
+ *     parameters:
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *           enum: ['Workshop', 'Exposição', 'Masterclass', 'Networking']
+ *         description: Filtrar por categoria
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: ['upcoming', 'ongoing', 'completed', 'cancelled']
+ *         description: Filtrar por status
+ *     responses:
+ *       200:
+ *         description: Lista de eventos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: integer
+ *                 events:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Event'
+ */
 router.get(
   '/',
   query('category').optional().trim(),
@@ -27,7 +63,36 @@ router.get(
   })
 )
 
-// Get event by ID
+/**
+ * @swagger
+ * /events/{id}:
+ *   get:
+ *     summary: Obter evento por ID
+ *     tags:
+ *       - Eventos
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: ID do evento
+ *     responses:
+ *       200:
+ *         description: Detalhes do evento
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 event:
+ *                   $ref: '#/components/schemas/Event'
+ *       404:
+ *         description: Evento não encontrado
+ */
 router.get(
   '/:id',
   asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -45,7 +110,37 @@ router.get(
   })
 )
 
-// Search events
+/**
+ * @swagger
+ * /events/search/{query}:
+ *   get:
+ *     summary: Buscar eventos
+ *     tags:
+ *       - Eventos
+ *     parameters:
+ *       - in: path
+ *         name: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Termo de busca
+ *     responses:
+ *       200:
+ *         description: Resultados da busca
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: integer
+ *                 events:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Event'
+ */
 router.get(
   '/search/:query',
   asyncHandler(async (req: AuthRequest, res: Response) => {
