@@ -1,7 +1,9 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import swaggerUi from 'swagger-ui-express'
 import { connectDB } from './config/database'
+import { swaggerSpec } from './config/swagger'
 import { errorHandler } from './middleware/errorHandler'
 import authRoutes from './routes/auth'
 import eventRoutes from './routes/events'
@@ -19,6 +21,13 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  swaggerOptions: {
+    persistAuthorization: true,
+  },
+}))
 
 // Routes
 app.use('/api/auth', authRoutes)

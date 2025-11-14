@@ -6,7 +6,54 @@ import { asyncHandler } from '../middleware/errorHandler'
 
 const router = Router()
 
-// Register
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Registrar novo usuário
+ *     tags:
+ *       - Autenticação
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: João Silva
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: joao@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: senha123
+ *     responses:
+ *       201:
+ *         description: Usuário registrado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 token:
+ *                   type: string
+ *       400:
+ *         description: Dados inválidos
+ */
 router.post(
   '/register',
   [
