@@ -82,7 +82,7 @@ CREATE INDEX idx_events_organizer ON events(organizer_id);
 CREATE INDEX idx_events_date ON events(date);
 ```
 
-### Tabela: registrations
+### Tabela: registrations (Inscrições em Eventos)
 ```sql
 CREATE TABLE registrations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -103,21 +103,34 @@ CREATE INDEX idx_registrations_event ON registrations(event_id);
 CREATE INDEX idx_registrations_status ON registrations(status);
 ```
 
-### Tabela: testimonials
+### Tabela: event_favorites (Eventos Favoritos)
 ```sql
-CREATE TABLE testimonials (
+CREATE TABLE event_favorites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-  comment VARCHAR(1000) NOT NULL,
-  is_approved BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  UNIQUE(user_id, event_id)
 );
 
-CREATE INDEX idx_testimonials_event ON testimonials(event_id);
-CREATE INDEX idx_testimonials_approved ON testimonials(is_approved);
+CREATE INDEX idx_event_favorites_user ON event_favorites(user_id);
+CREATE INDEX idx_event_favorites_event ON event_favorites(event_id);
+```
+
+### Tabela: event_ratings (Avaliações Rápidas)
+```sql
+CREATE TABLE event_ratings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, event_id)
+);
+
+CREATE INDEX idx_event_ratings_event ON event_ratings(event_id);
+CREATE INDEX idx_event_ratings_user ON event_ratings(user_id);
 ```
 
 ### Tabela: newsletter
@@ -144,7 +157,8 @@ CREATE INDEX idx_newsletter_subscribed ON newsletter(is_subscribed);
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE registrations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_ratings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE newsletter ENABLE ROW LEVEL SECURITY;
 ```
 
@@ -194,13 +208,31 @@ CREATE POLICY "Users can cancel own registrations" ON registrations
   FOR DELETE USING (auth.uid() = user_id);
 ```
 
-#### Testimonials
+#### Event Favorites (Favoritos)
 ```sql
-CREATE POLICY "Anyone can read approved testimonials" ON testimonials
-  FOR SELECT USING (is_approved = true);
+CREATE POLICY "Users can read own favorites" ON event_favorites
+  FOR SELECT USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can create testimonials" ON testimonials
-  FOR INSERT WITH CHECK (auth.uid() = author_id);
+CREATE POLICY "Users can add favorites" ON event_favorites
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can remove own favorites" ON event_favorites
+  FOR DELETE USING (auth.uid() = user_id);
+```
+
+#### Event Ratings (Avaliações)
+```sql
+CREATE POLICY "Anyone can read event ratings" ON event_ratings
+  FOR SELECT USING (true);
+
+CREATE POLICY "Users can create ratings" ON event_ratings
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own ratings" ON event_ratings
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own ratings" ON event_ratings
+  FOR DELETE USING (auth.uid() = user_id);
 ```
 
 #### Newsletter
@@ -253,43 +285,73 @@ INSERT INTO users (name, email, password, role, is_email_verified) VALUES
 
 ## 📊 Estrutura de Dados
 
+### Tabelas Principais
+
 ```
-users
+users (Usuários)
 ├── id (UUID)
 ├── name
 ├── email (único)
 ├── password (criptografada)
+├── phone, profile_image, bio
 ├── role (user, artist, admin)
+├── is_email_verified, is_active
 └── timestamps
 
-events
+events (Eventos)
 ├── id (UUID)
-├── title, description
-├── category, date, time, location
+├── title, description, full_description
+├── category (Workshop, Exposição, Masterclass, Networking)
+├── date, time, location
+├── image, images[]
 ├── capacity, attendees, available_spots
+├── price, is_free
+├── status (upcoming, ongoing, completed, cancelled)
 ├── organizer_id (FK users)
 └── timestamps
 
-registrations
+registrations (Inscrições em Eventos)
 ├── id (UUID)
 ├── user_id (FK users)
 ├── event_id (FK events)
-├── status, payment_status
+├── status (registered, attended, cancelled)
+├── registration_date
+├── payment_status (pending, completed, failed)
+├── payment_method, notes
 └── timestamps
 
-testimonials
+event_favorites (Eventos Favoritos)
 ├── id (UUID)
-├── author_id (FK users)
+├── user_id (FK users)
+├── event_id (FK events)
+└── created_at
+
+event_ratings (Avaliações Rápidas)
+├── id (UUID)
+├── user_id (FK users)
 ├── event_id (FK events)
 ├── rating (1-5)
-├── comment
 └── timestamps
 
-newsletter
+newsletter (Newsletter)
 ├── id (UUID)
 ├── email (único)
 ├── is_subscribed
+├── subscribed_at, unsubscribed_at
 └── timestamps
+```
+
+### Relacionamentos
+
+```
+users ──────┬──→ events (organizer_id)
+            ├──→ registrations (user_id)
+            ├──→ event_favorites (user_id)
+            └──→ event_ratings (user_id)
+
+events ─────┬──→ registrations (event_id)
+            ├──→ event_favorites (event_id)
+            └──→ event_ratings (event_id)
 ```
 
 ## 🚀 Próximos Passos
