@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "seed": "ts-node-dev --transpile-only src/seeds/seedData.ts",
+    "seed:events": "ts-node-dev --transpile-only src/seeds/seedEvents.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts"
   },
