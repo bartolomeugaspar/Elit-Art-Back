@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "stArte": "node dist/index.js",
+    "start": "node dist/index.js",
     "seed": "ts-node-dev --transpile-only src/seeds/seedData.ts",
     "seed:events": "ts-node-dev --transpile-only src/seeds/seedEvents.ts",
     "typecheck": "tsc --noEmit",
