@@ -4,6 +4,36 @@ import { IRegistration, IRegistrationInput } from '../models/Registration'
 import { ITestimonial, ITestimonialInput } from '../models/Testimonial'
 
 export class EventService {
+  // Helper function to determine event status based on date
+  private static getEventStatus(eventDate: string): 'upcoming' | 'ongoing' | 'completed' {
+    const event = new Date(eventDate)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    if (event < today) {
+      return 'completed'
+    }
+    return 'upcoming'
+  }
+
+  // Update event status based on current date
+  private static async updateEventStatus(event: IEvent): Promise<IEvent> {
+    const newStatus = this.getEventStatus(event.date)
+    
+    if (event.status !== newStatus && event.status !== 'cancelled') {
+      const { data: updated } = await supabase
+        .from('events')
+        .update({ status: newStatus })
+        .eq('id', event.id)
+        .select()
+        .single()
+      
+      return updated || event
+    }
+    
+    return event
+  }
+
   static async createEvent(eventData: IEventInput): Promise<IEvent> {
     const { data: event, error } = await supabase
       .from('events')
@@ -35,7 +65,12 @@ export class EventService {
       throw new Error(error.message)
     }
 
-    return events || []
+    // Update status for each event based on current date
+    const updatedEvents = await Promise.all(
+      (events || []).map(event => this.updateEventStatus(event))
+    )
+
+    return updatedEvents
   }
 
   static async getEventById(id: string): Promise<IEvent | null> {
@@ -49,7 +84,8 @@ export class EventService {
       return null
     }
 
-    return event
+    // Update status if needed
+    return await this.updateEventStatus(event)
   }
 
   static async updateEvent(id: string, updates: Partial<IEvent>): Promise<IEvent | null> {
@@ -89,7 +125,7 @@ export class EventService {
     return events || []
   }
 
-  static async registerUserForEvent(userId: string, eventId: string): Promise<IRegistration> {
+  static async registerUserForEvent(userId: string | undefined, eventId: string): Promise<IRegistration> {
     // Get event
     const event = await this.getEventById(eventId)
     if (!event) {
@@ -97,29 +133,35 @@ export class EventService {
     }
 
     // Validate available spots
-    if (event.availableSpots <= 0 || event.attendees >= event.capacity) {
+    if (event.available_spots <= 0 || event.attendees >= event.capacity) {
       throw new Error('No available spots for this event')
     }
 
-    // Check existing registration
-    const { data: existingRegistration } = await supabase
-      .from('registrations')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('event_id', eventId)
-      .single()
+    // If no userId provided, use a placeholder anonymous user ID
+    // In production, you might want to create actual anonymous user records
+    const finalUserId = userId || '00000000-0000-0000-0000-000000000000'
 
-    if (existingRegistration) {
-      throw new Error('User already registered for this event')
+    // If userId is provided, check for existing registration
+    if (userId) {
+      const { data: existingRegistration } = await supabase
+        .from('registrations')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('event_id', eventId)
+        .single()
+
+      if (existingRegistration) {
+        throw new Error('User already registered for this event')
+      }
     }
 
     // Create registration
     const { data: registration, error } = await supabase
       .from('registrations')
       .insert({
-        user_id: userId,
+        user_id: finalUserId,
         event_id: eventId,
-        payment_status: event.isFree ? 'completed' : 'pending',
+        payment_status: event.is_free ? 'completed' : 'pending',
       })
       .select()
       .single()
@@ -132,7 +174,7 @@ export class EventService {
     const newAttendees = Math.min(event.attendees + 1, event.capacity)
     await this.updateEvent(eventId, {
       attendees: newAttendees,
-      availableSpots: calculateAvailableSpots(event.capacity, newAttendees),
+      available_spots: calculateAvailableSpots(event.capacity, newAttendees),
     })
 
     return registration
@@ -166,7 +208,7 @@ export class EventService {
       const newAttendees = Math.max(0, event.attendees - 1)
       await this.updateEvent(registration.event_id, {
         attendees: newAttendees,
-        availableSpots: calculateAvailableSpots(event.capacity, newAttendees),
+        available_spots: calculateAvailableSpots(event.capacity, newAttendees),
       })
     }
 

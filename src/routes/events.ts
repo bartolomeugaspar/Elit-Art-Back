@@ -313,7 +313,7 @@ router.put(
       return
     }
 
-    if (event.organizerId !== req.userId && req.userRole !== 'admin') {
+    if (event.organizer_id !== req.userId && req.userRole !== 'admin') {
       res.status(403).json({ success: false, message: 'Not authorized to update this event' })
       return
     }
@@ -366,7 +366,7 @@ router.delete(
       return
     }
 
-    if (event.organizerId !== req.userId && req.userRole !== 'admin') {
+    if (event.organizer_id !== req.userId && req.userRole !== 'admin') {
       res.status(403).json({ success: false, message: 'Not authorized to delete this event' })
       return
     }
@@ -404,12 +404,11 @@ router.delete(
  *       404:
  *         description: Evento não encontrado
  */
-// Register for event
+// Register for event (no authentication required)
 router.post(
   '/:id/register',
-  authenticate,
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const registration = await EventService.registerUserForEvent(req.userId!, req.params.id)
+    const registration = await EventService.registerUserForEvent(req.userId, req.params.id)
 
     res.status(201).json({
       success: true,
@@ -495,7 +494,7 @@ router.get(
       return
     }
 
-    if (event.organizerId !== req.userId && req.userRole !== 'admin') {
+    if (event.organizer_id !== req.userId && req.userRole !== 'admin') {
       res.status(403).json({ success: false, message: 'Not authorized' })
       return
     }

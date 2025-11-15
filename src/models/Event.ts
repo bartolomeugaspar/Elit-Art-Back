@@ -2,7 +2,7 @@ export interface IEvent {
   id: string
   title: string
   description: string
-  fullDescription?: string
+  full_description?: string
   category: 'Workshop' | 'Exposição' | 'Masterclass' | 'Networking'
   date: string
   time: string
@@ -11,19 +11,19 @@ export interface IEvent {
   images?: string[]
   capacity: number
   attendees: number
-  availableSpots: number
+  available_spots: number
   price: number
-  isFree: boolean
+  is_free: boolean
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
-  organizerId: string
-  createdAt: Date
-  updatedAt: Date
+  organizer_id: string
+  created_at: Date
+  updated_at: Date
 }
 
 export interface IEventInput {
   title: string
   description: string
-  fullDescription?: string
+  full_description?: string
   category: 'Workshop' | 'Exposição' | 'Masterclass' | 'Networking'
   date: string
   time: string
@@ -32,8 +32,8 @@ export interface IEventInput {
   images?: string[]
   capacity: number
   price?: number
-  isFree?: boolean
-  organizerId: string
+  is_free?: boolean
+  organizer_id: string
 }
 
 // Calculate available spots
