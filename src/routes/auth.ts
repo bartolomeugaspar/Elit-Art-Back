@@ -1,6 +1,7 @@
 import { Router, Response } from 'express'
 import { body, validationResult } from 'express-validator'
 import { AuthService } from '../services/AuthService'
+import { PasswordResetService } from '../services/PasswordResetService'
 import { authenticate, AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
 
@@ -271,6 +272,118 @@ router.put(
       success: true,
       message: 'Profile updated successfully',
       user: updatedUser,
+    })
+  })
+)
+
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Solicitar recuperação de senha
+ *     tags:
+ *       - Autenticação
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Email de recuperação enviado
+ *       400:
+ *         description: Email inválido
+ */
+router.post(
+  '/forgot-password',
+  [body('email').isEmail().withMessage('Valid email is required')],
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() })
+      return
+    }
+
+    const { email } = req.body
+    await PasswordResetService.requestPasswordReset(email)
+
+    res.status(200).json({
+      success: true,
+      message: 'If an account exists with this email, a password reset link has been sent',
+    })
+  })
+)
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Redefinir senha com token
+ *     tags:
+ *       - Autenticação
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               token:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       200:
+ *         description: Senha redefinida com sucesso
+ *       400:
+ *         description: Token inválido ou expirado
+ */
+router.post(
+  '/reset-password',
+  [
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('token').notEmpty().withMessage('Reset token is required'),
+    body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  ],
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() })
+      return
+    }
+
+    const { email, token, newPassword } = req.body
+
+    // Validate token first
+    const isValid = await PasswordResetService.validateResetToken(email, token)
+    if (!isValid) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset token',
+      })
+      return
+    }
+
+    await PasswordResetService.resetPassword(email, token, newPassword)
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully',
     })
   })
 )

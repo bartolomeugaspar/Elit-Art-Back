@@ -11,16 +11,16 @@ export class NewsletterService {
       .single()
 
     if (existingSubscriber) {
-      if (existingSubscriber.isSubscribed) {
+      if (existingSubscriber.is_subscribed) {
         throw new Error('Email already subscribed')
       }
       // Resubscribe
       const { data: subscriber, error } = await supabase
         .from('newsletter')
         .update({
-          isSubscribed: true,
-          subscribedAt: new Date(),
-          unsubscribedAt: null,
+          is_subscribed: true,
+          subscribed_at: new Date(),
+          unsubscribed_at: null,
         })
         .eq('email', email)
         .select()
@@ -38,8 +38,8 @@ export class NewsletterService {
       .from('newsletter')
       .insert({
         email,
-        isSubscribed: true,
-        subscribedAt: new Date(),
+        is_subscribed: true,
+        subscribed_at: new Date(),
       })
       .select()
       .single()
@@ -55,8 +55,8 @@ export class NewsletterService {
     const { data: subscriber, error } = await supabase
       .from('newsletter')
       .update({
-        isSubscribed: false,
-        unsubscribedAt: new Date(),
+        is_subscribed: false,
+        unsubscribed_at: new Date(),
       })
       .eq('email', email)
       .select()
@@ -73,7 +73,7 @@ export class NewsletterService {
     const { data: subscribers, error } = await supabase
       .from('newsletter')
       .select('*')
-      .eq('isSubscribed', true)
+      .eq('is_subscribed', true)
 
     if (error) {
       throw new Error(error.message)
@@ -86,12 +86,23 @@ export class NewsletterService {
     const { count, error } = await supabase
       .from('newsletter')
       .select('*', { count: 'exact', head: true })
-      .eq('isSubscribed', true)
+      .eq('is_subscribed', true)
 
     if (error) {
       throw new Error(error.message)
     }
 
     return count || 0
+  }
+
+  static async deleteSubscriber(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('newsletter')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      throw new Error(error.message)
+    }
   }
 }

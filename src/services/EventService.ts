@@ -96,7 +96,8 @@ export class EventService {
       throw new Error('Event not found')
     }
 
-    if (event.availableSpots <= 0) {
+    // Validate available spots
+    if (event.availableSpots <= 0 || event.attendees >= event.capacity) {
       throw new Error('No available spots for this event')
     }
 
@@ -127,8 +128,8 @@ export class EventService {
       throw new Error(error.message)
     }
 
-    // Update event attendees
-    const newAttendees = event.attendees + 1
+    // Update event attendees - ensure it doesn't exceed capacity
+    const newAttendees = Math.min(event.attendees + 1, event.capacity)
     await this.updateEvent(eventId, {
       attendees: newAttendees,
       availableSpots: calculateAvailableSpots(event.capacity, newAttendees),

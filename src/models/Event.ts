@@ -38,5 +38,6 @@ export interface IEventInput {
 
 // Calculate available spots
 export function calculateAvailableSpots(capacity: number, attendees: number): number {
-  return capacity - attendees
+  const available = capacity - attendees
+  return Math.max(0, available) // Never return negative values
 }

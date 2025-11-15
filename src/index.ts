@@ -11,6 +11,8 @@ import authRoutes from './routes/auth'
 import eventRoutes from './routes/events'
 import newsletterRoutes from './routes/newsletter'
 import uploadRoutes from './routes/upload'
+import usersRoutes from './routes/users'
+import registrationsRoutes from './routes/registrations'
 
 dotenv.config()
 
@@ -22,7 +24,20 @@ UploadService.ensureUploadDir()
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://elit-arte.vercel.app',
+      process.env.FRONTEND_URL,
+    ].filter(Boolean);
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }))
 app.use(express.json())
@@ -43,6 +58,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/events', eventRoutes)
 app.use('/api/newsletter', newsletterRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/users', usersRoutes)
+app.use('/api/registrations', registrationsRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
