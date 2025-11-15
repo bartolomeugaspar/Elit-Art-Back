@@ -3,7 +3,7 @@ import path from 'path'
 
 export class UploadService {
   static getImageUrl(filename: string): string {
-    const baseUrl = process.env.API_URL || 'http://localhost:5000'
+    const baseUrl = process.env.BACKEND_URL || process.env.API_URL || 'http://localhost:5000'
     return `${baseUrl}/uploads/images/${filename}`
   }
 
