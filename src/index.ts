@@ -53,6 +53,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   swaggerOptions: {
     persistAuthorization: true,
   },
+  customCss: '.swagger-ui { background-color: #fafafa; }',
+  customCssUrl: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css',
+  swaggerUrl: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js',
 }))
 
 // Root route - redirect to Swagger
