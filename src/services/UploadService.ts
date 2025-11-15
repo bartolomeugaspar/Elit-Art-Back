@@ -22,9 +22,21 @@ export class UploadService {
   }
 
   static ensureUploadDir(): void {
+    // Skip in production (Vercel) - uploads are handled by cloud storage
+    if (process.env.NODE_ENV === 'production') {
+      console.log('[UploadService] Skipping local upload directory creation in production');
+      return;
+    }
+
     const uploadDir = 'uploads/images'
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true })
+    try {
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true })
+        console.log('[UploadService] Upload directory created:', uploadDir);
+      }
+    } catch (error) {
+      console.error('[UploadService] Error creating upload directory:', error);
+      // Don't throw - allow app to continue
     }
   }
 }
