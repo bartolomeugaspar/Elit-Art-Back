@@ -1,9 +1,17 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
+export interface IAuthUser {
+  id: string;
+  email: string;
+  role: 'admin' | 'artist' | 'user';
+  isActive: boolean;
+}
+
 export interface AuthRequest extends Request {
-  userId?: string
-  userRole?: string
+  user?: IAuthUser;
+  userId?: string;
+  userRole?: string;
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -15,11 +23,28 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
       return
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { userId: string; role: string }
-    req.userId = decoded.userId
-    req.userRole = decoded.role
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any
+    
+    // Handle both old format (userId) and new format (id)
+    const userId = decoded.id || decoded.userId;
+    const role = decoded.role;
+    
+    if (!userId || !role) {
+      res.status(401).json({ message: 'Invalid token format' })
+      return
+    }
+    
+    req.user = {
+      id: userId,
+      email: decoded.email || '',
+      role: role,
+      isActive: decoded.isActive !== false
+    };
+    req.userId = userId;
+    req.userRole = role;
     next()
   } catch (error) {
+    console.error('Auth error:', error)
     res.status(401).json({ message: 'Invalid token' })
   }
 }

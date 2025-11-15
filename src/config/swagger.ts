@@ -46,6 +46,30 @@ const options = {
             createdAt: { type: 'string', format: 'date-time' },
           },
         },
+        AuditLog: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer', format: 'int64' },
+            user_id: { type: 'string', format: 'uuid', nullable: true },
+            action: { type: 'string' },
+            entity_type: { type: 'string' },
+            entity_id: { type: 'string' },
+            old_values: { 
+              type: 'object',
+              additionalProperties: true,
+              nullable: true 
+            },
+            new_values: { 
+              type: 'object',
+              additionalProperties: true,
+              nullable: true 
+            },
+            ip_address: { type: 'string', nullable: true },
+            user_agent: { type: 'string', nullable: true },
+            created_at: { type: 'string', format: 'date-time' },
+            updated_at: { type: 'string', format: 'date-time' }
+          }
+        },
         Event: {
           type: 'object',
           properties: {
@@ -105,8 +129,143 @@ const options = {
         bearerAuth: [],
       },
     ],
+    paths: {
+      '/audit-logs': {
+        get: {
+          tags: ['Auditoria'],
+          summary: 'Listar logs de auditoria (apenas admin)',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'entityType',
+              in: 'query',
+              description: 'Filtrar por tipo de entidade',
+              schema: { type: 'string' }
+            },
+            {
+              name: 'entityId',
+              in: 'query',
+              description: 'Filtrar por ID da entidade',
+              schema: { type: 'string' }
+            },
+            {
+              name: 'userId',
+              in: 'query',
+              description: 'Filtrar por ID do usuário',
+              schema: { type: 'string' }
+            },
+            {
+              name: 'limit',
+              in: 'query',
+              description: 'Limite de resultados por página',
+              schema: { type: 'integer', default: 50 }
+            },
+            {
+              name: 'offset',
+              in: 'query',
+              description: 'Deslocamento para paginação',
+              schema: { type: 'integer', default: 0 }
+            }
+          ],
+          responses: {
+            200: {
+              description: 'Lista de logs de auditoria',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      success: { type: 'boolean' },
+                      data: {
+                        type: 'array',
+                        items: { $ref: '#/components/schemas/AuditLog' }
+                      },
+                      pagination: {
+                        type: 'object',
+                        properties: {
+                          total: { type: 'integer' },
+                          limit: { type: 'integer' },
+                          offset: { type: 'integer' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            401: { $ref: '#/components/responses/Unauthorized' },
+            403: { $ref: '#/components/responses/Forbidden' },
+            500: { $ref: '#/components/responses/ServerError' }
+          }
+        }
+      },
+      '/audit-logs/{entityType}/{entityId}': {
+        get: {
+          tags: ['Auditoria'],
+          summary: 'Obter logs de auditoria de uma entidade específica',
+          security: [{ bearerAuth: [] }],
+          parameters: [
+            {
+              name: 'entityType',
+              in: 'path',
+              required: true,
+              description: 'Tipo da entidade',
+              schema: { type: 'string' }
+            },
+            {
+              name: 'entityId',
+              in: 'path',
+              required: true,
+              description: 'ID da entidade',
+              schema: { type: 'string' }
+            },
+            {
+              name: 'limit',
+              in: 'query',
+              description: 'Limite de resultados por página',
+              schema: { type: 'integer', default: 50 }
+            },
+            {
+              name: 'offset',
+              in: 'query',
+              description: 'Deslocamento para paginação',
+              schema: { type: 'integer', default: 0 }
+            }
+          ],
+          responses: {
+            200: {
+              description: 'Logs de auditoria da entidade',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      success: { type: 'boolean' },
+                      data: {
+                        type: 'array',
+                        items: { $ref: '#/components/schemas/AuditLog' }
+                      },
+                      pagination: {
+                        type: 'object',
+                        properties: {
+                          total: { type: 'integer' },
+                          limit: { type: 'integer' },
+                          offset: { type: 'integer' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            401: { $ref: '#/components/responses/Unauthorized' },
+            500: { $ref: '#/components/responses/ServerError' }
+          }
+        }
+      }
+    }
   },
   apis: ['./src/routes/*.ts'],
-}
+};
 
 export const swaggerSpec = swaggerJsdoc(options)

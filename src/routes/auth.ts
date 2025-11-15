@@ -1,6 +1,7 @@
 import { Router, Response } from 'express'
 import { body, validationResult } from 'express-validator'
 import { AuthService } from '../services/AuthService'
+import { AuditService } from '../services/audit.service'
 import { PasswordResetService } from '../services/PasswordResetService'
 import { authenticate, AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
@@ -156,23 +157,115 @@ router.post(
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
+      // Registrar tentativa de login falhada (validação)
+      try {
+        await AuditService.log({
+          userId: null,
+          action: 'LOGIN_FAILED_VALIDATION',
+          entityType: 'user',
+          entityId: req.body.email || 'unknown',
+          newValues: { reason: 'Invalid email or password format' },
+          ipAddress: req.ip || req.socket.remoteAddress || undefined,
+          userAgent: req.get('user-agent'),
+        }, req)
+      } catch (error) {
+        console.error('Error logging failed login attempt:', error)
+      }
+      
       res.status(400).json({ errors: errors.array() })
       return
     }
 
     const { email, password } = req.body
-    const { user, token } = await AuthService.login(email, password)
+    
+    try {
+      const { user, token } = await AuthService.login(email, password)
+
+      // Registrar login bem-sucedido no audit log
+      try {
+        await AuditService.log({
+          userId: user.id,
+          action: 'LOGIN',
+          entityType: 'user',
+          entityId: user.id,
+          ipAddress: req.ip || req.socket.remoteAddress || undefined,
+          userAgent: req.get('user-agent'),
+        }, req)
+      } catch (error) {
+        console.error('Error logging login action:', error)
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+        token,
+      })
+    } catch (error: any) {
+      // Registrar tentativa de login falhada (credenciais inválidas)
+      try {
+        await AuditService.log({
+          userId: null,
+          action: 'LOGIN_FAILED',
+          entityType: 'user',
+          entityId: email,
+          newValues: { reason: error.message || 'Invalid credentials' },
+          ipAddress: req.ip || req.socket.remoteAddress || undefined,
+          userAgent: req.get('user-agent'),
+        }, req)
+      } catch (logError) {
+        console.error('Error logging failed login attempt:', logError)
+      }
+      
+      res.status(401).json({
+        success: false,
+        message: 'Invalid email or password',
+      })
+    }
+  })
+)
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Fazer logout
+ *     tags:
+ *       - Autenticação
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout realizado com sucesso
+ *       401:
+ *         description: Não autenticado
+ */
+router.post(
+  '/logout',
+  authenticate,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    // Registrar logout no audit log
+    try {
+      await AuditService.log({
+        userId: req.userId,
+        action: 'LOGOUT',
+        entityType: 'user',
+        entityId: req.userId!,
+        ipAddress: req.ip || req.socket.remoteAddress || undefined,
+        userAgent: req.get('user-agent'),
+      }, req)
+    } catch (error) {
+      console.error('Error logging logout action:', error)
+    }
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      token,
+      message: 'Logout successful',
     })
   })
 )
@@ -204,9 +297,22 @@ router.post(
 router.get('/me', authenticate, asyncHandler(async (req: AuthRequest, res: Response) => {
   const user = await AuthService.getUserById(req.userId!)
 
+  if (!user) {
+    res.status(404).json({
+      success: false,
+      message: 'User not found',
+    })
+    return
+  }
+
   res.status(200).json({
     success: true,
-    user,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
   })
 }))
 
@@ -387,5 +493,41 @@ router.post(
     })
   })
 )
+
+/**
+ * @swagger
+ * /auth/test-log:
+ *   post:
+ *     summary: Teste de log de auditoria
+ *     tags:
+ *       - Autenticação
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Log de teste criado
+ */
+router.post('/test-log', authenticate, asyncHandler(async (req: AuthRequest, res: Response) => {
+  try {
+    await AuditService.log({
+      userId: req.userId,
+      action: 'TEST',
+      entityType: 'test',
+      entityId: 'test-123',
+      newValues: { message: 'Test log entry' }
+    }, req)
+
+    res.status(200).json({
+      success: true,
+      message: 'Test log created successfully',
+    })
+  } catch (error) {
+    console.error('Error creating test log:', error)
+    res.status(500).json({
+      success: false,
+      message: 'Error creating test log',
+    })
+  }
+}))
 
 export default router

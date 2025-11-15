@@ -105,8 +105,8 @@ export class EventService {
     const { data: existingRegistration } = await supabase
       .from('registrations')
       .select('id')
-      .eq('userId', userId)
-      .eq('eventId', eventId)
+      .eq('user_id', userId)
+      .eq('event_id', eventId)
       .single()
 
     if (existingRegistration) {
@@ -117,9 +117,9 @@ export class EventService {
     const { data: registration, error } = await supabase
       .from('registrations')
       .insert({
-        userId,
-        eventId,
-        paymentStatus: event.isFree ? 'completed' : 'pending',
+        user_id: userId,
+        event_id: eventId,
+        payment_status: event.isFree ? 'completed' : 'pending',
       })
       .select()
       .single()
@@ -161,10 +161,10 @@ export class EventService {
     }
 
     // Update event attendees
-    const event = await this.getEventById(registration.eventId)
+    const event = await this.getEventById(registration.event_id)
     if (event) {
       const newAttendees = Math.max(0, event.attendees - 1)
-      await this.updateEvent(registration.eventId, {
+      await this.updateEvent(registration.event_id, {
         attendees: newAttendees,
         availableSpots: calculateAvailableSpots(event.capacity, newAttendees),
       })
@@ -177,8 +177,8 @@ export class EventService {
     const { data: registrations, error } = await supabase
       .from('registrations')
       .select('*')
-      .eq('eventId', eventId)
-      .order('registrationDate', { ascending: false })
+      .eq('event_id', eventId)
+      .order('registration_date', { ascending: false })
 
     if (error) {
       throw new Error(error.message)
@@ -191,8 +191,8 @@ export class EventService {
     const { data: registrations, error } = await supabase
       .from('registrations')
       .select('*')
-      .eq('userId', userId)
-      .order('registrationDate', { ascending: false })
+      .eq('user_id', userId)
+      .order('registration_date', { ascending: false })
 
     if (error) {
       throw new Error(error.message)

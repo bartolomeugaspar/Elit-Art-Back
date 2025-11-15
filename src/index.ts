@@ -13,6 +13,7 @@ import newsletterRoutes from './routes/newsletter'
 import uploadRoutes from './routes/upload'
 import usersRoutes from './routes/users'
 import registrationsRoutes from './routes/registrations'
+import auditRoutes from './routes/audit.routes'
 
 dotenv.config()
 
@@ -60,6 +61,7 @@ app.use('/api/newsletter', newsletterRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/users', usersRoutes)
 app.use('/api/registrations', registrationsRoutes)
+app.use('/api/audit-logs', auditRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
