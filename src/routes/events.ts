@@ -210,13 +210,13 @@ router.get(
  *       401:
  *         description: Não autenticado
  *       403:
- *         description: Sem permissão (apenas admin/artist)
+ *         description: Sem permissão (apenas admin/Arteist)
  */
-// Create event (admin/artist only)
+// Create event (admin/Arteist only)
 router.post(
   '/',
   authenticate,
-  authorize('admin', 'artist'),
+  authorize('admin', 'Arteist'),
   [
     body('title').trim().notEmpty().withMessage('Title is required'),
     body('description').trim().notEmpty().withMessage('Description is required'),
@@ -408,7 +408,18 @@ router.delete(
 router.post(
   '/:id/register',
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const registration = await EventService.registerUserForEvent(req.userId, req.params.id)
+    const { full_name, email, payment_method, proof_url } = req.body
+
+    const registration = await EventService.registerUserForEvent(
+      req.userId,
+      req.params.id,
+      {
+        full_name,
+        email,
+        payment_method,
+        proof_url,
+      }
+    )
 
     res.status(201).json({
       success: true,

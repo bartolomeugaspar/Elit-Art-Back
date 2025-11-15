@@ -1,14 +1,15 @@
+// @ts-ignore
 import swaggerJsdoc from 'swagger-jsdoc'
 
 const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Elit\'Arte API',
+      title: 'Elit\'Artee API',
       version: '1.0.0',
-      description: 'API Backend para o projeto Elit\'Arte - Movimento artístico angolano',
+      description: 'API Backend para o projeto Elit\'Artee - Movimento Arteístico angolano',
       contact: {
-        name: 'Elit\'Arte Team',
+        name: 'Elit\'Artee Team',
         email: 'faustinodomingos83@hotmail.com',
       },
     },
@@ -18,7 +19,7 @@ const options = {
         description: 'Servidor de Desenvolvimento',
       },
       {
-        url: 'https://elit-arte-api.vercel.app/api',
+        url: 'https://elit-Artee-api.vercel.app/api',
         description: 'Servidor de Produção',
       },
     ],
@@ -38,7 +39,7 @@ const options = {
             id: { type: 'string', format: 'uuid' },
             name: { type: 'string' },
             email: { type: 'string', format: 'email' },
-            role: { type: 'string', enum: ['user', 'artist', 'admin'] },
+            role: { type: 'string', enum: ['user', 'Arteist', 'admin'] },
             profileImage: { type: 'string', nullable: true },
             bio: { type: 'string', nullable: true },
             isEmailVerified: { type: 'boolean' },

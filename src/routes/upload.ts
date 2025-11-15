@@ -1,7 +1,7 @@
 import { Router, Response } from 'express'
 import { upload } from '../config/multer'
 import { UploadService } from '../services/UploadService'
-import { authenticate, AuthRequest } from '../middleware/auth'
+import { AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
 
 const router = Router()
@@ -10,11 +10,9 @@ const router = Router()
  * @swagger
  * /upload/image:
  *   post:
- *     summary: Upload de imagem
+ *     summary: Upload de imagem (sem autenticação necessária)
  *     tags:
  *       - Upload
- *     security:
- *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -43,12 +41,9 @@ const router = Router()
  *                   type: string
  *       400:
  *         description: Erro no upload
- *       401:
- *         description: Não autenticado
  */
 router.post(
   '/image',
-  authenticate,
   upload.single('image'),
   asyncHandler(async (req: AuthRequest, res: Response) => {
     if (!req.file) {

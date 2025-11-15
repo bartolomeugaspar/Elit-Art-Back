@@ -66,7 +66,7 @@
  * @swagger
  * /events:
  *   post:
- *     summary: Criar novo evento (artist/admin)
+ *     summary: Criar novo evento (Arteist/admin)
  *     tags:
  *       - Eventos
  *     security:

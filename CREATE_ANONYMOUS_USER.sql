@@ -4,7 +4,7 @@ INSERT INTO users (id, name, email, password, role, is_email_verified, is_active
 VALUES (
   '00000000-0000-0000-0000-000000000000',
   'Anonymous User',
-  'anonymous@elit-arte.local',
+  'anonymous@elit-Artee.local',
   '$2b$10$YIjlrJxnM5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z', -- dummy hashed password
   'user',
   false,

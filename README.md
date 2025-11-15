@@ -1,6 +1,6 @@
 # 🎭 Elit'Arte Backend API
 
-Backend API para o projeto Elit'Arte - Movimento artístico angolano.
+Backend API para o projeto Elit'Arte - Movimento Arteístico angolano.
 
 ## 🚀 Tecnologias
 
@@ -21,10 +21,10 @@ Backend API para o projeto Elit'Arte - Movimento artístico angolano.
 
 ```bash
 # Clone o repositório
-git clone https://github.com/bartolomeugaspar/Elit-Art-Back.git
+git clone https://github.com/bArteolomeugaspar/Elit-Arte-Back.git
 
 # Entre no diretório
-cd Elit-Art-Back
+cd Elit-Arte-Back
 
 # Instale as dependências
 npm install
@@ -40,7 +40,7 @@ Edite o arquivo `.env` com suas configurações:
 ```env
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/elit-art
+MONGODB_URI=mongodb://localhost:27017/elit-Arte
 JWT_SECRET=sua_chave_secreta_aqui
 JWT_EXPIRE=7d
 FRONTEND_URL=http://localhost:3000
@@ -56,7 +56,7 @@ npm run dev
 ### Build para produção
 ```bash
 npm run build
-npm start
+npm stArte
 ```
 
 ## 📚 Estrutura do Projeto
@@ -107,7 +107,7 @@ A API usa JWT (JSON Web Tokens) para autenticação.
 - `GET /api/events` - Listar todos os eventos
 - `GET /api/events/:id` - Obter evento por ID
 - `GET /api/events/search/:query` - Pesquisar eventos
-- `POST /api/events` - Criar evento (admin/artist)
+- `POST /api/events` - Criar evento (admin/Arteist)
 - `PUT /api/events/:id` - Atualizar evento
 - `DELETE /api/events/:id` - Deletar evento
 - `POST /api/events/:id/register` - Inscrever-se em evento
@@ -174,7 +174,7 @@ curl -X POST http://localhost:5000/api/events/{eventId}/register \
 ## 🔄 Fluxo de Negócio
 
 ### Gestão de Eventos
-1. Artistas/Admin criam eventos
+1. Arteistas/Admin criam eventos
 2. Usuários visualizam e pesquisam eventos
 3. Usuários se inscrevem em eventos
 4. Após evento, usuários podem deixar depoimentos
@@ -202,7 +202,7 @@ curl -X POST http://localhost:5000/api/events/{eventId}/register \
 ## 📝 Roles de Usuário
 
 - **user**: Usuário comum (pode se inscrever em eventos)
-- **artist**: Artista (pode criar eventos)
+- **Arteist**: Arteista (pode criar eventos)
 - **admin**: Administrador (acesso total)
 
 ## 🚀 Deploy

@@ -1,19 +1,19 @@
 {
-  "name": "elit-art-backend",
+  "name": "elit-Arte-backend",
   "version": "1.0.0",
-  "description": "Backend API for Elit'Arte - Angolan artistic movement",
+  "description": "Backend API for Elit'Arte - Angolan Arteistic movement",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "stArte": "node dist/index.js",
     "seed": "ts-node-dev --transpile-only src/seeds/seedData.ts",
     "seed:events": "ts-node-dev --transpile-only src/seeds/seedEvents.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts"
   },
   "keywords": [
-    "elit-arte",
+    "elit-Artee",
     "events",
     "api",
     "express",

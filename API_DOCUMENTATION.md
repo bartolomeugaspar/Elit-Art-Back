@@ -112,7 +112,7 @@ Authorization: Bearer {token}
 ```json
 {
   "name": "João Silva Updated",
-  "bio": "Artista apaixonado por teatro"
+  "bio": "Arteista apaixonado por teatro"
 }
 ```
 
@@ -125,7 +125,7 @@ Authorization: Bearer {token}
     "_id": "507f1f77bcf86cd799439011",
     "name": "João Silva Updated",
     "email": "joao@example.com",
-    "bio": "Artista apaixonado por teatro"
+    "bio": "Arteista apaixonado por teatro"
   }
 }
 ```
@@ -201,7 +201,7 @@ GET /events?category=Workshop&status=upcoming
     "organizer": {
       "_id": "507f1f77bcf86cd799439010",
       "name": "Faustino Domingos",
-      "email": "faustino@elit-arte.com"
+      "email": "faustino@elit-Artee.com"
     }
   }
 }
@@ -571,7 +571,7 @@ Authorization: Bearer {admin_token}
 ## 🔑 Roles de Usuário
 
 - **user**: Usuário comum
-- **artist**: Artista (pode criar eventos)
+- **Arteist**: Arteista (pode criar eventos)
 - **admin**: Administrador (acesso total)
 
 ---

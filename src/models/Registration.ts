@@ -1,21 +1,25 @@
 export interface IRegistration {
   id: string
-  userId: string
-  eventId: string
+  user_id: string
+  event_id: string
   status: 'registered' | 'attended' | 'cancelled'
-  registrationDate: Date
-  paymentStatus: 'pending' | 'completed' | 'failed'
-  paymentMethod?: string
-  notes?: string
-  createdAt: Date
-  updatedAt: Date
+  registration_date: Date
+  payment_status: 'pending' | 'completed' | 'failed' | 'pending_approval'
+  payment_method?: string
+  proof_url?: string
+  full_name?: string
+  payment_notes?: string
+  created_at: Date
+  updated_at: Date
 }
 
 export interface IRegistrationInput {
-  userId: string
-  eventId: string
+  user_id?: string
+  event_id: string
   status?: 'registered' | 'attended' | 'cancelled'
-  paymentStatus?: 'pending' | 'completed' | 'failed'
-  paymentMethod?: string
-  notes?: string
+  payment_status?: 'pending' | 'completed' | 'failed' | 'pending_approval'
+  payment_method?: string
+  proof_url?: string
+  full_name?: string
+  payment_notes?: string
 }

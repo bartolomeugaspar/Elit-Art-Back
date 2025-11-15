@@ -31,7 +31,7 @@
 - **Método:** POST
 - **Rota:** `/api/events`
 - **Autenticação:** Requerida (Bearer Token)
-- **Permissões:** Admin ou Artist
+- **Permissões:** Admin ou Arteist
 - **Body:**
   ```json
   {
@@ -152,7 +152,7 @@ curl -X POST http://localhost:5000/api/events \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Workshop de Arte",
+    "title": "Workshop de Artee",
     "description": "Um workshop incrível",
     "category": "Workshop",
     "date": "2025-12-15",

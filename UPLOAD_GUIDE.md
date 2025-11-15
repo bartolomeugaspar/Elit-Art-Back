@@ -107,7 +107,7 @@ Ambos os endpoints requerem autenticação:
 # 1. Fazer login
 TOKEN=$(curl -s http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@elit-arte.com","password":"admin123"}' | jq -r '.token')
+  -d '{"email":"admin@elit-Artee.com","password":"admin123"}' | jq -r '.token')
 
 # 2. Usar token nos requests
 curl -X POST http://localhost:5000/api/upload/image \
@@ -234,6 +234,6 @@ limits: {
 ## 📚 Referências
 
 - [Multer Documentation](https://github.com/expressjs/multer)
-- [Express Static Files](https://expressjs.com/en/starter/static-files.html)
+- [Express Static Files](https://expressjs.com/en/stArteer/static-files.html)
 - [FormData API](https://developer.mozilla.org/en-US/docs/Web/API/FormData)
 

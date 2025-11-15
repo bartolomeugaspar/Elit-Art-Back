@@ -125,7 +125,16 @@ export class EventService {
     return events || []
   }
 
-  static async registerUserForEvent(userId: string | undefined, eventId: string): Promise<IRegistration> {
+  static async registerUserForEvent(
+    userId: string | undefined,
+    eventId: string,
+    registrationData?: {
+      full_name?: string
+      email?: string
+      payment_method?: string
+      proof_url?: string
+    }
+  ): Promise<IRegistration> {
     // Get event
     const event = await this.getEventById(eventId)
     if (!event) {
@@ -137,21 +146,28 @@ export class EventService {
       throw new Error('No available spots for this event')
     }
 
-    // If no userId provided, use a placeholder anonymous user ID
-    // In production, you might want to create actual anonymous user records
-    const finalUserId = userId || '00000000-0000-0000-0000-000000000000'
-
-    // If userId is provided, check for existing registration
-    if (userId) {
+    // Check for existing registration by email to prevent duplicates
+    if (registrationData?.email) {
       const { data: existingRegistration } = await supabase
         .from('registrations')
         .select('id')
-        .eq('user_id', userId)
+        .eq('email', registrationData.email)
         .eq('event_id', eventId)
         .single()
 
       if (existingRegistration) {
-        throw new Error('User already registered for this event')
+        throw new Error('This email is already registered for this event')
+      }
+    }
+
+    // Determine payment status based on event type and provided data
+    let paymentStatus: 'completed' | 'pending' | 'pending_approval' = 'completed'
+    if (!event.is_free) {
+      // If event is not free and payment proof is provided, set to pending_approval
+      if (registrationData?.proof_url) {
+        paymentStatus = 'pending_approval'
+      } else {
+        paymentStatus = 'pending'
       }
     }
 
@@ -159,9 +175,12 @@ export class EventService {
     const { data: registration, error } = await supabase
       .from('registrations')
       .insert({
-        user_id: finalUserId,
         event_id: eventId,
-        payment_status: event.is_free ? 'completed' : 'pending',
+        payment_status: paymentStatus,
+        full_name: registrationData?.full_name,
+        email: registrationData?.email,
+        payment_method: registrationData?.payment_method,
+        proof_url: registrationData?.proof_url,
       })
       .select()
       .single()

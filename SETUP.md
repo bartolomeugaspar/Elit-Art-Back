@@ -29,7 +29,7 @@ O servidor estará rodando em `http://localhost:5000`
 ### Build para Produção
 ```bash
 npm run build
-npm start
+npm stArte
 ```
 
 ## 4️⃣ Popular Banco de Dados (Opcional)
@@ -41,14 +41,14 @@ npm run seed
 
 Isso criará:
 - 1 usuário admin
-- 2 usuários artistas
+- 2 usuários Arteistas
 - 2 usuários comuns
 - 5 eventos de exemplo
 - 3 inscritos na newsletter
 
 **Credenciais de teste:**
-- Admin: `admin@elit-arte.com` / `admin123`
-- Artista: `faustino@elit-arte.com` / `artist123`
+- Admin: `admin@elit-Artee.com` / `admin123`
+- Arteista: `faustino@elit-Artee.com` / `Arteist123`
 - Usuário: `maria@example.com` / `user123`
 
 ## 5️⃣ Testar a API
@@ -88,7 +88,7 @@ Veja `API_DOCUMENTATION.md` para documentação detalhada de todos os endpoints.
 ### MongoDB não conecta
 - Verifique se MongoDB está rodando
 - Confirme a URL em `.env`
-- Para MongoDB local: `mongodb://localhost:27017/elit-art`
+- Para MongoDB local: `mongodb://localhost:27017/elit-Arte`
 
 ### Porta 5000 já em uso
 - Mude a porta em `.env`: `PORT=5001`

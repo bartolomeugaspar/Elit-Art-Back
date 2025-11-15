@@ -5,7 +5,7 @@
 1. Acesse [supabase.com](https://supabase.com)
 2. Clique em "New Project"
 3. Preencha os dados:
-   - **Project Name**: elit-arte
+   - **Project Name**: elit-Artee
    - **Database Password**: Escolha uma senha forte
    - **Region**: Escolha a mais próxima (ex: Europe - Dublin)
 4. Clique em "Create new project"
@@ -41,7 +41,7 @@ CREATE TABLE users (
   phone VARCHAR(20),
   profile_image VARCHAR(255),
   bio TEXT,
-  role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'artist', 'admin')),
+  role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'Arteist', 'admin')),
   is_email_verified BOOLEAN DEFAULT false,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -178,7 +178,7 @@ CREATE POLICY "Public can read user profiles" ON users
 CREATE POLICY "Anyone can read events" ON events
   FOR SELECT USING (true);
 
-CREATE POLICY "Artists can create events" ON events
+CREATE POLICY "Arteists can create events" ON events
   FOR INSERT WITH CHECK (auth.uid() = organizer_id);
 
 CREATE POLICY "Organizers can update own events" ON events
@@ -271,8 +271,8 @@ Você pode inserir dados manualmente no Supabase ou criar um script de seed.
 ### Inserir usuário de teste
 ```sql
 INSERT INTO users (name, email, password, role, is_email_verified) VALUES
-('Admin Elit', 'admin@elit-arte.com', '$2a$10$...', 'admin', true),
-('Faustino', 'faustino@elit-arte.com', '$2a$10$...', 'artist', true);
+('Admin Elit', 'admin@elit-Artee.com', '$2a$10$...', 'admin', true),
+('Faustino', 'faustino@elit-Artee.com', '$2a$10$...', 'Arteist', true);
 ```
 
 ## 🔐 Segurança
@@ -294,7 +294,7 @@ users (Usuários)
 ├── email (único)
 ├── password (criptografada)
 ├── phone, profile_image, bio
-├── role (user, artist, admin)
+├── role (user, Arteist, admin)
 ├── is_email_verified, is_active
 └── timestamps
 

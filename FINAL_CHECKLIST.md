@@ -12,7 +12,7 @@
 
 ### ✅ Modelos de Dados
 
-- [x] **User** - Usuários com roles (user, artist, admin)
+- [x] **User** - Usuários com roles (user, Arteist, admin)
 - [x] **Event** - Eventos com gestão de vagas
 - [x] **Registration** - Inscrições em eventos
 - [x] **Testimonial** - Depoimentos e avaliações
@@ -56,7 +56,7 @@
 
 - [x] **README.md** - Documentação principal
 - [x] **SETUP.md** - Guia de setup rápido
-- [x] **QUICK_START.md** - Quick start em 5 minutos
+- [x] **QUICK_STArte.md** - Quick stArte em 5 minutos
 - [x] **SUPABASE_SETUP.md** - Setup Supabase com SQL
 - [x] **API_DOCUMENTATION.md** - Documentação detalhada
 - [x] **FRONTEND_INTEGRATION.md** - Integração com frontend
@@ -78,7 +78,7 @@
 - [x] **RLS policies** - Segurança no BD
 - [x] **Input validation** - express-validator
 - [x] **CORS configurado** - Apenas frontend autorizado
-- [x] **Roles de usuário** - user, artist, admin
+- [x] **Roles de usuário** - user, Arteist, admin
 
 ### ✅ Ferramentas
 
@@ -140,14 +140,14 @@ http://localhost:5000/api-docs
 Após `npm run seed`:
 ```
 Admin:
-  Email: admin@elit-arte.com
+  Email: admin@elit-Artee.com
   Password: admin123
   Role: admin
 
-Artista:
-  Email: faustino@elit-arte.com
-  Password: artist123
-  Role: artist
+Arteista:
+  Email: faustino@elit-Artee.com
+  Password: Arteist123
+  Role: Arteist
 
 Usuário:
   Email: maria@example.com
@@ -167,7 +167,7 @@ Usuário:
 - `SWAGGER_SUMMARY.md` - Resumo
 
 ### Para DevOps
-- `QUICK_START.md` - Deploy rápido
+- `QUICK_STArte.md` - Deploy rápido
 - `SUPABASE_SETUP.md` - Configuração BD
 
 ### Para Frontend

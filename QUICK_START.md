@@ -1,4 +1,4 @@
-# ⚡ Quick Start - Elit'Arte Backend com Supabase
+# ⚡ Quick StArte - Elit'Arte Backend com Supabase
 
 ## 🚀 Em 5 Minutos
 
@@ -13,7 +13,7 @@
 ### 2. Configurar Backend
 ```bash
 # Clone ou entre no diretório
-cd Elit-Art-Back
+cd Elit-Arte-Back
 
 # Configure as variáveis
 cp .env.example .env

@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 export interface IAuthUser {
   id: string;
   email: string;
-  role: 'admin' | 'artist' | 'user';
+  role: 'admin' | 'Arteist' | 'user';
   isActive: boolean;
 }
 

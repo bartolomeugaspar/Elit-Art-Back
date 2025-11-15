@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator'
 import { authenticate, authorize, AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
 import { supabase } from '../config/database'
+import { EmailService } from '../services/EmailService'
 
 const router = Router()
 
@@ -32,7 +33,6 @@ router.get(
       .from('registrations')
       .select(`
         *,
-        user:users(id, name, email),
         event:events(id, title)
       `)
       .order('created_at', { ascending: false })
@@ -76,7 +76,6 @@ router.get(
       .from('registrations')
       .select(`
         *,
-        user:users(id, name, email),
         event:events(id, title)
       `)
       .eq('id', req.params.id)
@@ -118,7 +117,7 @@ router.get(
  *             properties:
  *               status:
  *                 type: string
- *                 enum: ['confirmed', 'pending', 'cancelled']
+ *                 enum: ['registered', 'attended', 'cancelled']
  *     responses:
  *       200:
  *         description: Inscrição atualizada
@@ -133,7 +132,7 @@ router.patch(
   authorize('admin'),
   [
     body('status')
-      .isIn(['confirmed', 'pending', 'cancelled'])
+      .isIn(['registered', 'attended', 'cancelled'])
       .withMessage('Invalid status'),
   ],
   asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -158,14 +157,38 @@ router.patch(
       .from('registrations')
       .update({ status: req.body.status })
       .eq('id', req.params.id)
-      .select(`
-        *,
-        user:users(id, name, email),
-        event:events(id, title)
-      `)
+      .select()
       .single()
 
-    if (updateError) throw updateError
+    if (updateError) {
+      console.error('Update error:', updateError)
+      throw updateError
+    }
+
+    // Send confirmation email if status is changed to 'attended'
+    if (req.body.status === 'attended' && updatedRegistration) {
+      try {
+        // Fetch event details
+        const { data: event } = await supabase
+          .from('events')
+          .select('title, date, location')
+          .eq('id', updatedRegistration.event_id)
+          .single()
+
+        if (event) {
+          await EmailService.sendRegistrationConfirmationEmail(
+            updatedRegistration.email,
+            updatedRegistration.full_name,
+            event.title,
+            event.date,
+            event.location
+          )
+        }
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError)
+        // Don't throw error, just log it - the registration was updated successfully
+      }
+    }
 
     res.status(200).json({
       success: true,

@@ -8,7 +8,7 @@ export interface User {
   phone?: string
   profile_image?: string
   bio?: string
-  role: 'user' | 'artist' | 'admin'
+  role: 'user' | 'Arteist' | 'admin'
   is_email_verified: boolean
   is_active: boolean
   created_at: string

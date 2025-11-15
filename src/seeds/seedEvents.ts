@@ -5,28 +5,28 @@ dotenv.config()
 
 const seedEvents = async () => {
   try {
-    console.log('🌱 Starting events seed...')
+    console.log('🌱 StArteing events seed...')
 
     // Get existing users
     const { data: admin } = await supabase
       .from('users')
       .select('id')
-      .eq('email', 'admin@elit-arte.com')
+      .eq('email', 'admin@elit-Artee.com')
       .single()
 
-    const { data: artist1 } = await supabase
+    const { data: Arteist1 } = await supabase
       .from('users')
       .select('id')
-      .eq('email', 'faustino@elit-arte.com')
+      .eq('email', 'faustino@elit-Artee.com')
       .single()
 
-    const { data: artist2 } = await supabase
+    const { data: Arteist2 } = await supabase
       .from('users')
       .select('id')
-      .eq('email', 'josemara@elit-arte.com')
+      .eq('email', 'josemara@elit-Artee.com')
       .single()
 
-    if (!admin || !artist1 || !artist2) {
+    if (!admin || !Arteist1 || !Arteist2) {
       throw new Error('Required users not found. Please run seed:users first.')
     }
 
@@ -41,12 +41,12 @@ const seedEvents = async () => {
       .insert([
         {
           title: 'Workshop de Pintura Moderna',
-          description: 'Aprenda técnicas modernas de pintura com nossos artistas experientes. Todos os níveis são bem-vindos.',
-          full_description: 'Neste workshop intensivo, você aprenderá as técnicas mais modernas de pintura com nossos artistas experientes. Cobriremos desde os fundamentos até técnicas avançadas. Todos os níveis são bem-vindos e o material será fornecido.',
+          description: 'Aprenda técnicas modernas de pintura com nossos Arteistas experientes. Todos os níveis são bem-vindos.',
+          full_description: 'Neste workshop intensivo, você aprenderá as técnicas mais modernas de pintura com nossos Arteistas experientes. Cobriremos desde os fundamentos até técnicas avançadas. Todos os níveis são bem-vindos e o material será fornecido.',
           category: 'Workshop',
           date: '15 de Dezembro, 2024',
           time: '14h',
-          location: 'Estúdio Elit\'Arte',
+          location: 'Estúdio Elit\'Artee',
           image: 'https://images.unsplash.com/photo-1561214115-6d2f1b0609fa?w=500&h=300&fit=crop',
           images: [
             'https://images.unsplash.com/photo-1561214115-6d2f1b0609fa?w=500&h=300&fit=crop',
@@ -58,12 +58,12 @@ const seedEvents = async () => {
           price: 0,
           is_free: true,
           status: 'upcoming',
-          organizer_id: artist1.id,
+          organizer_id: Arteist1.id,
         },
         {
-          title: 'Exposição de Arte Contemporânea',
-          description: 'Venha conhecer as obras mais recentes de nossos artistas. Haverá coquetel de abertura.',
-          full_description: 'Uma exposição exclusiva apresentando as obras mais recentes de nossos artistas talentosos. Haverá coquetel de abertura com drinks e aperitivos. Entrada gratuita para membros.',
+          title: 'Exposição de Artee Contemporânea',
+          description: 'Venha conhecer as obras mais recentes de nossos Arteistas. Haverá coquetel de abertura.',
+          full_description: 'Uma exposição exclusiva apresentando as obras mais recentes de nossos Arteistas talentosos. Haverá coquetel de abertura com drinks e aperitivos. Entrada gratuita para membros.',
           category: 'Exposição',
           date: '20 de Dezembro, 2024',
           time: '18:00',
@@ -79,16 +79,16 @@ const seedEvents = async () => {
           price: 0,
           is_free: true,
           status: 'upcoming',
-          organizer_id: artist2.id,
+          organizer_id: Arteist2.id,
         },
         {
-          title: 'Masterclass com Artista Convidado',
-          description: 'Sessão especial com artista internacional renomado. Inscrição obrigatória.',
-          full_description: 'Uma oportunidade única de aprender diretamente com um artista internacional renomado. Esta masterclass é limitada a 40 participantes. Inscrição obrigatória com antecedência.',
+          title: 'Masterclass com Arteista Convidado',
+          description: 'Sessão especial com Arteista internacional renomado. Inscrição obrigatória.',
+          full_description: 'Uma oportunidade única de aprender diretamente com um Arteista internacional renomado. Esta masterclass é limitada a 40 pArteicipantes. Inscrição obrigatória com antecedência.',
           category: 'Masterclass',
           date: '28 de Dezembro, 2024',
           time: '15:00',
-          location: 'Estúdio Elit\'Arte',
+          location: 'Estúdio Elit\'Artee',
           image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=300&fit=crop',
           images: [
             'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=300&fit=crop',
@@ -100,12 +100,12 @@ const seedEvents = async () => {
           price: 0,
           is_free: true,
           status: 'upcoming',
-          organizer_id: artist1.id,
+          organizer_id: Arteist1.id,
         },
         {
-          title: 'Noite de Networking Artístico',
-          description: 'Encontre outros artistas, colecionadores e entusiastas de arte. Networking informal.',
-          full_description: 'Uma noite informal para conectar com outros artistas, colecionadores e entusiastas de arte. Haverá drinks, música ao vivo e muito networking. Perfeito para expandir sua rede profissional.',
+          title: 'Noite de Networking Arteístico',
+          description: 'Encontre outros Arteistas, colecionadores e entusiastas de Artee. Networking informal.',
+          full_description: 'Uma noite informal para conectar com outros Arteistas, colecionadores e entusiastas de Artee. Haverá drinks, música ao vivo e muito networking. Perfeito para expandir sua rede profissional.',
           category: 'Networking',
           date: '10 de Janeiro, 2025',
           time: '19:00',
@@ -125,12 +125,12 @@ const seedEvents = async () => {
         },
         {
           title: 'Workshop de Escultura em Argila',
-          description: 'Workshop bem-sucedido com 35 participantes entusiasmados.',
-          full_description: 'Um workshop incrível onde aprendemos técnicas tradicionais de escultura em argila. Todos os materiais foram fornecidos e os participantes saíram com suas próprias criações.',
+          description: 'Workshop bem-sucedido com 35 pArteicipantes entusiasmados.',
+          full_description: 'Um workshop incrível onde aprendemos técnicas tradicionais de escultura em argila. Todos os materiais foram fornecidos e os pArteicipantes saíram com suas próprias criações.',
           category: 'Workshop',
           date: '10 de Novembro, 2024',
           time: '14:00',
-          location: 'Estúdio Elit\'Arte',
+          location: 'Estúdio Elit\'Artee',
           image: 'https://images.unsplash.com/photo-1578926078328-123456789012?w=500&h=300&fit=crop',
           images: [
             'https://images.unsplash.com/photo-1578926078328-123456789012?w=500&h=300&fit=crop',
@@ -141,7 +141,7 @@ const seedEvents = async () => {
           price: 0,
           is_free: true,
           status: 'completed',
-          organizer_id: artist2.id,
+          organizer_id: Arteist2.id,
         },
       ])
       .select()

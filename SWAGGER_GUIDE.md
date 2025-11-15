@@ -127,7 +127,7 @@ No Swagger, use o botão **Authorize** para adicionar o token automaticamente.
   "id": "uuid",
   "name": "string",
   "email": "string",
-  "role": "user|artist|admin",
+  "role": "user|Arteist|admin",
   "profileImage": "string",
   "bio": "string",
   "isEmailVerified": "boolean",
