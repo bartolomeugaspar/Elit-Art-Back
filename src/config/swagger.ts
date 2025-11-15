@@ -32,6 +32,32 @@ const options = {
           description: 'JWT Authorization header using the Bearer scheme',
         },
       },
+      responses: {
+        Unauthorized: {
+          description: 'Não autenticado',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/Error' }
+            }
+          }
+        },
+        Forbidden: {
+          description: 'Sem permissão',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/Error' }
+            }
+          }
+        },
+        ServerError: {
+          description: 'Erro interno do servidor',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/Error' }
+            }
+          }
+        }
+      },
       schemas: {
         User: {
           type: 'object',
