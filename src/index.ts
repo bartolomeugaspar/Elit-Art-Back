@@ -55,6 +55,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   },
 }))
 
+// Root route - redirect to Swagger
+app.get('/', (req, res) => {
+  res.redirect('/api-docs')
+})
+
 // Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/events', eventRoutes)
