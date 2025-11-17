@@ -140,12 +140,12 @@ http://localhost:5000/api-docs
 Após `npm run seed`:
 ```
 Admin:
-  Email: admin@elit-Artee.com
+  Email: admin@elit-Arte.com
   Password: admin123
   Role: admin
 
 Arteista:
-  Email: faustino@elit-Artee.com
+  Email: faustino@elit-Arte.com
   Password: Arteist123
   Role: Arteist
 

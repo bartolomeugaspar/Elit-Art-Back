@@ -201,7 +201,7 @@ GET /events?category=Workshop&status=upcoming
     "organizer": {
       "_id": "507f1f77bcf86cd799439010",
       "name": "Faustino Domingos",
-      "email": "faustino@elit-Artee.com"
+      "email": "faustino@elit-Arte.com"
     }
   }
 }

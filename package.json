@@ -13,7 +13,7 @@
     "lint": "eslint src --ext .ts"
   },
   "keywords": [
-    "elit-Artee",
+    "elit-Arte",
     "events",
     "api",
     "express",

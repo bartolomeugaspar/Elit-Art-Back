@@ -174,7 +174,7 @@ curl -X POST http://localhost:5000/api/events/{eventId}/register \
 ## 🔄 Fluxo de Negócio
 
 ### Gestão de Eventos
-1. Arteistas/Admin criam eventos
+1. Artistas  /Admin criam eventos
 2. Usuários visualizam e pesquisam eventos
 3. Usuários se inscrevem em eventos
 4. Após evento, usuários podem deixar depoimentos

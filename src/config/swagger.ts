@@ -5,11 +5,11 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Elit\'Artee API',
+      title: 'Elit\'Arte API',
       version: '1.0.0',
-      description: 'API Backend para o projeto Elit\'Artee - Movimento Arteístico angolano',
+      description: 'API Backend para o projeto Elit\'Arte - Movimento Arteístico angolano',
       contact: {
-        name: 'Elit\'Artee Team',
+        name: 'Elit\'Arte Team',
         email: 'faustinodomingos83@hotmail.com',
       },
     },
@@ -19,7 +19,7 @@ const options = {
         description: 'Servidor de Desenvolvimento',
       },
       {
-        url: 'https://elit-Artee-api.vercel.app/api',
+        url: 'https://elit-Arte-api.vercel.app/api',
         description: 'Servidor de Produção',
       },
     ],

@@ -152,7 +152,7 @@ curl -X POST http://localhost:5000/api/events \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Workshop de Artee",
+    "title": "Workshop de Arte",
     "description": "Um workshop incrível",
     "category": "Workshop",
     "date": "2025-12-15",

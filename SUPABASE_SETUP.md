@@ -5,7 +5,7 @@
 1. Acesse [supabase.com](https://supabase.com)
 2. Clique em "New Project"
 3. Preencha os dados:
-   - **Project Name**: elit-Artee
+   - **Project Name**: elit-Arte
    - **Database Password**: Escolha uma senha forte
    - **Region**: Escolha a mais próxima (ex: Europe - Dublin)
 4. Clique em "Create new project"
@@ -271,8 +271,8 @@ Você pode inserir dados manualmente no Supabase ou criar um script de seed.
 ### Inserir usuário de teste
 ```sql
 INSERT INTO users (name, email, password, role, is_email_verified) VALUES
-('Admin Elit', 'admin@elit-Artee.com', '$2a$10$...', 'admin', true),
-('Faustino', 'faustino@elit-Artee.com', '$2a$10$...', 'Arteist', true);
+('Admin Elit', 'admin@elit-Arte.com', '$2a$10$...', 'admin', true),
+('Faustino', 'faustino@elit-Arte.com', '$2a$10$...', 'Arteist', true);
 ```
 
 ## 🔐 Segurança

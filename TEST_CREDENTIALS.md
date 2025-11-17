@@ -5,20 +5,20 @@
 Todos os usuários foram criados com sucesso no Supabase. Use as credenciais abaixo para testar a API.
 
 ### 👨‍💼 Admin
-- **Email**: `admin@elit-Artee.com`
+- **Email**: `admin@elit-Arte.com`
 - **Senha**: `admin123`
 - **Role**: `admin`
 - **ID**: `d257d4c4-21ca-414d-9ced-d01719cf8f5f`
 
 ### 🎭 Arteista 1 - Faustino Domingos
-- **Email**: `faustino@elit-Artee.com`
+- **Email**: `faustino@elit-Arte.com`
 - **Senha**: `Arteist123`
 - **Role**: `Arteist`
 - **ID**: `55e8dc26-db72-447c-a08a-152000145269`
 - **Bio**: Fundador e Diretor Geral do Elit'Arte
 
 ### 🎭 Arteista 2 - Josemara Comongo
-- **Email**: `josemara@elit-Artee.com`
+- **Email**: `josemara@elit-Arte.com`
 - **Senha**: `Arteist123`
 - **Role**: `Arteist`
 - **ID**: `e7906713-7ef2-4291-a8da-5dd4e05dea98`
@@ -44,7 +44,7 @@ Todos os usuários foram criados com sucesso no Supabase. Use as credenciais aba
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@elit-Artee.com","password":"admin123"}'
+  -d '{"email":"admin@elit-Arte.com","password":"admin123"}'
 ```
 
 **Resposta esperada:**
@@ -55,7 +55,7 @@ curl -X POST http://localhost:5000/api/auth/login \
   "user": {
     "id": "d257d4c4-21ca-414d-9ced-d01719cf8f5f",
     "name": "Admin Elit",
-    "email": "admin@elit-Artee.com",
+    "email": "admin@elit-Arte.com",
     "role": "admin"
   },
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -79,9 +79,9 @@ curl -X GET http://localhost:5000/api/events
 
 ### Eventos
 - ✅ Workshop de Teatro Contemporâneo (Faustino)
-- ✅ Exposição de Artee Angolana (Josemara)
+- ✅ Exposição de Arte Angolana (Josemara)
 - ✅ Masterclass de Dança Tradicional (Faustino)
-- ✅ Networking de Arteistas (Admin)
+- ✅ Networking de Artistas(Admin)
 - ✅ Concerto de Música Angolana (Josemara)
 
 ### Newsletter

@@ -41,14 +41,14 @@ npm run seed
 
 Isso criará:
 - 1 usuário admin
-- 2 usuários Arteistas
+- 2 usuários Artistas  
 - 2 usuários comuns
 - 5 eventos de exemplo
 - 3 inscritos na newsletter
 
 **Credenciais de teste:**
-- Admin: `admin@elit-Artee.com` / `admin123`
-- Arteista: `faustino@elit-Artee.com` / `Arteist123`
+- Admin: `admin@elit-Arte.com` / `admin123`
+- Arteista: `faustino@elit-Arte.com` / `Arteist123`
 - Usuário: `maria@example.com` / `user123`
 
 ## 5️⃣ Testar a API

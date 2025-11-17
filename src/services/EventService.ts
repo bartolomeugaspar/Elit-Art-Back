@@ -16,22 +16,20 @@ export class EventService {
     return 'upcoming'
   }
 
-  // Update event status based on current date
-  private static async updateEventStatus(event: IEvent): Promise<IEvent> {
+  // Calculate event status based on current date (without updating DB)
+  private static calculateEventStatus(event: IEvent): IEvent {
     const newStatus = this.getEventStatus(event.date)
     
-    if (event.status !== newStatus && event.status !== 'cancelled') {
-      const { data: updated } = await supabase
-        .from('events')
-        .update({ status: newStatus })
-        .eq('id', event.id)
-        .select()
-        .single()
-      
-      return updated || event
+    // If status is cancelled, keep it
+    if (event.status === 'cancelled') {
+      return event
     }
     
-    return event
+    // Return event with calculated status
+    return {
+      ...event,
+      status: newStatus
+    }
   }
 
   static async createEvent(eventData: IEventInput): Promise<IEvent> {
@@ -65,10 +63,8 @@ export class EventService {
       throw new Error(error.message)
     }
 
-    // Update status for each event based on current date
-    const updatedEvents = await Promise.all(
-      (events || []).map(event => this.updateEventStatus(event))
-    )
+    // Calculate status for each event based on current date
+    const updatedEvents = (events || []).map(event => this.calculateEventStatus(event))
 
     return updatedEvents
   }
@@ -84,8 +80,8 @@ export class EventService {
       return null
     }
 
-    // Update status if needed
-    return await this.updateEventStatus(event)
+    // Calculate status if needed
+    return this.calculateEventStatus(event)
   }
 
   static async updateEvent(id: string, updates: Partial<IEvent>): Promise<IEvent | null> {
