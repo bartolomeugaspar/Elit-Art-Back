@@ -157,11 +157,11 @@ export class EventService {
     }
 
     // Determine payment status based on event type and provided data
-    let paymentStatus: 'completed' | 'pending' | 'pending_approval' = 'completed'
+    let paymentStatus: 'completed' | 'pending' | 'failed' = 'completed'
     if (!event.is_free) {
-      // If event is not free and payment proof is provided, set to pending_approval
+      // If event is not free and payment proof is provided, set to pending
       if (registrationData?.proof_url) {
-        paymentStatus = 'pending_approval'
+        paymentStatus = 'pending'
       } else {
         paymentStatus = 'pending'
       }

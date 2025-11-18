@@ -55,8 +55,14 @@ const seedEvents = async () => {
           capacity: 30,
           attendees: 24,
           available_spots: 6,
-          price: 0,
-          is_free: true,
+          price: 5000,
+          is_free: false,
+          bank_details: {
+            account_holder: 'Elit Arte Estúdio',
+            bank_name: 'BAI',
+            account_number: '0001234567890',
+            iban: 'AO06000100037131174310147'
+          },
           status: 'upcoming',
           organizer_id: Arteist1.id,
         },
@@ -76,8 +82,14 @@ const seedEvents = async () => {
           capacity: 200,
           attendees: 150,
           available_spots: 50,
-          price: 0,
-          is_free: true,
+          price: 2500,
+          is_free: false,
+          bank_details: {
+            account_holder: 'Galeria Central Luanda',
+            bank_name: 'BPC',
+            account_number: '0009876543210',
+            iban: 'AO06000200037131174310148'
+          },
           status: 'upcoming',
           organizer_id: Arteist2.id,
         },
@@ -97,8 +109,14 @@ const seedEvents = async () => {
           capacity: 40,
           attendees: 40,
           available_spots: 0,
-          price: 0,
-          is_free: true,
+          price: 10000,
+          is_free: false,
+          bank_details: {
+            account_holder: 'Elit Arte Masterclass',
+            bank_name: 'BAI',
+            account_number: '0005555555555',
+            iban: 'AO06000100037131174310149'
+          },
           status: 'upcoming',
           organizer_id: Arteist1.id,
         },
@@ -118,8 +136,14 @@ const seedEvents = async () => {
           capacity: 100,
           attendees: 0,
           available_spots: 100,
-          price: 0,
-          is_free: true,
+          price: 3000,
+          is_free: false,
+          bank_details: {
+            account_holder: 'Espaço Criativo',
+            bank_name: 'Banco Angolano de Investimentos',
+            account_number: '0007777777777',
+            iban: 'AO06000100037131174310150'
+          },
           status: 'upcoming',
           organizer_id: admin.id,
         },
@@ -138,11 +162,17 @@ const seedEvents = async () => {
           capacity: 35,
           attendees: 35,
           available_spots: 0,
-          price: 0,
-          is_free: true,
+          price: 4500,
+          is_free: false,
+          bank_details: {
+            account_holder: 'Elit Arte Estúdio',
+            bank_name: 'BAI',
+            account_number: '0001234567890',
+            iban: 'AO06000100037131174310147'
+          },
           status: 'completed',
           organizer_id: Arteist2.id,
-        },
+        }
       ])
       .select()
 
