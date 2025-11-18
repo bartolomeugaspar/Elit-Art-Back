@@ -103,7 +103,7 @@
  *                 example: João Silva Updated
  *               bio:
  *                 type: string
- *                 example: Arteista apaixonado por teatro
+ *                 example: Artista apaixonado por teatro
  *     responses:
  *       200:
  *         description: Perfil atualizado com sucesso

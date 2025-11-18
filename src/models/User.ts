@@ -8,7 +8,7 @@ export interface IUser {
   phone?: string
   profileImage?: string
   bio?: string
-  role: 'user' | 'Arteist' | 'admin'
+  role: 'user' | 'artista' | 'admin'
   isEmailVerified: boolean
   isActive: boolean
   createdAt: Date
@@ -22,7 +22,7 @@ export interface IUserInput {
   phone?: string
   profileImage?: string
   bio?: string
-  role?: 'user' | 'Arteist' | 'admin'
+  role?: 'user' | 'artista' | 'admin'
 }
 
 // Hash password utility

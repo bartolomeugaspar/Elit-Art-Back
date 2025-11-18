@@ -30,38 +30,38 @@ const seedDatabase = async () => {
 
     if (adminError) throw new Error(`Admin creation failed: ${adminError.message}`)
 
-    // Create Arteist users
-    const Arteist1Password = await hashPassword('Arteist123')
-    const { data: Arteist1, error: Arteist1Error } = await supabase
+    // Create artista users
+    const artista1Password = await hashPassword('artista123')
+    const { data: artista1, error: artista1Error } = await supabase
       .from('users')
       .insert({
         name: 'Faustino Domingos',
         email: 'faustino@elit-Arte.com',
-        password: Arteist1Password,
-        role: 'Arteist',
+        password: artista1Password,
+        role: 'artista',
         bio: 'Fundador e Diretor Geral do Elit\'Arte',
         is_email_verified: true,
       })
       .select()
       .single()
 
-    if (Arteist1Error) throw new Error(`Arteist 1 creation failed: ${Arteist1Error.message}`)
+    if (artista1Error) throw new Error(`artista 1 creation failed: ${artista1Error.message}`)
 
-    const Arteist2Password = await hashPassword('Arteist123')
-    const { data: Arteist2, error: Arteist2Error } = await supabase
+    const artista2Password = await hashPassword('artista123')
+    const { data: artista2, error: artista2Error } = await supabase
       .from('users')
       .insert({
         name: 'Josemara Comongo',
         email: 'josemara@elit-Arte.com',
-        password: Arteist2Password,
-        role: 'Arteist',
+        password: artista2Password,
+        role: 'artista',
         bio: 'Co-fundadora do Elit\'Arte',
         is_email_verified: true,
       })
       .select()
       .single()
 
-    if (Arteist2Error) throw new Error(`Arteist 2 creation failed: ${Arteist2Error.message}`)
+    if (artista2Error) throw new Error(`artista 2 creation failed: ${artista2Error.message}`)
 
     // Create regular users
     const user1Password = await hashPassword('user123')
@@ -117,7 +117,7 @@ const seedDatabase = async () => {
           price: 0,
           is_free: true,
           status: 'upcoming',
-          organizer_id: Arteist1.id,
+          organizer_id: artista1.id,
         },
         {
           title: 'Exposição de Arte Contemporânea',
@@ -138,13 +138,13 @@ const seedDatabase = async () => {
           price: 0,
           is_free: true,
           status: 'upcoming',
-          organizer_id: Arteist2.id,
+          organizer_id: artista2.id,
         },
         {
-          title: 'Masterclass com Arteista Convidado',
-          description: 'Sessão especial com Arteista internacional renomado. Inscrição obrigatória.',
-          full_description: 'Uma oportunidade única de aprender diretamente com um Arteista internacional renomado. Esta masterclass é limitada a 40 pArteicipantes. Inscrição obrigatória com antecedência.',
-          category: 'Masterclass',
+          title: 'Masterclass com Artista Convidado',
+          description: 'Sessão especial com Artista internacional renomado. Inscrição obrigatória.',
+          full_description: 'Uma oportunidade única de aprender diretamente com um Artista internacional renomado. Esta masterclass é limitada a 40 pArteicipantes. Inscrição obrigatória com antecedência.',
+          category: 'Master',
           date: '28 de Dezembro, 2024',
           time: '15:00 - 18:00',
           location: 'Estúdio Elit\'Arte, Lisboa',
@@ -159,13 +159,13 @@ const seedDatabase = async () => {
           price: 0,
           is_free: true,
           status: 'upcoming',
-          organizer_id: Arteist1.id,
+          organizer_id: artista1.id,
         },
         {
           title: 'Noite de Networking Artístico',
           description: 'Encontre outros Artistas  , colecionadores e entusiastas de Arte. Networking informal.',
           full_description: 'Uma noite informal para conectar com outros Artistas  , colecionadores e entusiastas de Arte. Haverá drinks, música ao vivo e muito networking. Perfeito para expandir sua rede profissional.',
-          category: 'Networking',
+          category: 'Network',
           date: '10 de Janeiro, 2025',
           time: '19:00 - 23:00',
           location: 'Espaço Criativo, Lisboa',
@@ -200,7 +200,7 @@ const seedDatabase = async () => {
           price: 0,
           is_free: true,
           status: 'completed',
-          organizer_id: Arteist2.id,
+          organizer_id: artista2.id,
         },
       ])
       .select()
@@ -230,15 +230,15 @@ const seedDatabase = async () => {
 
     console.log('✅ Database seeded successfully!')
     console.log(`📝 Created 1 admin user`)
-    console.log(`🎭 Created 2 Arteist users`)
+    console.log(`🎭 Created 2 artista users`)
     console.log(`👥 Created 2 regular users`)
     console.log(`🎪 Created ${events?.length || 0} events`)
     console.log(`📧 Created ${newsletter?.length || 0} newsletter subscribers`)
 
     console.log('\n📋 Test Credentials:')
     console.log('Admin: admin@elit-Arte.com / admin123')
-    console.log('Arteist 1: faustino@elit-Arte.com / Arteist123')
-    console.log('Arteist 2: josemara@elit-Arte.com / Arteist123')
+    console.log('Artista 1: faustino@elit-Arte.com / artista123')
+    console.log('Artista 2: josemara@elit-Arte.com / artista123')
     console.log('User 1: maria@example.com / user123')
     console.log('User 2: joao@example.com / user123')
 

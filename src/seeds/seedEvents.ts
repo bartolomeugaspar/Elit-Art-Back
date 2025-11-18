@@ -94,9 +94,9 @@ const seedEvents = async () => {
           organizer_id: Arteist2.id,
         },
         {
-          title: 'Masterclass com Arteista Convidado',
-          description: 'Sessão especial com Arteista internacional renomado. Inscrição obrigatória.',
-          full_description: 'Uma oportunidade única de aprender diretamente com um Arteista internacional renomado. Esta masterclass é limitada a 40 pArteicipantes. Inscrição obrigatória com antecedência.',
+          title: 'Masterclass com Artista Convidado',
+          description: 'Sessão especial com Artista internacional renomado. Inscrição obrigatória.',
+          full_description: 'Uma oportunidade única de aprender diretamente com um Artista internacional renomado. Esta masterclass é limitada a 40 pArteicipantes. Inscrição obrigatória com antecedência.',
           category: 'Masterclass',
           date: '28 de Dezembro, 2024',
           time: '15:00',

@@ -7,6 +7,7 @@ import { connectDB } from './config/database'
 import { swaggerSpec } from './config/swagger'
 import { errorHandler } from './middleware/errorHandler'
 import { UploadService } from './services/UploadService'
+import { LogCleanupService } from './services/LogCleanupService'
 import authRoutes from './routes/auth'
 import artistRoutes from './routes/artists'
 import eventRoutes from './routes/events'
@@ -98,6 +99,9 @@ app.use(errorHandler)
 const startServer = async () => {
   try {
     await connectDB()
+    
+    // Start log cleanup scheduler (runs every 6 hours)
+    LogCleanupService.startCleanupScheduler(6)
     
     app.listen(PORT, () => {
       console.log(`✅ Server running on port ${PORT}`)

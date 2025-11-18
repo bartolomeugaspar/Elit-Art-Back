@@ -80,6 +80,56 @@ export class AuditLog {
   static async logAction(auditData: Omit<AuditLogAttributes, 'id' | 'created_at' | 'updated_at'>): Promise<AuditLogAttributes | null> {
     return this.create(auditData);
   }
+
+  /**
+   * Delete audit logs older than specified days
+   * Specifically for session logs (login/logout actions)
+   */
+  static async deleteOldSessionLogs(daysOld: number = 2): Promise<number> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+    const cutoffISO = cutoffDate.toISOString();
+
+    const { data, error } = await supabase
+      .from('audit_logs')
+      .delete()
+      .lt('created_at', cutoffISO)
+      .in('action', ['login', 'logout', 'login_failed'])
+      .select();
+
+    if (error) {
+      console.error('Error deleting old session logs:', error);
+      return 0;
+    }
+
+    const deletedCount = data?.length || 0;
+    console.log(`[AuditLog.deleteOldSessionLogs] Deleted ${deletedCount} session logs older than ${daysOld} days`);
+    return deletedCount;
+  }
+
+  /**
+   * Delete all audit logs older than specified days
+   */
+  static async deleteOldLogs(daysOld: number = 30): Promise<number> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+    const cutoffISO = cutoffDate.toISOString();
+
+    const { data, error } = await supabase
+      .from('audit_logs')
+      .delete()
+      .lt('created_at', cutoffISO)
+      .select();
+
+    if (error) {
+      console.error('Error deleting old logs:', error);
+      return 0;
+    }
+
+    const deletedCount = data?.length || 0;
+    console.log(`[AuditLog.deleteOldLogs] Deleted ${deletedCount} logs older than ${daysOld} days`);
+    return deletedCount;
+  }
 }
 
 export default AuditLog;

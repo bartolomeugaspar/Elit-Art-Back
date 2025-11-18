@@ -337,7 +337,7 @@ router.get('/me', authenticate, asyncHandler(async (req: AuthRequest, res: Respo
  *                 example: João Silva
  *               bio:
  *                 type: string
- *                 example: Arteista e criador
+ *                 example: Artista e criador
  *               phone:
  *                 type: string
  *                 example: +244 923 123 456

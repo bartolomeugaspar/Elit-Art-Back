@@ -202,7 +202,7 @@ curl -X POST http://localhost:5000/api/events/{eventId}/register \
 ## 📝 Roles de Usuário
 
 - **user**: Usuário comum (pode se inscrever em eventos)
-- **Arteist**: Arteista (pode criar eventos)
+- **Arteist**: Artista (pode criar eventos)
 - **admin**: Administrador (acesso total)
 
 ## 🚀 Deploy

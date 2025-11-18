@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
 import { AuditService } from '../services/audit.service';
+import { LogCleanupService } from '../services/LogCleanupService';
 import { asyncHandler } from '../middleware/errorHandler';
 
 export const router = Router();
@@ -211,7 +212,72 @@ router.get('/:entityType/:entityId',
   }
 }));
 
-// Audit logs are read-only and cannot be deleted
+/**
+ * @swagger
+ * /audit-logs/cleanup/manual:
+ *   post:
+ *     summary: Executar limpeza manual de logs antigos
+ *     tags:
+ *       - Auditoria
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Limpeza executada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 deleted:
+ *                   type: object
+ *                   properties:
+ *                     sessionLogs:
+ *                       type: integer
+ *                       description: Logs de sessão deletados (>2 dias)
+ *                     otherLogs:
+ *                       type: integer
+ *                       description: Outros logs deletados (>30 dias)
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão (apenas admins)
+ */
+// Manual cleanup endpoint (admin only)
+router.post('/cleanup/manual',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    try {
+      console.log('[Audit Routes] Manual cleanup triggered by admin:', req.user?.id);
+      const result = await LogCleanupService.manualCleanup();
+
+      res.json({
+        success: true,
+        message: 'Limpeza de logs executada com sucesso',
+        deleted: {
+          sessionLogs: result.sessionLogs,
+          otherLogs: result.otherLogs,
+          total: result.sessionLogs + result.otherLogs,
+        },
+      });
+    } catch (error) {
+      console.error('Error during manual cleanup:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao executar limpeza de logs',
+      });
+    }
+  })
+);
+
+// Audit logs are read-only and cannot be deleted automatically by users
 // This ensures data integrity and compliance with audit trail requirements
+// Only session logs (login/logout) older than 2 days are auto-deleted
+// Other logs are kept for 30 days before auto-deletion
 
 export default router;

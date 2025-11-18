@@ -8,7 +8,7 @@ export interface User {
   phone?: string
   profile_image?: string
   bio?: string
-  role: 'user' | 'Arteist' | 'admin'
+  role: 'user' | 'artista' | 'admin'
   is_email_verified: boolean
   is_active: boolean
   created_at: string
@@ -20,7 +20,7 @@ export interface Event {
   title: string
   description: string
   full_description?: string
-  category: 'Workshop' | 'Exposição' | 'Masterclass' | 'Networking'
+  category: 'Workshop' | 'Exposição' | 'Master' | 'Network'
   date: string
   time: string
   location: string

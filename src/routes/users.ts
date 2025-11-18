@@ -152,7 +152,7 @@ router.get(
  *                 type: string
  *               role:
  *                 type: string
- *                 enum: ['admin', 'Arteist', 'user']
+ *                 enum: ['admin', 'artista', 'user']
  *               is_active:
  *                 type: boolean
  *     responses:
