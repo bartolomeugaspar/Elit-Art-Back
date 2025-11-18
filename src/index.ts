@@ -8,6 +8,7 @@ import { swaggerSpec } from './config/swagger'
 import { errorHandler } from './middleware/errorHandler'
 import { UploadService } from './services/UploadService'
 import authRoutes from './routes/auth'
+import artistRoutes from './routes/artists'
 import eventRoutes from './routes/events'
 import newsletterRoutes from './routes/newsletter'
 import uploadRoutes from './routes/upload'
@@ -65,6 +66,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes)
+app.use('/api/artists', artistRoutes)
 app.use('/api/events', eventRoutes)
 app.use('/api/newsletter', newsletterRoutes)
 app.use('/api/upload', uploadRoutes)
