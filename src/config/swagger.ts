@@ -7,7 +7,7 @@ const options = {
     info: {
       title: 'Elit\'Arte API',
       version: '1.0.0',
-      description: 'API Backend para o projeto Elit\'Arte - Movimento Arteístico angolano',
+      description: 'API Backend para o projeto Elit\'Arte - Movimento Artístico angolano',
       contact: {
         name: 'Elit\'Arte Team',
         email: 'faustinodomingos83@hotmail.com',

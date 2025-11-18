@@ -70,6 +70,7 @@ CREATE TABLE events (
   available_spots INTEGER DEFAULT 0,
   price DECIMAL(10, 2) DEFAULT 0,
   is_free BOOLEAN DEFAULT true,
+  bank_details JSONB DEFAULT NULL,
   status VARCHAR(20) DEFAULT 'upcoming' CHECK (status IN ('upcoming', 'ongoing', 'completed', 'cancelled')),
   organizer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -80,6 +81,7 @@ CREATE INDEX idx_events_category ON events(category);
 CREATE INDEX idx_events_status ON events(status);
 CREATE INDEX idx_events_organizer ON events(organizer_id);
 CREATE INDEX idx_events_date ON events(date);
+CREATE INDEX idx_events_bank_details ON events USING GIN (bank_details);
 ```
 
 ### Tabela: registrations (Inscrições em Eventos)

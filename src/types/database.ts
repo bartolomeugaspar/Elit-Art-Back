@@ -33,6 +33,12 @@ export interface Event {
   is_free: boolean
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
   organizer_id: string
+  bank_details?: {
+    account_holder?: string
+    account_number?: string
+    bank_name?: string
+    iban?: string
+  }
   created_at: string
   updated_at: string
 }

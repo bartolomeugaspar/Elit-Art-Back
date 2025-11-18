@@ -1,6 +1,6 @@
 # 🎭 Elit'Arte Backend API
 
-Backend API para o projeto Elit'Arte - Movimento Arteístico angolano.
+Backend API para o projeto Elit'Arte - Movimento Artístico angolano.
 
 ## 🚀 Tecnologias
 

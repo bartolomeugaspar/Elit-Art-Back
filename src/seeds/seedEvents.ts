@@ -41,8 +41,8 @@ const seedEvents = async () => {
       .insert([
         {
           title: 'Workshop de Pintura Moderna',
-          description: 'Aprenda técnicas modernas de pintura com nossos Artistasexperientes. Todos os níveis são bem-vindos.',
-          full_description: 'Neste workshop intensivo, você aprenderá as técnicas mais modernas de pintura com nossos Artistasexperientes. Cobriremos desde os fundamentos até técnicas avançadas. Todos os níveis são bem-vindos e o material será fornecido.',
+          description: 'Aprenda técnicas modernas de pintura com nossos Artistas experientes. Todos os níveis são bem-vindos.',
+          full_description: 'Neste workshop intensivo, você aprenderá as técnicas mais modernas de pintura com nossos Artistas experientes. Cobriremos desde os fundamentos até técnicas avançadas. Todos os níveis são bem-vindos e o material será fornecido.',
           category: 'Workshop',
           date: '15 de Dezembro, 2024',
           time: '14h',
@@ -103,7 +103,7 @@ const seedEvents = async () => {
           organizer_id: Arteist1.id,
         },
         {
-          title: 'Noite de Networking Arteístico',
+          title: 'Noite de Networking Artístico',
           description: 'Encontre outros Artistas  , colecionadores e entusiastas de Arte. Networking informal.',
           full_description: 'Uma noite informal para conectar com outros Artistas  , colecionadores e entusiastas de Arte. Haverá drinks, música ao vivo e muito networking. Perfeito para expandir sua rede profissional.',
           category: 'Networking',

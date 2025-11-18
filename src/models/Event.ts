@@ -16,6 +16,12 @@ export interface IEvent {
   is_free: boolean
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled'
   organizer_id: string
+  bank_details?: {
+    account_holder?: string
+    account_number?: string
+    bank_name?: string
+    iban?: string
+  }
   created_at: Date
   updated_at: Date
 }
@@ -33,6 +39,12 @@ export interface IEventInput {
   capacity: number
   price?: number
   is_free?: boolean
+  bank_details?: {
+    account_holder?: string
+    account_number?: string
+    bank_name?: string
+    iban?: string
+  }
   organizer_id: string
 }
 
