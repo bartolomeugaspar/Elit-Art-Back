@@ -144,7 +144,7 @@ const seedDatabase = async () => {
       {
         title: 'Paisagem Angolana',
         description: 'Fotografia que captura a beleza natural de Angola',
-        artist_name: 'Fotógrafo Anônimo',
+        artist_name: 'Fotógrafo Usúario',
         type: 'photography',
         year: 2024,
         dimensions: '60x90cm',

@@ -121,7 +121,7 @@ Remove a restrição de foreign key da tabela blog_posts.
 |--------|------|---------|-----|
 | Reflexão Urbana | painting | Faustino Mulumba | 2023 |
 | Escultura Abstrata | sculpture | Josemara Silva | 2024 |
-| Paisagem Angolana | photography | Fotógrafo Anônimo | 2024 |
+| Paisagem Angolana | photography | Fotógrafo Usúario | 2024 |
 | Código Criativo | digital | Artista Digital | 2025 |
 | Fusão de Técnicas | mixed_media | Criador Experimental | 2024 |
 

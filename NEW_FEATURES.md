@@ -108,7 +108,7 @@ DELETE /api/blog/comments/:id     - Deletar comentário (admin)
 ### Comentários
 - Moderação: pending → approved/rejected
 - Contagem automática de comentários
-- Suporte a usuários anônimos
+- Suporte a usuários Usúarios
 
 ---
 

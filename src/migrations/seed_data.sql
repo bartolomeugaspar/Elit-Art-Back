@@ -29,7 +29,7 @@ INSERT INTO artworks (title, description, artist_id, artist_name, type, year, di
 VALUES
   ('Reflexão Urbana', 'Pintura que retrata a vida urbana moderna com cores vibrantes', NULL, 'Faustino Mulumba', 'painting', 2023, '100x80cm', 'Acrílico sobre tela', 'https://elit-arte.vercel.app/icon.jpeg', 5000.00, TRUE, TRUE),
   ('Escultura Abstrata', 'Escultura em madeira que explora formas geométricas abstratas', NULL, 'Josemara Silva', 'sculpture', 2024, '150cm altura', 'Madeira de mogno', 'https://elit-arte.vercel.app/icon.jpeg', 8000.00, TRUE, TRUE),
-  ('Paisagem Angolana', 'Fotografia que captura a beleza natural de Angola', NULL, 'Fotógrafo Anônimo', 'photography', 2024, '60x90cm', 'Impressão em papel fotográfico', 'https://elit-arte.vercel.app/icon.jpeg', 1500.00, TRUE, FALSE),
+  ('Paisagem Angolana', 'Fotografia que captura a beleza natural de Angola', NULL, 'Fotógrafo Usúario', 'photography', 2024, '60x90cm', 'Impressão em papel fotográfico', 'https://elit-arte.vercel.app/icon.jpeg', 1500.00, TRUE, FALSE),
   ('Código Criativo', 'Arte digital que combina programação e criatividade visual', NULL, 'Artista Digital', 'digital', 2025, 'Formato digital', 'Técnica digital', 'https://elit-arte.vercel.app/icon.jpeg', 2000.00, TRUE, FALSE),
   ('Fusão de Técnicas', 'Obra mista que combina pintura, colagem e elementos tridimensionais', NULL, 'Criador Experimental', 'mixed_media', 2024, '120x120cm', 'Técnica mista', 'https://elit-arte.vercel.app/icon.jpeg', 3500.00, TRUE, FALSE);
 
