@@ -29,7 +29,7 @@ export class EmailService {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-              <img src="https://elit-Arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 150px; height: auto; margin-bottom: 15px;">
+             <img src="https://elit-Arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 100px; height: auto; margin-bottom: 15px; border-radius: 100%;">
               <h1 style="color: #DAA520; margin: 0;">Elit'Arte</h1>
               <p style="color: #F4A460; margin: 5px 0 0 0;">Recuperação de Senha</p>
             </div>
@@ -85,7 +85,7 @@ export class EmailService {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-              <img src="https://elit-Arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 150px; height: auto; margin-bottom: 15px;">
+              <img src="https://elit-Arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 100px; height: auto; margin-bottom: 15px; border-radius: 100%;">
               <h1 style="color: #DAA520; margin: 0;">Elit'Arte</h1>
               <p style="color: #F4A460; margin: 5px 0 0 0;">Bem-vindo!</p>
             </div>
@@ -135,7 +135,7 @@ export class EmailService {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-              <img src="https://elit-Arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 150px; height: auto; margin-bottom: 15px;">
+              <img src="https://elit-Arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 100px; height: auto; margin-bottom: 15px; border-radius: 100%;">
               <h1 style="color: #DAA520; margin: 0;">Elit'Arte</h1>
               <p style="color: #F4A460; margin: 5px 0 0 0;">Inscrição Recebida</p>
             </div>
