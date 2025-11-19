@@ -93,6 +93,7 @@ app.get('/api/health', (req, res) => {
     success: true,
     message: 'Server is running',
     timestamp: new Date().toISOString(),
+    version: '1.0.0',
   })
 })
 
