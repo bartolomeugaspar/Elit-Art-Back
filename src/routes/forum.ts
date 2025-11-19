@@ -339,11 +339,9 @@ router.get(
  * @swagger
  * /forum/topics/{topicId}/replies:
  *   post:
- *     summary: Adicionar resposta a um tópico (autenticado)
+ *     summary: Adicionar resposta a um tópico
  *     tags:
  *       - Fórum
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: topicId
@@ -357,13 +355,19 @@ router.get(
  *           schema:
  *             type: object
  *             required: [content, author_name]
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: Conteúdo da resposta
+ *               author_name:
+ *                 type: string
+ *                 description: Nome do autor (pode ser anônimo)
  *     responses:
  *       201:
  *         description: Resposta adicionada com sucesso
  */
 router.post(
   '/topics/:topicId/replies',
-  authenticate,
   body('content').notEmpty().withMessage('Content is required'),
   body('author_name').notEmpty().withMessage('Author name is required'),
   asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -372,17 +376,33 @@ router.post(
       return res.status(400).json({ success: false, errors: errors.array() })
     }
 
-    const reply = await ForumService.createReply({
-      ...req.body,
-      topic_id: req.params.topicId,
-      author_id: req.userId,
-    })
+    try {
+      const reply = await ForumService.createReply({
+        ...req.body,
+        topic_id: req.params.topicId,
+        author_id: req.userId || null,
+      })
 
-    res.status(201).json({
-      success: true,
-      message: 'Reply added successfully',
-      reply,
-    })
+      res.status(201).json({
+        success: true,
+        message: 'Reply added successfully',
+        reply,
+      })
+    } catch (error) {
+      console.error('Error creating reply:', error)
+      const message = error instanceof Error ? error.message : 'Failed to create reply'
+      
+      // Check if it's a "Topic is closed" error
+      if (message.includes('closed')) {
+        return res.status(400).json({
+          success: false,
+          message: 'Este tópico foi fechado e não aceita mais respostas.',
+        })
+      }
+      
+      // Re-throw to error handler
+      throw error
+    }
   })
 )
 
