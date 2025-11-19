@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS products (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_products_category ON products(category);
-CREATE INDEX idx_products_sku ON products(sku);
-CREATE INDEX idx_products_is_active ON products(is_active);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_products_sku ON products(sku);
+CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);
 
 -- ===== ORDERS TABLE =====
 CREATE TABLE IF NOT EXISTS orders (
@@ -53,10 +53,10 @@ CREATE TABLE IF NOT EXISTS orders (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_orders_user_id ON orders(user_id);
-CREATE INDEX idx_orders_email ON orders(email);
-CREATE INDEX idx_orders_status ON orders(status);
-CREATE INDEX idx_orders_payment_status ON orders(payment_status);
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_email ON orders(email);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON orders(payment_status);
 
 -- ===== BLOG POSTS TABLE =====
 CREATE TABLE IF NOT EXISTS blog_posts (
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   excerpt TEXT NOT NULL,
   featured_image TEXT NOT NULL,
   category VARCHAR(50) NOT NULL CHECK (category IN ('magazine', 'story', 'article', 'poetry', 'drama', 'other')),
-  author_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  author_id UUID,
   author_name VARCHAR(255) NOT NULL,
   status VARCHAR(50) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
   views INTEGER DEFAULT 0,
@@ -77,10 +77,10 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_blog_posts_category ON blog_posts(category);
-CREATE INDEX idx_blog_posts_status ON blog_posts(status);
-CREATE INDEX idx_blog_posts_author_id ON blog_posts(author_id);
-CREATE INDEX idx_blog_posts_slug ON blog_posts(slug);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_category ON blog_posts(category);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_author_id ON blog_posts(author_id);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
 
 -- ===== BLOG COMMENTS TABLE =====
 CREATE TABLE IF NOT EXISTS blog_comments (
@@ -95,8 +95,8 @@ CREATE TABLE IF NOT EXISTS blog_comments (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_blog_comments_post_id ON blog_comments(post_id);
-CREATE INDEX idx_blog_comments_status ON blog_comments(status);
+CREATE INDEX IF NOT EXISTS idx_blog_comments_post_id ON blog_comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_blog_comments_status ON blog_comments(status);
 
 -- ===== ARTWORKS TABLE =====
 CREATE TABLE IF NOT EXISTS artworks (
@@ -118,10 +118,10 @@ CREATE TABLE IF NOT EXISTS artworks (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_artworks_artist_id ON artworks(artist_id);
-CREATE INDEX idx_artworks_type ON artworks(type);
-CREATE INDEX idx_artworks_is_available ON artworks(is_available);
-CREATE INDEX idx_artworks_is_featured ON artworks(is_featured);
+CREATE INDEX IF NOT EXISTS idx_artworks_artist_id ON artworks(artist_id);
+CREATE INDEX IF NOT EXISTS idx_artworks_type ON artworks(type);
+CREATE INDEX IF NOT EXISTS idx_artworks_is_available ON artworks(is_available);
+CREATE INDEX IF NOT EXISTS idx_artworks_is_featured ON artworks(is_featured);
 
 -- ===== PRESS RELEASES TABLE =====
 CREATE TABLE IF NOT EXISTS press_releases (
@@ -137,8 +137,8 @@ CREATE TABLE IF NOT EXISTS press_releases (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_press_releases_status ON press_releases(status);
-CREATE INDEX idx_press_releases_publication_date ON press_releases(publication_date);
+CREATE INDEX IF NOT EXISTS idx_press_releases_status ON press_releases(status);
+CREATE INDEX IF NOT EXISTS idx_press_releases_publication_date ON press_releases(publication_date);
 
 -- ===== MEDIA KIT TABLE =====
 CREATE TABLE IF NOT EXISTS media_kits (
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS media_kits (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_media_kits_created_at ON media_kits(created_at);
+CREATE INDEX IF NOT EXISTS idx_media_kits_created_at ON media_kits(created_at);
 
 -- ===== FORUM TOPICS TABLE =====
 CREATE TABLE IF NOT EXISTS forum_topics (
@@ -171,10 +171,10 @@ CREATE TABLE IF NOT EXISTS forum_topics (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_forum_topics_category ON forum_topics(category);
-CREATE INDEX idx_forum_topics_author_id ON forum_topics(author_id);
-CREATE INDEX idx_forum_topics_is_pinned ON forum_topics(is_pinned);
-CREATE INDEX idx_forum_topics_is_closed ON forum_topics(is_closed);
+CREATE INDEX IF NOT EXISTS idx_forum_topics_category ON forum_topics(category);
+CREATE INDEX IF NOT EXISTS idx_forum_topics_author_id ON forum_topics(author_id);
+CREATE INDEX IF NOT EXISTS idx_forum_topics_is_pinned ON forum_topics(is_pinned);
+CREATE INDEX IF NOT EXISTS idx_forum_topics_is_closed ON forum_topics(is_closed);
 
 -- ===== FORUM REPLIES TABLE =====
 CREATE TABLE IF NOT EXISTS forum_replies (
@@ -188,8 +188,8 @@ CREATE TABLE IF NOT EXISTS forum_replies (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_forum_replies_topic_id ON forum_replies(topic_id);
-CREATE INDEX idx_forum_replies_author_id ON forum_replies(author_id);
+CREATE INDEX IF NOT EXISTS idx_forum_replies_topic_id ON forum_replies(topic_id);
+CREATE INDEX IF NOT EXISTS idx_forum_replies_author_id ON forum_replies(author_id);
 
 -- ===== ENABLE ROW LEVEL SECURITY (Optional) =====
 -- ALTER TABLE products ENABLE ROW LEVEL SECURITY;
