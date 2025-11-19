@@ -16,6 +16,12 @@ import uploadRoutes from './routes/upload'
 import usersRoutes from './routes/users'
 import registrationsRoutes from './routes/registrations'
 import auditRoutes from './routes/audit.routes'
+import productRoutes from './routes/products'
+import orderRoutes from './routes/orders'
+import blogRoutes from './routes/blog'
+import artworkRoutes from './routes/artworks'
+import pressRoutes from './routes/press'
+import forumRoutes from './routes/forum'
 
 dotenv.config()
 
@@ -74,6 +80,12 @@ app.use('/api/upload', uploadRoutes)
 app.use('/api/users', usersRoutes)
 app.use('/api/registrations', registrationsRoutes)
 app.use('/api/audit-logs', auditRoutes)
+app.use('/api/products', productRoutes)
+app.use('/api/orders', orderRoutes)
+app.use('/api/blog', blogRoutes)
+app.use('/api/artworks', artworkRoutes)
+app.use('/api/press', pressRoutes)
+app.use('/api/forum', forumRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
