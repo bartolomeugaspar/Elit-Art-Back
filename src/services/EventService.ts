@@ -2,6 +2,8 @@ import { supabase } from '../config/database'
 import { IEvent, IEventInput, calculateAvailableSpots } from '../models/Event'
 import { IRegistration, IRegistrationInput } from '../models/Registration'
 import { ITestimonial, ITestimonialInput } from '../models/Testimonial'
+import { EmailService } from './EmailService'
+import { SMSService } from './SMSService'
 
 export class EventService {
   // Helper function to determine event status based on date
@@ -127,6 +129,7 @@ export class EventService {
     registrationData?: {
       full_name?: string
       email?: string
+      phone_number?: string
       payment_method?: string
       proof_url?: string
     }
@@ -175,6 +178,7 @@ export class EventService {
         payment_status: paymentStatus,
         full_name: registrationData?.full_name,
         email: registrationData?.email,
+        phone_number: registrationData?.phone_number,
         payment_method: registrationData?.payment_method,
         proof_url: registrationData?.proof_url,
       })
@@ -191,6 +195,40 @@ export class EventService {
       attendees: newAttendees,
       available_spots: calculateAvailableSpots(event.capacity, newAttendees),
     })
+
+    // Send registration confirmation email
+    if (registration.email && registration.full_name) {
+      try {
+        await EmailService.sendRegistrationEmail(
+          registration.email,
+          registration.full_name,
+          event.title,
+          event.date,
+          event.time,
+          event.location
+        )
+      } catch (emailError) {
+        console.error('Error sending registration email:', emailError)
+        // Don't throw error, just log it - the registration was created successfully
+      }
+    }
+
+    // Send registration SMS if phone number is provided
+    if (registration.phone_number && registration.full_name) {
+      try {
+        await SMSService.sendRegistrationSMS(
+          registration.phone_number,
+          registration.full_name,
+          event.title,
+          event.date,
+          event.time,
+          event.location
+        )
+      } catch (smsError) {
+        console.error('Error sending registration SMS:', smsError)
+        // Don't throw error, just log it - the registration was created successfully
+      }
+    }
 
     return registration
   }

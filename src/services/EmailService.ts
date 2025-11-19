@@ -119,13 +119,86 @@ export class EmailService {
     }
   }
 
+  static async sendRegistrationEmail(
+    email: string,
+    name: string,
+    eventTitle: string,
+    eventDate: string,
+    eventTime: string,
+    eventLocation: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        from: process.env.SMTP_FROM || 'noreply@elitArte.com',
+        to: email,
+        subject: `Inscrição Recebida - ${eventTitle}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+              <img src="https://elit-Arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 150px; height: auto; margin-bottom: 15px;">
+              <h1 style="color: #DAA520; margin: 0;">Elit'Arte</h1>
+              <p style="color: #F4A460; margin: 5px 0 0 0;">Inscrição Recebida</p>
+            </div>
+            
+            <div style="background: #fafaebff; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #8B4513;">
+              <p style="color: #2D1810; font-size: 16px;">Olá <strong>${name}</strong>,</p>
+              
+              <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
+                Obrigado por se inscrever! Recebemos sua inscrição no seguinte evento:
+              </p>
+              
+              <div style="background: #f0f0f0; padding: 20px; border-left: 4px solid #8B4513; margin: 20px 0; border-radius: 4px;">
+                <p style="color: #2D1810; font-size: 16px; font-weight: bold; margin: 0 0 10px 0;">
+                  📌 ${eventTitle}
+                </p>
+                <p style="color: #654321; font-size: 14px; margin: 5px 0;">
+                  <strong>Data:</strong> ${eventDate}
+                </p>
+                <p style="color: #654321; font-size: 14px; margin: 5px 0;">
+                  <strong>Hora:</strong> ${eventTime}
+                </p>
+                <p style="color: #654321; font-size: 14px; margin: 5px 0;">
+                  <strong>Local:</strong> ${eventLocation}
+                </p>
+              </div>
+              
+              <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
+                Sua inscrição está sendo processada. Você receberá uma confirmação em breve.
+              </p>
+              
+              <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
+                Guarde este email como comprovante da sua inscrição.
+              </p>
+              
+              <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
+                Se tiver alguma dúvida, entre em contato conosco.
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #DAA520; margin: 20px 0;">
+              
+              <p style="color: #654321; font-size: 11px; text-align: center;">
+                © 2025 Elit'Arte. Todos os direitos reservados.
+              </p>
+            </div>
+          </div>
+        `,
+      }
+
+      await transporter.sendMail(mailOptions)
+      console.log(`✅ Registration email sent to ${email}`)
+    } catch (error) {
+      console.error('❌ Error sending registration email:', error)
+      throw new Error('Failed to send registration email')
+    }
+  }
+
   static async sendRegistrationConfirmationEmail(
     email: string,
     name: string,
     eventTitle: string,
     eventDate: string,
-    eventLocation: string, 
-    
+    eventTime: string,
+    eventLocation: string
   ): Promise<void> {
     try {
       const mailOptions = {
@@ -153,6 +226,9 @@ export class EmailService {
                 </p>
                 <p style="color: #654321; font-size: 14px; margin: 5px 0;">
                   <strong>Data:</strong> ${eventDate}
+                </p>
+                <p style="color: #654321; font-size: 14px; margin: 5px 0;">
+                  <strong>Hora:</strong> ${eventTime}
                 </p>
                 <p style="color: #654321; font-size: 14px; margin: 5px 0;">
                   <strong>Local:</strong> ${eventLocation}

@@ -408,7 +408,7 @@ router.delete(
 router.post(
   '/:id/register',
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { full_name, email, payment_method, proof_url } = req.body
+    const { full_name, email, phone_number, payment_method, proof_url } = req.body
 
     const registration = await EventService.registerUserForEvent(
       req.userId,
@@ -416,6 +416,7 @@ router.post(
       {
         full_name,
         email,
+        phone_number,
         payment_method,
         proof_url,
       }

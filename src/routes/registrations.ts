@@ -4,6 +4,7 @@ import { authenticate, authorize, AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
 import { supabase } from '../config/database'
 import { EmailService } from '../services/EmailService'
+import { SMSService } from '../services/SMSService'
 
 const router = Router()
 
@@ -165,27 +166,41 @@ router.patch(
       throw updateError
     }
 
-    // Send confirmation email if status is changed to 'attended'
+    // Send confirmation email and SMS if status is changed to 'attended'
     if (req.body.status === 'attended' && updatedRegistration) {
       try {
         // Fetch event details
         const { data: event } = await supabase
           .from('events')
-          .select('title, date, location')
+          .select('title, date, time, location')
           .eq('id', updatedRegistration.event_id)
           .single()
 
         if (event) {
+          // Send email
           await EmailService.sendRegistrationConfirmationEmail(
             updatedRegistration.email,
             updatedRegistration.full_name,
             event.title,
             event.date,
+            event.time,
             event.location
           )
+
+          // Send SMS if phone number is available
+          if (updatedRegistration.phone_number) {
+            await SMSService.sendConfirmationSMS(
+              updatedRegistration.phone_number,
+              updatedRegistration.full_name,
+              event.title,
+              event.date,
+              event.time,
+              event.location
+            )
+          }
         }
       } catch (emailError) {
-        console.error('Error sending confirmation email:', emailError)
+        console.error('Error sending confirmation email/SMS:', emailError)
         // Don't throw error, just log it - the registration was updated successfully
       }
     }

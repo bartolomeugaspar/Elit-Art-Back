@@ -8,6 +8,8 @@ export interface IRegistration {
   payment_method?: string
   proof_url?: string
   full_name?: string
+  email?: string
+  phone_number?: string
   payment_notes?: string
   created_at: Date
   updated_at: Date
@@ -21,5 +23,7 @@ export interface IRegistrationInput {
   payment_method?: string
   proof_url?: string
   full_name?: string
+  email?: string
+  phone_number?: string
   payment_notes?: string
 }
