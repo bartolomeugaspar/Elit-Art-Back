@@ -156,7 +156,7 @@ export class EventService {
         .single()
 
       if (existingRegistration) {
-        throw new ConflictError('Este e-mail já está registrado para este evento')
+        throw new ConflictError('Este e-mail já está registrado para este evento. Você pode se inscrever em outros eventos, mas apenas uma vez por evento.')
       }
     }
 
