@@ -146,17 +146,17 @@ export class EventService {
       throw new ValidationError('No available spots for this event')
     }
 
-    // Check for existing registration by email to prevent duplicates
-    if (registrationData?.email) {
+    // Check for existing registration by name to prevent duplicates
+    if (registrationData?.full_name) {
       const { data: existingRegistration } = await supabase
         .from('registrations')
         .select('id')
-        .eq('email', registrationData.email)
+        .eq('full_name', registrationData.full_name)
         .eq('event_id', eventId)
         .single()
 
       if (existingRegistration) {
-        throw new ConflictError('Este e-mail já está registrado para este evento. Você pode se inscrever em outros eventos, mas apenas uma vez por evento.')
+        throw new ConflictError('Este nome já está registrado para este evento. Você pode se inscrever em outros eventos, mas apenas uma vez por evento.')
       }
     }
 
