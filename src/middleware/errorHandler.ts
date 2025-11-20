@@ -5,8 +5,18 @@ export interface ApiError extends Error {
 }
 
 export const errorHandler = (err: ApiError, req: Request, res: Response, next: NextFunction): void => {
-  const statusCode = err.statusCode || 500
-  const message = err.message || 'Internal Server Error'
+  // Default status code
+  let statusCode = err.statusCode || 500
+  let message = err.message || 'Internal Server Error'
+
+  // Handle specific error types
+  if (err.name === 'ValidationError') {
+    statusCode = 400
+  } else if (err.name === 'ConflictError') {
+    statusCode = 409
+  } else if (err.name === 'NotFoundError') {
+    statusCode = 404
+  }
 
   console.error(`[${new Date().toISOString()}] Error:`, err)
 

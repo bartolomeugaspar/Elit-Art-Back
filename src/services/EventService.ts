@@ -4,6 +4,7 @@ import { IRegistration, IRegistrationInput } from '../models/Registration'
 import { ITestimonial, ITestimonialInput } from '../models/Testimonial'
 import { EmailService } from './EmailService'
 import { SMSService } from './SMSService'
+import { ValidationError, ConflictError, NotFoundError } from '../utils/errors'
 
 export class EventService {
   // Helper function to determine event status based on date
@@ -137,12 +138,12 @@ export class EventService {
     // Get event
     const event = await this.getEventById(eventId)
     if (!event) {
-      throw new Error('Event not found')
+      throw new NotFoundError('Event not found')
     }
 
     // Validate available spots
     if (event.available_spots <= 0 || event.attendees >= event.capacity) {
-      throw new Error('No available spots for this event')
+      throw new ValidationError('No available spots for this event')
     }
 
     // Check for existing registration by email to prevent duplicates
@@ -155,7 +156,7 @@ export class EventService {
         .single()
 
       if (existingRegistration) {
-        throw new Error('This email is already registered for this event')
+        throw new ConflictError('Este e-mail já está registrado para este evento')
       }
     }
 
