@@ -19,7 +19,7 @@ export class AuthService {
       .from('users')
       .select('id')
       .eq('email', email)
-      .single()
+      .single() 
 
     if (existingUser) {
       throw new Error('Email already registered')
