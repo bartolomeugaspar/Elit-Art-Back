@@ -196,6 +196,16 @@ router.patch(
               event.time,
               event.location
             )
+            
+            // Send WhatsApp confirmation
+            const { WhatsAppService } = await import('../services/WhatsAppService')
+            await WhatsAppService.sendRegistrationConfirmation(
+              updatedRegistration.phone_number,
+              updatedRegistration.full_name,
+              event.title,
+              event.date,
+              event.location
+            ).catch(err => console.error('Erro ao enviar WhatsApp:', err))
           }
         }
       } catch (emailError) {

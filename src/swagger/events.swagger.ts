@@ -67,6 +67,14 @@
  * /events:
  *   post:
  *     summary: Criar novo evento (artista/admin)
+ *     description: |
+ *       Cria um novo evento e notifica todos os inscritos na newsletter.
+ *       
+ *       **Notificações Automáticas para Inscritos:**
+ *       - 📧 Email para todos os inscritos da newsletter
+ *       - 📱 WhatsApp para inscritos que têm telefone cadastrado
+ *       
+ *       **Nota:** As notificações são enviadas em background e não bloqueiam a criação do evento.
  *     tags:
  *       - Eventos
  *     security:

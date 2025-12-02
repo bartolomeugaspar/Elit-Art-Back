@@ -80,6 +80,33 @@ export class EventService {
           console.error('Erro ao enviar notificações em massa:', error)
         })
         
+        // Enviar WhatsApp em background para inscritos com telefone
+        // Nota: Newsletter só tem email, então vamos buscar usuários com telefone
+        const { WhatsAppService } = await import('./WhatsAppService')
+        
+        // Buscar usuários que têm emails da newsletter e telefone cadastrado
+        const { data: usersWithPhone } = await supabase
+          .from('users')
+          .select('email, phone')
+          .in('email', subscriberEmails)
+          .not('phone', 'is', null)
+        
+        if (usersWithPhone && usersWithPhone.length > 0) {
+          WhatsAppService.sendBulkNewEventNotifications(
+            usersWithPhone,
+            event.title,
+            event.description,
+            eventDate,
+            eventTime,
+            event.location,
+            event.category,
+            event.price,
+            event.is_free
+          ).catch(error => {
+            console.error('Erro ao enviar notificações WhatsApp em massa:', error)
+          })
+        }
+        
         console.log(`✅ Evento criado! Notificações sendo enviadas para ${subscribers.length} inscritos...`)
       }
     } catch (error) {
@@ -266,6 +293,21 @@ export class EventService {
           event.location
         )
       } catch (smsError) {
+        // Don't throw error, just log it - the registration was created successfully
+      }
+      
+      // Send WhatsApp registration confirmation
+      try {
+        const { WhatsAppService } = await import('./WhatsAppService')
+        await WhatsAppService.sendRegistrationReceived(
+          registration.phone_number,
+          registration.full_name,
+          event.title,
+          event.date,
+          event.time,
+          event.location
+        )
+      } catch (whatsappError) {
         // Don't throw error, just log it - the registration was created successfully
       }
     }

@@ -23,6 +23,7 @@ import artworkRoutes from './routes/artworks'
 import pressRoutes from './routes/press'
 import forumRoutes from './routes/forum'
 import contactRoutes from './routes/contact'
+import whatsappRoutes from './routes/whatsapp'
 
 dotenv.config()
 
@@ -87,6 +88,7 @@ app.use('/api/artworks', artworkRoutes)
 app.use('/api/press', pressRoutes)
 app.use('/api/forum', forumRoutes)
 app.use('/api/contact', contactRoutes)
+app.use('/api/whatsapp', whatsappRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

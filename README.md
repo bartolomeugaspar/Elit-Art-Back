@@ -38,13 +38,48 @@ cp .env.example .env
 Edite o arquivo `.env` com suas configurações:
 
 ```env
+# Server
 PORT=5000
 NODE_ENV=development
-MONGODB_URI=mongodb://localhost:27017/elit-Arte
+FRONTEND_URL=http://localhost:3000
+
+# Database (Supabase)
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+
+# JWT
 JWT_SECRET=sua_chave_secreta_aqui
 JWT_EXPIRE=7d
-FRONTEND_URL=http://localhost:3000
+
+# Email (SMTP)
+SMTP_HOST=smtp.mailtrap.io
+SMTP_PORT=2525
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_password
+SMTP_FROM=noreply@elitarte.com
+
+# WhatsApp (Green-API)
+GREEN_API_URL=https://7105.api.green-api.com
+GREEN_API_MEDIA_URL=https://7105.media.green-api.com
+GREEN_API_INSTANCE_ID=7105402510
+GREEN_API_TOKEN=your_green_api_token
 ```
+
+### 📱 Integração WhatsApp (Green-API)
+
+O backend está integrado com o **Green-API** para enviar notificações via WhatsApp. Todas as notificações enviadas por email também são enviadas por WhatsApp quando o usuário possui número de telefone cadastrado.
+
+**Notificações enviadas:**
+- ✅ Boas-vindas ao registrar novo usuário
+- ✅ Recuperação de senha
+- ✅ Confirmação de inscrição em eventos
+- ✅ Registro recebido em eventos
+- ✅ Resposta a mensagens de contato
+- ✅ Notificação de login
+- ✅ Novos eventos para inscritos na newsletter
+
+**Configuração:**
+As credenciais do Green-API já estão pré-configuradas no `.env.example`. Certifique-se de que sua instância WhatsApp está autorizada e ativa no painel Green-API.
 
 ## 🏃 Executar
 

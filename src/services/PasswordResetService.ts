@@ -42,9 +42,14 @@ export class PasswordResetService {
         throw new Error('Failed to store reset token')
       }
 
-      // Send reset email
+      // Send reset email and WhatsApp
       const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`
       await EmailService.sendPasswordResetEmail(email, user.name, resetToken, resetLink)
+      
+      // Send WhatsApp notification
+      const { WhatsAppService } = await import('./WhatsAppService')
+      await WhatsAppService.sendPasswordResetMessage(email, user.name, resetLink)
+        .catch(err => console.error('Error sending reset WhatsApp:', err))
 
     } catch (error) {
       throw new Error('Failed to process password reset request')

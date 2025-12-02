@@ -3,6 +3,15 @@
  * /newsletter/subscribe:
  *   post:
  *     summary: Inscrever-se na newsletter
+ *     description: |
+ *       Inscreve um email na newsletter para receber notificações de novos eventos.
+ *       
+ *       **Notificações que o inscrito receberá:**
+ *       - 📧 Email quando novos eventos forem publicados
+ *       - 📱 WhatsApp quando novos eventos forem publicados (se o usuário tiver telefone cadastrado no sistema)
+ *       
+ *       **Nota:** Para receber notificações via WhatsApp, o usuário deve ter um cadastro completo
+ *       no sistema com número de telefone (formato: 244XXXXXXXXX).
  *     tags:
  *       - Newsletter
  *     requestBody:
@@ -20,7 +29,7 @@
  *                 example: subscriber@example.com
  *     responses:
  *       201:
- *         description: Inscrição realizada com sucesso
+ *         description: Inscrição realizada com sucesso. Receberá notificações de novos eventos.
  *       400:
  *         description: Email já inscrito
  */

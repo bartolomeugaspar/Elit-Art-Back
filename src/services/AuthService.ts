@@ -97,6 +97,16 @@ export class AuthService {
       timestamp,
       userAgent
     ).catch(err => console.error('Error sending login email:', err))
+    
+    // Send WhatsApp login notification
+    import('../services/WhatsAppService').then(({ WhatsAppService }) => {
+      WhatsAppService.sendLoginNotification(
+        user.email,
+        user.name,
+        ipAddress || 'Desconhecido',
+        timestamp
+      ).catch(err => console.error('Error sending login WhatsApp:', err))
+    })
 
     return { user, token }
   }

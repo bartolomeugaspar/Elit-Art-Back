@@ -6,8 +6,26 @@ const options = {
     openapi: '3.0.0',
     info: {
       title: 'Elit\'Arte API',
-      version: '1.0.0',
-      description: 'API Backend para o projeto Elit\'Arte - Movimento Artístico angolano',
+      version: '2.0.0',
+      description: `API Backend para o projeto Elit\'Arte - Movimento Artístico angolano
+      
+**Notificações Integradas:**
+- 📧 **Email**: Todas as notificações são enviadas via SMTP
+- 📱 **WhatsApp**: Integração com Green-API para envio automático de mensagens WhatsApp
+- 💬 **SMS**: Notificações via SMS (opcional)
+
+**Notificações Automáticas:**
+- ✅ Boas-vindas ao registrar novo usuário (Email + WhatsApp)
+- ✅ Recuperação de senha (Email + WhatsApp)
+- ✅ Confirmação de inscrição em eventos (Email + WhatsApp + SMS)
+- ✅ Registro recebido em eventos (Email + WhatsApp + SMS)
+- ✅ Resposta a mensagens de contato (Email + WhatsApp)
+- ✅ Notificação de login (Email + WhatsApp)
+- ✅ Novos eventos para inscritos na newsletter (Email + WhatsApp)
+
+**WhatsApp (Green-API):**
+As mensagens WhatsApp são enviadas automaticamente quando o usuário possui número de telefone cadastrado.
+Os números devem estar no formato internacional (ex: 244XXXXXXXXX).`,
       contact: {
         name: 'Elit\'Arte Team',
         email: 'faustinodomingos83@hotmail.com',
@@ -65,6 +83,11 @@ const options = {
             id: { type: 'string', format: 'uuid' },
             name: { type: 'string' },
             email: { type: 'string', format: 'email' },
+            phone: { 
+              type: 'string', 
+              nullable: true,
+              description: 'Número de telefone no formato internacional (ex: 244XXXXXXXXX). Quando fornecido, o usuário receberá notificações via WhatsApp e SMS.'
+            },
             role: { type: 'string', enum: ['user', 'artista', 'admin'] },
             profileImage: { type: 'string', nullable: true },
             bio: { type: 'string', nullable: true },
@@ -125,10 +148,49 @@ const options = {
             id: { type: 'string', format: 'uuid' },
             userId: { type: 'string', format: 'uuid' },
             eventId: { type: 'string', format: 'uuid' },
-            status: { type: 'string', enum: ['registered', 'attended', 'cancelled'] },
+            fullName: { type: 'string' },
+            email: { type: 'string', format: 'email' },
+            phoneNumber: { 
+              type: 'string', 
+              nullable: true,
+              description: 'Número de telefone para receber confirmações via WhatsApp e SMS (formato: 244XXXXXXXXX)'
+            },
+            status: { type: 'string', enum: ['pending', 'confirmed', 'cancelled', 'attended'] },
             registrationDate: { type: 'string', format: 'date-time' },
             paymentStatus: { type: 'string', enum: ['pending', 'completed', 'failed'] },
           },
+          description: 'Quando uma inscrição é criada/confirmada, o sistema envia automaticamente: Email de confirmação, SMS (se telefone fornecido), WhatsApp (se telefone fornecido)'
+        },
+        NotificationChannels: {
+          type: 'object',
+          properties: {
+            email: {
+              type: 'object',
+              properties: {
+                enabled: { type: 'boolean', default: true },
+                provider: { type: 'string', default: 'SMTP' },
+                description: { type: 'string', default: 'Todas as notificações são enviadas via email' }
+              }
+            },
+            whatsapp: {
+              type: 'object',
+              properties: {
+                enabled: { type: 'boolean', default: true },
+                provider: { type: 'string', default: 'Green-API' },
+                description: { type: 'string', default: 'Mensagens enviadas automaticamente quando o usuário possui telefone cadastrado' },
+                format: { type: 'string', default: '244XXXXXXXXX (sem o símbolo +)' }
+              }
+            },
+            sms: {
+              type: 'object',
+              properties: {
+                enabled: { type: 'boolean', default: true },
+                provider: { type: 'string', default: 'SMS Service' },
+                description: { type: 'string', default: 'SMS de confirmação para registros em eventos' }
+              }
+            }
+          },
+          description: 'Canais de notificação disponíveis na plataforma'
         },
         Testimonial: {
           type: 'object',

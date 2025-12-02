@@ -224,9 +224,10 @@ router.post(
       })
     }
 
-    // Enviar email de resposta
+    // Enviar email e WhatsApp de resposta
     try {
       const { EmailService } = await import('../services/EmailService')
+      const { WhatsAppService } = await import('../services/WhatsAppService')
       
       await EmailService.sendContactReply(
         message.email,
@@ -236,6 +237,17 @@ router.post(
         reply,
         'Equipa Elit\'Arte'
       )
+      
+      // Enviar também por WhatsApp se houver número de telefone
+      if (message.phone) {
+        await WhatsAppService.sendContactReply(
+          message.phone,
+          message.name,
+          message.subject,
+          reply,
+          'Equipa Elit\'Arte'
+        ).catch(err => console.error('Erro ao enviar WhatsApp:', err))
+      }
 
       // Atualizar status para "replied"
       await supabase

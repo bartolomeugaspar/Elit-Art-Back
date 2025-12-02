@@ -3,6 +3,14 @@
  * /auth/register:
  *   post:
  *     summary: Registrar novo usuário
+ *     description: |
+ *       Registra um novo usuário no sistema.
+ *       
+ *       **Notificações Automáticas:**
+ *       - 📧 Email de boas-vindas com credenciais
+ *       - 📱 Mensagem WhatsApp de boas-vindas (se telefone cadastrado)
+ *       
+ *       **Nota:** As notificações são enviadas em background e não bloqueiam o registro.
  *     tags:
  *       - Autenticação
  *     requestBody:
@@ -27,9 +35,13 @@
  *                 type: string
  *                 format: password
  *                 example: senha123
+ *               phone:
+ *                 type: string
+ *                 description: Número de telefone para receber notificações via WhatsApp (formato 244XXXXXXXXX)
+ *                 example: "244923456789"
  *     responses:
  *       201:
- *         description: Usuário registrado com sucesso
+ *         description: Usuário registrado com sucesso. Notificações enviadas por email e WhatsApp.
  *       400:
  *         description: Dados inválidos
  */
@@ -39,6 +51,14 @@
  * /auth/login:
  *   post:
  *     summary: Fazer login
+ *     description: |
+ *       Realiza login no sistema.
+ *       
+ *       **Notificações Automáticas de Segurança:**
+ *       - 📧 Email notificando sobre novo acesso (IP, data/hora, dispositivo)
+ *       - 📱 Mensagem WhatsApp notificando sobre novo acesso (se telefone cadastrado)
+ *       
+ *       **Nota:** As notificações são enviadas em background para segurança do usuário.
  *     tags:
  *       - Autenticação
  *     requestBody:
@@ -61,7 +81,7 @@
  *                 example: senha123
  *     responses:
  *       200:
- *         description: Login realizado com sucesso
+ *         description: Login realizado com sucesso. Notificação de segurança enviada.
  *       401:
  *         description: Email ou senha inválidos
  */
