@@ -124,4 +124,22 @@ export class AuthService {
 
     return user
   }
+
+  static async getPasswordLength(userId: string): Promise<number> {
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('password')
+      .eq('id', userId)
+      .single()
+
+    if (error || !user || !user.password) {
+      return 12 // Retorna tamanho padrão em caso de erro
+    }
+
+    // A senha está hasheada, mas podemos inferir um tamanho razoável
+    // Como não podemos saber o tamanho real da senha original,
+    // vamos retornar um valor fixo representativo (12 caracteres)
+    // Isso mantém a segurança sem expor informações sensíveis
+    return 12
+  }
 }

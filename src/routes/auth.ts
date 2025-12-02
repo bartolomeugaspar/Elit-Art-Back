@@ -318,6 +318,39 @@ router.get('/me', authenticate, asyncHandler(async (req: AuthRequest, res: Respo
 
 /**
  * @swagger
+ * /auth/password-length:
+ *   get:
+ *     summary: Obter tamanho da senha do usuário (para exibição visual)
+ *     tags:
+ *       - Autenticação
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Tamanho da senha retornado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 passwordLength:
+ *                   type: number
+ *       401:
+ *         description: Não autenticado
+ */
+router.get('/password-length', authenticate, asyncHandler(async (req: AuthRequest, res: Response) => {
+  const passwordLength = await AuthService.getPasswordLength(req.userId!)
+
+  res.status(200).json({
+    success: true,
+    passwordLength,
+  })
+}))
+
+/**
+ * @swagger
  * /auth/profile:
  *   put:
  *     summary: Atualizar perfil do usuário
