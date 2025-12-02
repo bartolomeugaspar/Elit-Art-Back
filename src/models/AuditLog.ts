@@ -30,7 +30,6 @@ export class AuditLog {
       .single();
 
     if (error) {
-      console.error('Error creating audit log:', error);
       return null;
     }
 
@@ -48,7 +47,6 @@ export class AuditLog {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching audit logs by user ID:', error);
       return [];
     }
 
@@ -67,7 +65,6 @@ export class AuditLog {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching audit logs by entity:', error);
       return [];
     }
 
@@ -98,12 +95,10 @@ export class AuditLog {
       .select();
 
     if (error) {
-      console.error('Error deleting old session logs:', error);
       return 0;
     }
 
     const deletedCount = data?.length || 0;
-    console.log(`[AuditLog.deleteOldSessionLogs] Deleted ${deletedCount} session logs older than ${daysOld} days`);
     return deletedCount;
   }
 
@@ -122,12 +117,10 @@ export class AuditLog {
       .select();
 
     if (error) {
-      console.error('Error deleting old logs:', error);
       return 0;
     }
 
     const deletedCount = data?.length || 0;
-    console.log(`[AuditLog.deleteOldLogs] Deleted ${deletedCount} logs older than ${daysOld} days`);
     return deletedCount;
   }
 }

@@ -22,6 +22,7 @@ import blogRoutes from './routes/blog'
 import artworkRoutes from './routes/artworks'
 import pressRoutes from './routes/press'
 import forumRoutes from './routes/forum'
+import contactRoutes from './routes/contact'
 
 dotenv.config()
 
@@ -44,7 +45,6 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.warn(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -86,6 +86,7 @@ app.use('/api/blog', blogRoutes)
 app.use('/api/artworks', artworkRoutes)
 app.use('/api/press', pressRoutes)
 app.use('/api/forum', forumRoutes)
+app.use('/api/contact', contactRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -117,12 +118,8 @@ const startServer = async () => {
     LogCleanupService.startCleanupScheduler(6)
     
     app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`)
-      console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`)
-      console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`)
     })
   } catch (error) {
-    console.error('❌ Failed to start server:', error)
     process.exit(1)
   }
 }

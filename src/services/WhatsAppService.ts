@@ -25,14 +25,12 @@ export class WhatsAppService {
   ): Promise<void> {
     // Verificar se as credenciais estão configuradas
     if (!PHONE_NUMBER_ID || !ACCESS_TOKEN) {
-      console.warn('⚠️ WhatsApp API não configurada. Defina WHATSAPP_PHONE_NUMBER_ID e WHATSAPP_ACCESS_TOKEN no .env')
       return
     }
 
     // Limpar e validar número de telefone
     const cleanPhone = this.formatPhoneNumber(phoneNumber)
     if (!cleanPhone) {
-      console.warn(`⚠️ Número de telefone inválido: ${phoneNumber}`)
       return
     }
 
@@ -100,17 +98,12 @@ export class WhatsAppService {
       })
 
       if (response.data && response.data.messages) {
-        console.log(`✅ WhatsApp confirmation sent to ${cleanPhone}`)
-        console.log(`📱 Message ID: ${response.data.messages[0].id}`)
-        console.log(`📋 Mode: ${useTemplate ? 'Template (Production)' : 'Text (Development)'}`)
       }
     } catch (error: any) {
-      console.error('❌ Error sending WhatsApp message:', error.response?.data || error.message)
       
       // Log detalhado do erro
       if (error.response?.data?.error) {
         const whatsappError = error.response.data.error
-        console.error(`WhatsApp API Error: ${whatsappError.message} (Code: ${whatsappError.code})`)
       }
       
       // Não lançar erro para não bloquear o fluxo principal
@@ -130,13 +123,11 @@ export class WhatsAppService {
     templateParams: string[]
   ): Promise<void> {
     if (!PHONE_NUMBER_ID || !ACCESS_TOKEN) {
-      console.warn('⚠️ WhatsApp API não configurada')
       return
     }
 
     const cleanPhone = this.formatPhoneNumber(phoneNumber)
     if (!cleanPhone) {
-      console.warn(`⚠️ Número de telefone inválido: ${phoneNumber}`)
       return
     }
 
@@ -172,11 +163,8 @@ export class WhatsAppService {
       })
 
       if (response.data && response.data.messages) {
-        console.log(`✅ WhatsApp template message sent to ${cleanPhone}`)
-        console.log(`📱 Message ID: ${response.data.messages[0].id}`)
       }
     } catch (error: any) {
-      console.error('❌ Error sending WhatsApp template:', error.response?.data || error.message)
     }
   }
 
@@ -214,7 +202,6 @@ export class WhatsAppService {
    */
   static async testConnection(): Promise<boolean> {
     if (!PHONE_NUMBER_ID || !ACCESS_TOKEN) {
-      console.error('⚠️ WhatsApp credentials not configured')
       return false
     }
 
@@ -226,11 +213,8 @@ export class WhatsAppService {
         }
       })
 
-      console.log('✅ WhatsApp API connection successful')
-      console.log('📱 Phone Number Info:', response.data)
       return true
     } catch (error: any) {
-      console.error('❌ WhatsApp API connection failed:', error.response?.data || error.message)
       return false
     }
   }

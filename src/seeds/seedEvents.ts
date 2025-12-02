@@ -5,7 +5,6 @@ dotenv.config()
 
 const seedEvents = async () => {
   try {
-    console.log('🌱 StArteing events seed...')
 
     // Get existing users
     const { data: admin } = await supabase
@@ -31,11 +30,9 @@ const seedEvents = async () => {
     }
 
     // Delete existing events
-    console.log('🗑️  Deleting existing events...')
     await supabase.from('events').delete().neq('id', '00000000-0000-0000-0000-000000000000')
 
     // Create events
-    console.log('📝 Creating events...')
     const { data: events, error: eventsError } = await supabase
       .from('events')
       .insert([
@@ -178,16 +175,11 @@ const seedEvents = async () => {
 
     if (eventsError) throw new Error(`Events creation failed: ${eventsError.message}`)
 
-    console.log('✅ Events seeded successfully!')
-    console.log(`🎪 Created ${events?.length || 0} events`)
-    console.log('\n📋 Events Created:')
     events?.forEach((event, index) => {
-      console.log(`${index + 1}. ${event.title} (${event.category})`)
     })
 
     process.exit(0)
   } catch (error) {
-    console.error('❌ Error seeding events:', error)
     process.exit(1)
   }
 }

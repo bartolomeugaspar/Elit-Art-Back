@@ -69,9 +69,7 @@ export class EmailService {
       }
 
       await transporter.sendMail(mailOptions)
-      console.log(`✅ Password reset email sent to ${email}`)
     } catch (error) {
-      console.error('❌ Error sending password reset email:', error)
       throw new Error('Failed to send password reset email')
     }
   }
@@ -112,9 +110,7 @@ export class EmailService {
       }
 
       await transporter.sendMail(mailOptions)
-      console.log(`✅ Welcome email sent to ${email}`)
     } catch (error) {
-      console.error('❌ Error sending welcome email:', error)
       throw new Error('Failed to send welcome email')
     }
   }
@@ -185,9 +181,7 @@ export class EmailService {
       }
 
       await transporter.sendMail(mailOptions)
-      console.log(`✅ Registration email sent to ${email}`)
     } catch (error) {
-      console.error('❌ Error sending registration email:', error)
       throw new Error('Failed to send registration email')
     }
   }
@@ -254,9 +248,7 @@ export class EmailService {
       }
 
       await transporter.sendMail(mailOptions)
-      console.log(`✅ Registration confirmation email sent to ${email}`)
     } catch (error) {
-      console.error('❌ Error sending registration confirmation email:', error)
       throw new Error('Failed to send registration confirmation email')
     }
   }

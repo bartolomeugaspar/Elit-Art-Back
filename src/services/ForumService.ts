@@ -29,6 +29,15 @@ export class ForumService {
     return data || null
   }
 
+  static async getTopicWithReplies(id: string): Promise<{ topic: IForumTopic; replies: IForumReply[] } | null> {
+    const topic = await this.getTopicById(id)
+    if (!topic) return null
+
+    const replies = await this.getRepliesByTopic(id)
+
+    return { topic, replies }
+  }
+
   static async getTopicsByAuthor(authorId: string): Promise<IForumTopic[]> {
     const { data, error } = await supabase
       .from('forum_topics')
@@ -132,13 +141,6 @@ export class ForumService {
 
     if (topic.is_closed) throw new Error('Topic is closed')
 
-    console.log('Creating reply with data:', {
-      topic_id: replyData.topic_id,
-      author_name: replyData.author_name,
-      author_id: replyData.author_id,
-      content_length: replyData.content?.length,
-    })
-
     const { data, error } = await supabase
       .from('forum_replies')
       .insert({
@@ -149,16 +151,8 @@ export class ForumService {
       .single()
 
     if (error) {
-      console.error('Supabase error creating reply:', {
-        code: error.code,
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-      })
       throw new Error(`Failed to create reply: ${error.message}`)
     }
-
-    console.log('Reply created successfully:', data.id)
 
     // Increment replies count
     await this.updateTopic(replyData.topic_id, {

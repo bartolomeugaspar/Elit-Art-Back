@@ -44,7 +44,6 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     req.userRole = role;
     next()
   } catch (error) {
-    console.error('Auth error:', error)
     res.status(401).json({ message: 'Invalid token' })
   }
 }

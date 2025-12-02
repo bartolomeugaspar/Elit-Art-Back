@@ -30,13 +30,11 @@ export class SMSService {
     // Validar número de telefone
     const cleanPhone = this.formatPhoneNumber(phoneNumber)
     if (!cleanPhone) {
-      console.warn(`⚠️ Número de telefone inválido: ${phoneNumber}`)
       return
     }
 
     // Verificar se o SMS está configurado
     if (!this.isConfigured()) {
-      console.warn(`⚠️ SMS não configurado. Provedor: ${SMS_PROVIDER}`)
       return
     }
 
@@ -46,10 +44,8 @@ export class SMSService {
       if (SMS_PROVIDER === 'twilio') {
         await this.sendViaTwilio(cleanPhone, message)
       } else {
-        console.warn(`⚠️ Provedor SMS não suportado: ${SMS_PROVIDER}`)
       }
     } catch (error) {
-      console.error('❌ Error sending SMS:', error)
       // Não lançar erro para não bloquear o fluxo principal
     }
   }
@@ -73,12 +69,10 @@ export class SMSService {
   ): Promise<void> {
     const cleanPhone = this.formatPhoneNumber(phoneNumber)
     if (!cleanPhone) {
-      console.warn(`⚠️ Número de telefone inválido: ${phoneNumber}`)
       return
     }
 
     if (!this.isConfigured()) {
-      console.warn(`⚠️ SMS não configurado. Provedor: ${SMS_PROVIDER}`)
       return
     }
 
@@ -88,10 +82,8 @@ export class SMSService {
       if (SMS_PROVIDER === 'twilio') {
         await this.sendViaTwilio(cleanPhone, message)
       } else {
-        console.warn(`⚠️ Provedor SMS não suportado: ${SMS_PROVIDER}`)
       }
     } catch (error) {
-      console.error('❌ Error sending confirmation SMS:', error)
     }
   }
 
@@ -122,11 +114,8 @@ export class SMSService {
       })
 
       if (response.data && response.data.sid) {
-        console.log(`✅ SMS sent successfully to ${phoneNumber}`)
-        console.log(`📱 Message SID: ${response.data.sid}`)
       }
     } catch (error: any) {
-      console.error('❌ Twilio API Error:', error.response?.data || error.message)
       throw error
     }
   }
@@ -204,7 +193,6 @@ export class SMSService {
    */
   static async testConnection(): Promise<boolean> {
     if (!this.isConfigured()) {
-      console.error(`⚠️ SMS não configurado. Provedor: ${SMS_PROVIDER}`)
       return false
     }
 
@@ -219,12 +207,9 @@ export class SMSService {
           },
         })
 
-        console.log('✅ SMS (Twilio) connection successful')
-        console.log('📱 Account:', response.data.friendly_name)
         return true
       }
     } catch (error: any) {
-      console.error('❌ SMS connection failed:', error.response?.data || error.message)
       return false
     }
 

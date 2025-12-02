@@ -13,11 +13,9 @@ export class LogCleanupService {
    */
   static startCleanupScheduler(intervalHours: number = 6): void {
     if (this.cleanupInterval) {
-      console.log('[LogCleanupService] Cleanup scheduler already running');
       return;
     }
 
-    console.log(`[LogCleanupService] Starting cleanup scheduler - runs every ${intervalHours} hours`);
 
     // Run cleanup immediately on startup
     this.runCleanup();
@@ -36,7 +34,6 @@ export class LogCleanupService {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
-      console.log('[LogCleanupService] Cleanup scheduler stopped');
     }
   }
 
@@ -45,7 +42,6 @@ export class LogCleanupService {
    */
   private static async runCleanup(): Promise<void> {
     try {
-      console.log('[LogCleanupService] Starting cleanup process...');
       const startTime = Date.now();
 
       // Delete session logs older than 2 days
@@ -55,10 +51,7 @@ export class LogCleanupService {
       const otherLogsDeleted = await AuditLog.deleteOldLogs(30);
 
       const duration = Date.now() - startTime;
-      console.log(`[LogCleanupService] Cleanup completed in ${duration}ms`);
-      console.log(`[LogCleanupService] Summary: ${sessionLogsDeleted} session logs + ${otherLogsDeleted} other logs deleted`);
     } catch (error) {
-      console.error('[LogCleanupService] Error during cleanup:', error);
     }
   }
 
@@ -67,7 +60,6 @@ export class LogCleanupService {
    */
   static async manualCleanup(): Promise<{ sessionLogs: number; otherLogs: number }> {
     try {
-      console.log('[LogCleanupService] Manual cleanup triggered');
       const sessionLogsDeleted = await AuditLog.deleteOldSessionLogs(2);
       const otherLogsDeleted = await AuditLog.deleteOldLogs(30);
 
@@ -76,7 +68,6 @@ export class LogCleanupService {
         otherLogs: otherLogsDeleted,
       };
     } catch (error) {
-      console.error('[LogCleanupService] Error during manual cleanup:', error);
       return {
         sessionLogs: 0,
         otherLogs: 0,

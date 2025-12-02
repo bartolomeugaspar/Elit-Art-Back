@@ -75,7 +75,6 @@ export const auditMiddleware = (entityType: string) => {
           );
         }
       } catch (error) {
-        console.error('Error logging audit:', error);
       }
     });
 

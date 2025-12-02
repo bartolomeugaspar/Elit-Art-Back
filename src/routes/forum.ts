@@ -59,9 +59,9 @@ router.get(
 router.get(
   '/topics/:id',
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const topic = await ForumService.getTopicById(req.params.id)
+    const result = await ForumService.getTopicWithReplies(req.params.id)
 
-    if (!topic) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: 'Topic not found',
@@ -73,7 +73,8 @@ router.get(
 
     res.status(200).json({
       success: true,
-      topic,
+      topic: result.topic,
+      replies: result.replies,
     })
   })
 )
@@ -389,7 +390,6 @@ router.post(
         reply,
       })
     } catch (error) {
-      console.error('Error creating reply:', error)
       const message = error instanceof Error ? error.message : 'Failed to create reply'
       
       // Check if it's a "Topic is closed" error

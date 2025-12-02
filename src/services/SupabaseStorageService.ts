@@ -34,7 +34,6 @@ export class SupabaseStorageService {
 
       return publicUrlData.publicUrl
     } catch (error) {
-      console.error('[SupabaseStorageService] Upload error:', error)
       throw error
     }
   }
@@ -50,7 +49,6 @@ export class SupabaseStorageService {
       // Format: https://xxxxx.supabase.co/storage/v1/object/public/event-images/uploads/filename
       const urlParts = publicUrl.split(`${this.BUCKET_NAME}/`)
       if (urlParts.length < 2) {
-        console.warn('[SupabaseStorageService] Invalid URL format:', publicUrl)
         return false
       }
 
@@ -61,13 +59,11 @@ export class SupabaseStorageService {
         .remove([filePath])
 
       if (error) {
-        console.error('[SupabaseStorageService] Delete error:', error)
         return false
       }
 
       return true
     } catch (error) {
-      console.error('[SupabaseStorageService] Delete error:', error)
       return false
     }
   }
@@ -127,7 +123,6 @@ export class SupabaseStorageService {
 
       return publicUrlData.publicUrl
     } catch (error) {
-      console.error('[SupabaseStorageService] Upload from URL error:', error)
       throw error
     }
   }
@@ -140,20 +135,13 @@ export class SupabaseStorageService {
       const { data, error } = await supabase.storage.listBuckets()
 
       if (error) {
-        console.error('[SupabaseStorageService] Error listing buckets:', error)
         return false
       }
 
       const bucketExists = data?.some((b) => b.name === this.BUCKET_NAME)
-      if (!bucketExists) {
-        console.warn(
-          `[SupabaseStorageService] Bucket "${this.BUCKET_NAME}" not found. Please create it in Supabase dashboard.`
-        )
-      }
 
       return !!bucketExists
     } catch (error) {
-      console.error('[SupabaseStorageService] Bucket access check error:', error)
       return false
     }
   }

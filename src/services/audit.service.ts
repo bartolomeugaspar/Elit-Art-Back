@@ -29,7 +29,6 @@ export class AuditService {
         user_agent: data.userAgent || (req?.get('user-agent') || null)
       };
 
-      console.log('[AuditService] Salvando log:', logData);
 
       const { error, data: insertedData } = await supabase
         .from('audit_logs')
@@ -37,12 +36,9 @@ export class AuditService {
         .select();
 
       if (error) {
-        console.error('[AuditService] Erro ao salvar log:', error);
       } else {
-        console.log('[AuditService] Log salvo com sucesso:', insertedData);
       }
     } catch (error) {
-      console.error('[AuditService] Erro inesperado ao salvar log:', error);
     }
   }
 
@@ -54,7 +50,6 @@ export class AuditService {
     offset = 0
   ) {
     try {
-      console.log('[AuditService] Buscando logs com filtros:', { entityType, entityId, userId, limit, offset });
       
       let query = supabase
         .from('audit_logs')
@@ -76,16 +71,13 @@ export class AuditService {
 
       const { data, error, count } = await query;
 
-      console.log('[AuditService] Resultado da busca:', { count, dataLength: data?.length, error });
 
       if (error) {
-        console.error('[AuditService] Erro ao buscar logs:', error);
         return { data: [], count: 0 };
       }
 
       return { data, count };
     } catch (error) {
-      console.error('[AuditService] Erro inesperado ao buscar logs:', error);
       return { data: [], count: 0 };
     }
   }

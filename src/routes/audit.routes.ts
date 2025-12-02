@@ -119,7 +119,6 @@ router.get('/',
       }
     });
   } catch (error) {
-    console.error('Error fetching audit logs:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Erro ao buscar logs de auditoria' 
@@ -204,7 +203,6 @@ router.get('/:entityType/:entityId',
       }
     });
   } catch (error) {
-    console.error('Error fetching entity audit logs:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Erro ao buscar logs de auditoria da entidade' 
@@ -253,7 +251,6 @@ router.post('/cleanup/manual',
   authorize('admin'),
   asyncHandler(async (req: AuthRequest, res: Response) => {
     try {
-      console.log('[Audit Routes] Manual cleanup triggered by admin:', req.user?.id);
       const result = await LogCleanupService.manualCleanup();
 
       res.json({
@@ -266,7 +263,6 @@ router.post('/cleanup/manual',
         },
       });
     } catch (error) {
-      console.error('Error during manual cleanup:', error);
       res.status(500).json({
         success: false,
         message: 'Erro ao executar limpeza de logs',

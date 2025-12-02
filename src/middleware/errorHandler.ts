@@ -18,7 +18,6 @@ export const errorHandler = (err: ApiError, req: Request, res: Response, next: N
     statusCode = 404
   }
 
-  console.error(`[${new Date().toISOString()}] Error:`, err)
 
   res.status(statusCode).json({
     success: false,

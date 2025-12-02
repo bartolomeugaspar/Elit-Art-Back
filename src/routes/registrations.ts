@@ -162,7 +162,6 @@ router.patch(
       .single()
 
     if (updateError) {
-      console.error('Update error:', updateError)
       throw updateError
     }
 
@@ -200,7 +199,6 @@ router.patch(
           }
         }
       } catch (emailError) {
-        console.error('Error sending confirmation email/SMS:', emailError)
         // Don't throw error, just log it - the registration was updated successfully
       }
     }

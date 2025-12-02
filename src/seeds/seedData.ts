@@ -6,7 +6,6 @@ dotenv.config()
 
 const seedDatabase = async () => {
   try {
-    console.log('🌱 StArteing database seed...')
 
     // Clear existing data (optional - comment out if you want to keep existing data)
     // await supabase.from('newsletter').delete().neq('id', '00000000-0000-0000-0000-000000000000')
@@ -228,23 +227,10 @@ const seedDatabase = async () => {
 
     if (newsletterError) throw new Error(`Newsletter creation failed: ${newsletterError.message}`)
 
-    console.log('✅ Database seeded successfully!')
-    console.log(`📝 Created 1 admin user`)
-    console.log(`🎭 Created 2 artista users`)
-    console.log(`👥 Created 2 regular users`)
-    console.log(`🎪 Created ${events?.length || 0} events`)
-    console.log(`📧 Created ${newsletter?.length || 0} newsletter subscribers`)
 
-    console.log('\n📋 Test Credentials:')
-    console.log('Admin: admin@elit-Arte.com / admin123')
-    console.log('Artista 1: faustino@elit-Arte.com / artista123')
-    console.log('Artista 2: josemara@elit-Arte.com / artista123')
-    console.log('User 1: maria@example.com / user123')
-    console.log('User 2: joao@example.com / user123')
 
     process.exit(0)
   } catch (error) {
-    console.error('❌ Error seeding database:', error)
     process.exit(1)
   }
 }

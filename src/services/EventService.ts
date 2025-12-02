@@ -209,7 +209,6 @@ export class EventService {
           event.location
         )
       } catch (emailError) {
-        console.error('Error sending registration email:', emailError)
         // Don't throw error, just log it - the registration was created successfully
       }
     }
@@ -226,7 +225,6 @@ export class EventService {
           event.location
         )
       } catch (smsError) {
-        console.error('Error sending registration SMS:', smsError)
         // Don't throw error, just log it - the registration was created successfully
       }
     }

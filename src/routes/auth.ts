@@ -169,7 +169,6 @@ router.post(
           userAgent: req.get('user-agent'),
         }, req)
       } catch (error) {
-        console.error('Error logging failed login attempt:', error)
       }
       
       res.status(400).json({ errors: errors.array() })
@@ -192,7 +191,6 @@ router.post(
           userAgent: req.get('user-agent'),
         }, req)
       } catch (error) {
-        console.error('Error logging login action:', error)
       }
 
       res.status(200).json({
@@ -219,7 +217,6 @@ router.post(
           userAgent: req.get('user-agent'),
         }, req)
       } catch (logError) {
-        console.error('Error logging failed login attempt:', logError)
       }
       
       res.status(401).json({
@@ -260,7 +257,6 @@ router.post(
         userAgent: req.get('user-agent'),
       }, req)
     } catch (error) {
-      console.error('Error logging logout action:', error)
     }
 
     res.status(200).json({
@@ -522,7 +518,6 @@ router.post('/test-log', authenticate, asyncHandler(async (req: AuthRequest, res
       message: 'Test log created successfully',
     })
   } catch (error) {
-    console.error('Error creating test log:', error)
     res.status(500).json({
       success: false,
       message: 'Error creating test log',
