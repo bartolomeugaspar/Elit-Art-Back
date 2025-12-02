@@ -169,6 +169,95 @@ router.patch(
 
 /**
  * @swagger
+ * /contact/{id}/reply:
+ *   post:
+ *     summary: Responder mensagem de contato (Admin)
+ *     tags:
+ *       - Contato
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [reply]
+ *             properties:
+ *               reply:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Resposta enviada com sucesso
+ */
+router.post(
+  '/:id/reply',
+  authenticate,
+  authorize('admin'),
+  [body('reply').notEmpty().withMessage('Resposta é obrigatória')],
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() })
+    }
+
+    const { id } = req.params
+    const { reply } = req.body
+
+    // Buscar a mensagem original
+    const { data: message, error: fetchError } = await supabase
+      .from('contact_messages')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (fetchError || !message) {
+      return res.status(404).json({
+        success: false,
+        message: 'Mensagem não encontrada',
+      })
+    }
+
+    // Enviar email de resposta
+    try {
+      const { EmailService } = await import('../services/EmailService')
+      
+      await EmailService.sendContactReply(
+        message.email,
+        message.name,
+        message.subject,
+        message.message,
+        reply,
+        'Equipa Elit\'Arte'
+      )
+
+      // Atualizar status para "replied"
+      await supabase
+        .from('contact_messages')
+        .update({ status: 'replied' })
+        .eq('id', id)
+
+      res.status(200).json({
+        success: true,
+        message: 'Resposta enviada com sucesso',
+      })
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao enviar resposta por email',
+      })
+    }
+  })
+)
+
+/**
+ * @swagger
  * /contact/{id}:
  *   delete:
  *     summary: Excluir mensagem (Admin)

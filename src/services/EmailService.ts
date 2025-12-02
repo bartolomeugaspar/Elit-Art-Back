@@ -252,4 +252,79 @@ export class EmailService {
       throw new Error('Failed to send registration confirmation email')
     }
   }
+
+  static async sendContactReply(
+    recipientEmail: string,
+    recipientName: string,
+    originalSubject: string,
+    originalMessage: string,
+    replyMessage: string,
+    adminName: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        from: process.env.SMTP_FROM || 'noreply@elitarte.com',
+        to: recipientEmail,
+        subject: `Re: ${originalSubject} - Elit'Arte`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+              <img src="https://elit-arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 100px; height: auto; margin-bottom: 15px; border-radius: 100%;">
+              <h1 style="color: #DAA520; margin: 0;">Elit'Arte</h1>
+              <p style="color: #F4A460; margin: 5px 0 0 0;">Resposta à sua mensagem</p>
+            </div>
+            
+            <div style="background: #fafaebff; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #8B4513;">
+              <p style="color: #2D1810; font-size: 16px;">Olá <strong>${recipientName}</strong>,</p>
+              
+              <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
+                Obrigado por entrar em contacto connosco. Segue a resposta à sua mensagem:
+              </p>
+              
+              <div style="background: white; padding: 20px; border-left: 4px solid #8B4513; margin: 20px 0; border-radius: 4px;">
+                <p style="color: #2D1810; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${replyMessage}</p>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #DAA520; margin: 30px 0;">
+              
+              <p style="color: #654321; font-size: 12px; margin-bottom: 10px;"><strong>Sua mensagem original:</strong></p>
+              <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                <p style="color: #654321; font-size: 11px; margin: 0 0 5px 0;"><strong>Assunto:</strong> ${originalSubject}</p>
+                <p style="color: #654321; font-size: 12px; line-height: 1.6; white-space: pre-wrap; margin: 10px 0 0 0;">${originalMessage}</p>
+              </div>
+              
+              <p style="color: #2D1810; font-size: 13px;">
+                Se tiver mais alguma dúvida, não hesite em nos contactar novamente.
+              </p>
+              
+              <p style="color: #2D1810; font-size: 13px; margin-top: 20px;">
+                Cumprimentos,<br>
+                <strong>${adminName}</strong><br>
+                <span style="color: #8B4513;">Equipa Elit'Arte</span>
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #DAA520; margin: 30px 0;">
+              
+              <div style="text-align: center;">
+                <p style="color: #654321; font-size: 12px; margin-bottom: 10px;">Siga-nos nas redes sociais</p>
+                <div style="margin: 15px 0;">
+                  <a href="#" style="margin: 0 10px; color: #8B4513; text-decoration: none;">Facebook</a>
+                  <a href="#" style="margin: 0 10px; color: #8B4513; text-decoration: none;">Instagram</a>
+                  <a href="#" style="margin: 0 10px; color: #8B4513; text-decoration: none;">YouTube</a>
+                </div>
+              </div>
+              
+              <p style="color: #654321; font-size: 11px; text-align: center; margin-top: 20px;">
+                © 2025 Elit'Arte. Todos os direitos reservados.
+              </p>
+            </div>
+          </div>
+        `,
+      }
+
+      await transporter.sendMail(mailOptions)
+    } catch (error) {
+      throw new Error('Failed to send contact reply email')
+    }
+  }
 }
