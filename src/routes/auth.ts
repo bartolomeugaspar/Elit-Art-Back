@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator'
 import { AuthService } from '../services/AuthService'
 import { AuditService } from '../services/audit.service'
 import { PasswordResetService } from '../services/PasswordResetService'
+import { EmailService } from '../services/EmailService'
 import { authenticate, AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
 
@@ -89,6 +90,10 @@ router.post(
 
     const { name, email, password } = req.body
     const { user: newUser, token } = await AuthService.register(name, email, password)
+
+    // Enviar email de boas-vindas com senha temporária (async, não bloqueia a resposta)
+    EmailService.sendWelcomeEmail(newUser.email, newUser.name, password)
+      .catch(err => console.error('Erro ao enviar email de boas-vindas:', err))
 
     res.status(201).json({
       success: true,

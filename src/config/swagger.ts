@@ -65,7 +65,7 @@ const options = {
             id: { type: 'string', format: 'uuid' },
             name: { type: 'string' },
             email: { type: 'string', format: 'email' },
-            role: { type: 'string', enum: ['user', 'Arteist', 'admin'] },
+            role: { type: 'string', enum: ['user', 'artista', 'admin'] },
             profileImage: { type: 'string', nullable: true },
             bio: { type: 'string', nullable: true },
             isEmailVerified: { type: 'boolean' },

@@ -210,13 +210,13 @@ router.get(
  *       401:
  *         description: Não autenticado
  *       403:
- *         description: Sem permissão (apenas admin/Arteist)
+ *         description: Sem permissão (apenas admin/artista)
  */
-// Create event (admin/Arteist only)
+// Create event (admin/artista only)
 router.post(
   '/',
   authenticate,
-  authorize('admin', 'Arteist'),
+  authorize('admin', 'artista'),
   [
     body('title').trim().notEmpty().withMessage('Title is required'),
     body('description').trim().notEmpty().withMessage('Description is required'),

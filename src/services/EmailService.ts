@@ -74,8 +74,10 @@ export class EmailService {
     }
   }
 
-  static async sendWelcomeEmail(email: string, name: string): Promise<void> {
+  static async sendWelcomeEmail(email: string, name: string, temporaryPassword?: string): Promise<void> {
     try {
+      const loginUrl = process.env.FRONTEND_URL || 'https://elit-arte.vercel.app';
+      
       const mailOptions = {
         from: process.env.SMTP_FROM || 'noreply@elitArte.com',
         to: email,
@@ -83,26 +85,69 @@ export class EmailService {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-              <img src="https://elit-Arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 100px; height: auto; margin-bottom: 15px; border-radius: 100%;">
+              <img src="https://elit-arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 100px; height: auto; margin-bottom: 15px; border-radius: 100%;">
               <h1 style="color: #DAA520; margin: 0;">Elit'Arte</h1>
-              <p style="color: #F4A460; margin: 5px 0 0 0;">Bem-vindo!</p>
+              <p style="color: #F4A460; margin: 5px 0 0 0;">Plataforma Cultural Angolana</p>
             </div>
             
             <div style="background: #fafaebff; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #8B4513;">
-              <p style="color: #2D1810; font-size: 16px;">Olá <strong>${name}</strong>,</p>
+              <p style="color: #2D1810; font-size: 16px;">Olá <strong>${name}</strong>, 🎉</p>
               
               <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
-                Bem-vindo à Elit'Arte! Sua conta foi criada com sucesso.
+                Sua conta na <strong>Elit'Arte</strong> foi criada com sucesso! Estamos muito felizes em tê-lo(a) conosco.
               </p>
               
-              <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
-                Agora você pode acessar a plataforma e explorar todos os nossos eventos e oportunidades.
+              <div style="background: #ffffff; border-left: 4px solid #DAA520; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <h3 style="color: #8B4513; margin: 0 0 15px 0; font-size: 16px;">📧 Suas Credenciais de Acesso</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 8px 0; color: #654321; font-size: 14px; width: 80px;"><strong>Email:</strong></td>
+                    <td style="padding: 8px 0; color: #2D1810; font-size: 14px;">${email}</td>
+                  </tr>
+                  ${temporaryPassword ? `
+                  <tr>
+                    <td style="padding: 8px 0; color: #654321; font-size: 14px;"><strong>Senha:</strong></td>
+                    <td style="padding: 8px 0;">
+                      <span style="color: #2D1810; font-size: 14px; font-weight: 600; font-family: monospace; background: #fff8dc; padding: 5px 10px; border-radius: 4px; display: inline-block; border: 1px solid #DAA520;">${temporaryPassword}</span>
+                    </td>
+                  </tr>
+                  ` : ''}
+                </table>
+              </div>
+
+              ${temporaryPassword ? `
+              <div style="background: #fff8dc; border-left: 4px solid #DAA520; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <p style="color: #8B4513; font-size: 13px; margin: 0; line-height: 1.6;">
+                  <strong>⚠️ Importante:</strong> Por motivos de segurança, recomendamos que você altere sua senha no primeiro acesso através do seu perfil.
+                </p>
+              </div>
+              ` : ''}
+              
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="${loginUrl}/admin/login" style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); color: #DAA520; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 15px; box-shadow: 0 4px 6px rgba(139, 69, 19, 0.3);">
+                  🚀 Acessar Plataforma
+                </a>
+              </div>
+              
+              <div style="background: #fff8dc; padding: 20px; border-radius: 6px; margin: 20px 0; border: 1px solid #DAA520;">
+                <h3 style="color: #8B4513; margin: 0 0 15px 0; font-size: 16px;">✨ O que você pode fazer na Elit'Arte:</h3>
+                <ul style="color: #2D1810; font-size: 14px; line-height: 1.8; margin: 0; padding-left: 20px;">
+                  <li>Gerenciar eventos culturais e artísticos</li>
+                  <li>Cadastrar e promover artistas angolanos</li>
+                  <li>Publicar e gerenciar conteúdo na revista cultural</li>
+                  <li>Administrar a galeria de obras de arte</li>
+                  <li>Acompanhar inscrições e participantes</li>
+                </ul>
+              </div>
+              
+              <p style="color: #654321; font-size: 13px; line-height: 1.6; margin-top: 20px;">
+                Se você tiver alguma dúvida ou precisar de ajuda, não hesite em nos contactar.
               </p>
               
               <hr style="border: none; border-top: 1px solid #DAA520; margin: 20px 0;">
               
               <p style="color: #654321; font-size: 11px; text-align: center;">
-                © 2025 Elit'Arte. Todos os direitos reservados.
+                © ${new Date().getFullYear()} Elit'Arte. Todos os direitos reservados.
               </p>
             </div>
           </div>
@@ -110,7 +155,9 @@ export class EmailService {
       }
 
       await transporter.sendMail(mailOptions)
+      console.log(`✅ Email de boas-vindas enviado para: ${email}`)
     } catch (error) {
+      console.error(`❌ Erro ao enviar email de boas-vindas para ${email}:`, error)
       throw new Error('Failed to send welcome email')
     }
   }
