@@ -327,4 +327,104 @@ export class EmailService {
       throw new Error('Failed to send contact reply email')
     }
   }
+
+  static async sendLoginNotification(
+    email: string,
+    name: string,
+    ipAddress: string,
+    timestamp: string,
+    userAgent?: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        from: process.env.SMTP_FROM || 'noreply@elitarte.com',
+        to: email,
+        subject: '[Elit\'Arte][Login] Novo acesso detectado',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
+            <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 25px; text-align: center; border-radius: 8px 8px 0 0;">
+              <img src="https://elit-arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 80px; height: auto; margin-bottom: 10px; border-radius: 100%;">
+              <h1 style="color: #DAA520; margin: 0; font-size: 24px;">Elit'Arte</h1>
+            </div>
+            
+            <div style="background: #fafaebff; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #e0e0e0;">
+              <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="color: #856404; font-size: 14px; margin: 0; font-weight: bold;">
+                  🔐 Novo Login Detectado
+                </p>
+              </div>
+              
+              <p style="color: #2D1810; font-size: 16px; margin-bottom: 10px;">Olá <strong>${name}</strong>,</p>
+              
+              <p style="color: #2D1810; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+                Detectámos um novo login na sua conta Elit'Arte:
+              </p>
+              
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; margin: 20px 0; border: 1px solid #dee2e6;">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 8px 0; color: #6c757d; font-size: 13px; width: 120px;">
+                      <strong>📍 Endereço IP:</strong>
+                    </td>
+                    <td style="padding: 8px 0; color: #2D1810; font-size: 14px; font-family: 'Courier New', monospace;">
+                      ${ipAddress}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #6c757d; font-size: 13px;">
+                      <strong>🕒 Data/Hora:</strong>
+                    </td>
+                    <td style="padding: 8px 0; color: #2D1810; font-size: 14px;">
+                      ${timestamp}
+                    </td>
+                  </tr>
+                  ${userAgent ? `
+                  <tr>
+                    <td style="padding: 8px 0; color: #6c757d; font-size: 13px; vertical-align: top;">
+                      <strong>💻 Dispositivo:</strong>
+                    </td>
+                    <td style="padding: 8px 0; color: #2D1810; font-size: 12px; word-break: break-word;">
+                      ${userAgent}
+                    </td>
+                  </tr>
+                  ` : ''}
+                </table>
+              </div>
+              
+              <div style="background: #fff; border: 2px solid #dc3545; padding: 20px; border-radius: 6px; margin: 25px 0;">
+                <p style="color: #dc3545; font-size: 14px; font-weight: bold; margin: 0 0 10px 0;">
+                  ⚠️ Não reconhece este login?
+                </p>
+                <p style="color: #2D1810; font-size: 13px; line-height: 1.6; margin: 0;">
+                  Se não foi você que fez login, recomendamos que altere imediatamente a sua senha e entre em contacto connosco.
+                </p>
+              </div>
+              
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="https://elit-arte.vercel.app/admin/forgot-password" style="background: #8B4513; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 14px;">
+                  Alterar Senha
+                </a>
+              </div>
+              
+              <p style="color: #6c757d; font-size: 12px; line-height: 1.5; margin-top: 25px; text-align: center;">
+                Se foi você que fez login, pode ignorar este email. Este é um email automático de segurança.
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #DAA520; margin: 30px 0;">
+              
+              <p style="color: #654321; font-size: 11px; text-align: center; margin: 0;">
+                Este email foi enviado por Elit'Arte<br>
+                © 2025 Elit'Arte. Todos os direitos reservados.
+              </p>
+            </div>
+          </div>
+        `,
+      }
+
+      await transporter.sendMail(mailOptions)
+    } catch (error) {
+      // Log error but don't throw - login should succeed even if email fails
+      console.error('Failed to send login notification email:', error)
+    }
+  }
 }

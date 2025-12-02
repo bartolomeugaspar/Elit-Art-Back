@@ -1,6 +1,7 @@
 import jwt, { SignOptions } from 'jsonwebtoken'
 import { supabase } from '../config/database'
 import { IUser, IUserInput, hashPassword, comparePassword } from '../models/User'
+import { EmailService } from './EmailService'
 
 export class AuthService {
   static generateToken(userId: string, role: string): string {
@@ -50,7 +51,12 @@ export class AuthService {
     return { user, token }
   }
 
-  static async login(email: string, password: string): Promise<{ user: IUser; token: string }> {
+  static async login(
+    email: string, 
+    password: string, 
+    ipAddress?: string, 
+    userAgent?: string
+  ): Promise<{ user: IUser; token: string }> {
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
@@ -67,6 +73,25 @@ export class AuthService {
     }
 
     const token = this.generateToken(user.id, user.role)
+
+    // Send login notification email (async, don't wait)
+    const timestamp = new Date().toLocaleString('pt-PT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: 'Africa/Luanda'
+    })
+
+    EmailService.sendLoginNotification(
+      user.email,
+      user.name,
+      ipAddress || 'Desconhecido',
+      timestamp,
+      userAgent
+    ).catch(err => console.error('Error sending login email:', err))
 
     return { user, token }
   }

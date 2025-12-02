@@ -178,7 +178,11 @@ router.post(
     const { email, password } = req.body
     
     try {
-      const { user, token } = await AuthService.login(email, password)
+      // Get IP address and User-Agent
+      const ipAddress = req.ip || req.socket.remoteAddress || req.headers['x-forwarded-for'] as string || 'Desconhecido'
+      const userAgent = req.get('user-agent')
+      
+      const { user, token } = await AuthService.login(email, password, ipAddress, userAgent)
 
       // Registrar login bem-sucedido no audit log
       try {
@@ -187,8 +191,8 @@ router.post(
           action: 'LOGIN',
           entityType: 'user',
           entityId: user.id,
-          ipAddress: req.ip || req.socket.remoteAddress || undefined,
-          userAgent: req.get('user-agent'),
+          ipAddress: ipAddress,
+          userAgent: userAgent,
         }, req)
       } catch (error) {
       }
