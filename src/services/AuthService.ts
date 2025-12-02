@@ -64,12 +64,17 @@ export class AuthService {
       .single()
 
     if (error || !user) {
-      throw new Error('Invalid email or password')
+      throw new Error('Email ou senha incorretos')
+    }
+
+    // Verificar se a conta está ativa
+    if (!user.is_active) {
+      throw new Error('Sua conta foi desativada. Entre em contato com o administrador.')
     }
 
     const isPasswordValid = await comparePassword(password, user.password)
     if (!isPasswordValid) {
-      throw new Error('Invalid email or password')
+      throw new Error('Email ou senha incorretos')
     }
 
     const token = this.generateToken(user.id, user.role)
