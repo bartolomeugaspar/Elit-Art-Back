@@ -27,7 +27,7 @@ router.post(
   })
 )
 
-// Unsubscribe from newsletter
+// Unsubscribe from newsletter (POST)
 router.post(
   '/unsubscribe',
   [body('email').isEmail().withMessage('Valid email is required')],
@@ -44,6 +44,36 @@ router.post(
       success: true,
       message: 'Unsubscribed successfully',
     })
+  })
+)
+
+// Unsubscribe from newsletter via GET (for email links)
+router.get(
+  '/unsubscribe',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const email = req.query.email as string
+    
+    if (!email) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Email is required' 
+      })
+      return
+    }
+
+    const subscriber = await NewsletterService.unsubscribe(email)
+
+    if (subscriber) {
+      res.status(200).json({
+        success: true,
+        message: 'Você foi desinscrito da newsletter com sucesso.',
+      })
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'Email não encontrado na nossa lista.',
+      })
+    }
   })
 )
 

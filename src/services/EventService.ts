@@ -46,6 +46,47 @@ export class EventService {
       throw new Error(error.message)
     }
 
+    // Enviar notificações para todos os inscritos da newsletter
+    try {
+      const { NewsletterService } = await import('./NewsletterService')
+      const subscribers = await NewsletterService.getSubscribers()
+      
+      if (subscribers.length > 0) {
+        const subscriberEmails = subscribers.map(sub => sub.email)
+        
+        // Formatar data e hora para exibição
+        const eventDate = new Date(event.date).toLocaleDateString('pt-BR', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+        
+        const eventTime = event.time || 'A definir'
+        
+        // Enviar emails em background (não esperar conclusão)
+        EmailService.sendBulkNewEventNotifications(
+          subscriberEmails,
+          event.title,
+          event.description,
+          eventDate,
+          eventTime,
+          event.location,
+          event.category,
+          event.image_url,
+          event.price,
+          event.is_free
+        ).catch(error => {
+          console.error('Erro ao enviar notificações em massa:', error)
+        })
+        
+        console.log(`✅ Evento criado! Notificações sendo enviadas para ${subscribers.length} inscritos...`)
+      }
+    } catch (error) {
+      console.error('Erro ao processar notificações de newsletter:', error)
+      // Não bloquear a criação do evento se houver erro nas notificações
+    }
+
     return event
   }
 

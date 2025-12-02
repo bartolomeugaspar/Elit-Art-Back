@@ -474,4 +474,179 @@ export class EmailService {
       console.error('Failed to send login notification email:', error)
     }
   }
+
+  static async sendNewEventNotification(
+    email: string,
+    eventTitle: string,
+    eventDescription: string,
+    eventDate: string,
+    eventTime: string,
+    eventLocation: string,
+    eventCategory: string,
+    eventImage?: string,
+    eventPrice?: number,
+    isFree?: boolean
+  ): Promise<void> {
+    try {
+      const eventUrl = `${process.env.FRONTEND_URL || 'https://elit-arte.vercel.app'}/eventos`;
+      
+      const mailOptions = {
+        from: process.env.SMTP_FROM || 'noreply@elitarte.com',
+        to: email,
+        subject: `Novo Evento: ${eventTitle} - Elit'Arte`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
+            <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 25px; text-align: center; border-radius: 8px 8px 0 0;">
+              <img src="https://elit-arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 80px; height: auto; margin-bottom: 10px; border-radius: 100%;">
+              <h1 style="color: #DAA520; margin: 0; font-size: 24px;">Elit'Arte</h1>
+              <p style="color: #F4A460; margin: 5px 0 0 0; font-size: 14px;">Novo Evento Disponível</p>
+            </div>
+            
+            <div style="background: #fafaebff; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #e0e0e0;">
+              <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 15px; margin-bottom: 25px; border-radius: 6px; text-align: center;">
+                <p style="color: white; font-size: 16px; margin: 0; font-weight: bold;">
+                  🎉 Acabou de ser publicado um novo evento!
+                </p>
+              </div>
+              
+              ${eventImage ? `
+              <div style="margin-bottom: 20px; text-align: center;">
+                <img src="${eventImage}" alt="${eventTitle}" style="max-width: 100%; height: auto; border-radius: 8px; border: 2px solid #DAA520;">
+              </div>
+              ` : ''}
+              
+              <h2 style="color: #8B4513; font-size: 22px; margin: 0 0 10px 0; border-bottom: 2px solid #DAA520; padding-bottom: 10px;">
+                ${eventTitle}
+              </h2>
+              
+              <div style="background: #fff8dc; border-left: 4px solid #DAA520; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                <p style="color: #2D1810; font-size: 14px; line-height: 1.6; margin: 0;">
+                  ${eventDescription}
+                </p>
+              </div>
+              
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px solid #dee2e6;">
+                <h3 style="color: #8B4513; font-size: 16px; margin: 0 0 15px 0;">📋 Detalhes do Evento</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 10px 0; color: #6c757d; font-size: 14px; width: 100px; vertical-align: top;">
+                      <strong>📅 Data:</strong>
+                    </td>
+                    <td style="padding: 10px 0; color: #2D1810; font-size: 14px;">
+                      ${eventDate}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6c757d; font-size: 14px; vertical-align: top;">
+                      <strong>🕒 Hora:</strong>
+                    </td>
+                    <td style="padding: 10px 0; color: #2D1810; font-size: 14px;">
+                      ${eventTime}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6c757d; font-size: 14px; vertical-align: top;">
+                      <strong>📍 Local:</strong>
+                    </td>
+                    <td style="padding: 10px 0; color: #2D1810; font-size: 14px;">
+                      ${eventLocation}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6c757d; font-size: 14px; vertical-align: top;">
+                      <strong>🎭 Categoria:</strong>
+                    </td>
+                    <td style="padding: 10px 0; color: #2D1810; font-size: 14px;">
+                      ${eventCategory}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6c757d; font-size: 14px; vertical-align: top;">
+                      <strong>💰 Preço:</strong>
+                    </td>
+                    <td style="padding: 10px 0; color: #2D1810; font-size: 14px;">
+                      ${isFree ? '<span style="color: #28a745; font-weight: bold;">GRÁTIS</span>' : `${eventPrice?.toLocaleString('pt-AO')} Kz`}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${eventUrl}" style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); color: #DAA520; padding: 15px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold; font-size: 16px; box-shadow: 0 4px 8px rgba(139, 69, 19, 0.3);">
+                  🎫 Ver Evento e Inscrever-se
+                </a>
+              </div>
+              
+              <div style="background: #e7f3ff; border: 1px solid #b3d9ff; padding: 15px; border-radius: 6px; margin: 25px 0;">
+                <p style="color: #004085; font-size: 13px; line-height: 1.6; margin: 0;">
+                  <strong>💡 Dica:</strong> Não perca esta oportunidade! As vagas podem ser limitadas. Inscreva-se o quanto antes para garantir a sua participação.
+                </p>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #DAA520; margin: 30px 0;">
+              
+              <p style="color: #6c757d; font-size: 12px; line-height: 1.5; text-align: center; margin: 20px 0;">
+                Você está recebendo este email porque está inscrito na nossa newsletter.<br>
+                Para cancelar a subscrição, <a href="${process.env.FRONTEND_URL || 'https://elit-arte.vercel.app'}/newsletter/unsubscribe?email=${encodeURIComponent(email)}" style="color: #8B4513;">clique aqui</a>.
+              </p>
+              
+              <div style="text-align: center; margin: 20px 0;">
+                <p style="color: #654321; font-size: 12px; margin-bottom: 10px;">Siga-nos nas redes sociais</p>
+                <div style="margin: 15px 0;">
+                  <a href="#" style="margin: 0 10px; color: #8B4513; text-decoration: none; font-size: 12px;">Facebook</a>
+                  <a href="#" style="margin: 0 10px; color: #8B4513; text-decoration: none; font-size: 12px;">Instagram</a>
+                  <a href="#" style="margin: 0 10px; color: #8B4513; text-decoration: none; font-size: 12px;">YouTube</a>
+                </div>
+              </div>
+              
+              <p style="color: #654321; font-size: 11px; text-align: center; margin: 0;">
+                © ${new Date().getFullYear()} Elit'Arte. Todos os direitos reservados.
+              </p>
+            </div>
+          </div>
+        `,
+      }
+
+      await transporter.sendMail(mailOptions)
+    } catch (error) {
+      console.error(`❌ Erro ao enviar notificação de evento para ${email}:`, error)
+      // Não lançar erro para não bloquear a criação do evento
+    }
+  }
+
+  static async sendBulkNewEventNotifications(
+    subscribers: string[],
+    eventTitle: string,
+    eventDescription: string,
+    eventDate: string,
+    eventTime: string,
+    eventLocation: string,
+    eventCategory: string,
+    eventImage?: string,
+    eventPrice?: number,
+    isFree?: boolean
+  ): Promise<void> {
+    console.log(`📧 Enviando notificação de novo evento para ${subscribers.length} inscritos...`)
+    
+    const emailPromises = subscribers.map(email => 
+      this.sendNewEventNotification(
+        email,
+        eventTitle,
+        eventDescription,
+        eventDate,
+        eventTime,
+        eventLocation,
+        eventCategory,
+        eventImage,
+        eventPrice,
+        isFree
+      ).catch(error => {
+        console.error(`Erro ao enviar para ${email}:`, error)
+        // Continuar mesmo se falhar para um email
+      })
+    )
+
+    await Promise.allSettled(emailPromises)
+    console.log(`✅ Notificações enviadas para todos os inscritos`)
+  }
 }

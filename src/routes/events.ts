@@ -3,6 +3,7 @@ import { body, query, validationResult } from 'express-validator'
 import { EventService } from '../services/EventService'
 import { authenticate, authorize, AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
+import { PDFService } from '../services/PDFService'
 
 const router = Router()
 
@@ -220,12 +221,15 @@ router.post(
   [
     body('title').trim().notEmpty().withMessage('Title is required'),
     body('description').trim().notEmpty().withMessage('Description is required'),
-    body('category').isIn(['Workshop', 'Exposição', 'Masterclass', 'Networking']),
+    body('category').isIn(['Workshop', 'Exposição', 'Masterclass', 'Networking', 'Palestra', 'Performance', 'Lançamento', 'Encontro', 'Outro']).withMessage('Invalid category'),
     body('date').notEmpty().withMessage('Date is required'),
-    body('time').notEmpty().withMessage('Time is required'),
+    body('time').optional(),
     body('location').trim().notEmpty().withMessage('Location is required'),
     body('image').trim().notEmpty().withMessage('Image URL is required'),
     body('capacity').isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
+    body('price').optional().isNumeric(),
+    body('is_free').optional().isBoolean(),
+    body('bank_details').optional().isObject(),
   ],
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const errors = validationResult(req)
@@ -652,6 +656,86 @@ router.get(
       count: testimonials.length,
       testimonials,
     })
+  })
+)
+
+/**
+ * @swagger
+ * /events/{id}/registrations/pdf:
+ *   get:
+ *     summary: Baixar PDF com lista de inscritos do evento
+ *     tags:
+ *       - Eventos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *       - in: query
+ *         name: detailed
+ *         schema:
+ *           type: boolean
+ *         description: Se true, gera PDF detalhado
+ *     responses:
+ *       200:
+ *         description: PDF gerado com sucesso
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       404:
+ *         description: Evento não encontrado
+ *       401:
+ *         description: Não autenticado
+ */
+router.get(
+  '/:id/registrations/pdf',
+  authenticate,
+  authorize('admin', 'artista'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    try {
+      const event = await EventService.getEventById(req.params.id)
+      if (!event) {
+        res.status(404).json({ success: false, message: 'Event not found' })
+        return
+      }
+
+      const registrations = await EventService.getEventRegistrations(req.params.id)
+      
+      if (!registrations || registrations.length === 0) {
+        res.status(404).json({ success: false, message: 'No registrations found for this event' })
+        return
+      }
+
+      const detailed = req.query.detailed === 'true'
+
+      const doc = detailed 
+        ? await PDFService.generateEventRegistrationsDetailedPDF(event, registrations)
+        : await PDFService.generateEventRegistrationsPDF(event, registrations)
+
+      // Set response headers
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="inscritos-${event.title.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.pdf"`
+      )
+
+      // Pipe PDF to response
+      doc.pipe(res)
+      doc.end()
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      res.status(500).json({ 
+        success: false, 
+        message: 'Error generating PDF',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    }
   })
 )
 
