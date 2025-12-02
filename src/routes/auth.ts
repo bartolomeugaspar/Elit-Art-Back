@@ -164,7 +164,7 @@ router.post(
           action: 'LOGIN_FAILED_VALIDATION',
           entityType: 'user',
           entityId: req.body.email || 'unknown',
-          newValues: { reason: 'Invalid email or password format' },
+          newValues: { reason: 'Formato de email ou senha inválido' },
           ipAddress: req.ip || req.socket.remoteAddress || undefined,
           userAgent: req.get('user-agent'),
         }, req)
@@ -225,7 +225,7 @@ router.post(
       
       res.status(401).json({
         success: false,
-        message: 'Invalid email or password',
+        message: error.message || 'Email ou senha incorretos',
       })
     }
   })
