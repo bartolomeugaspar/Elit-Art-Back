@@ -247,6 +247,80 @@ router.delete(
 
 /**
  * @swagger
+ * /artworks/{id}/like:
+ *   post:
+ *     summary: Dar like em uma obra
+ *     tags:
+ *       - Obras
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Like registrado com sucesso
+ */
+router.post(
+  '/:id/like',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const artwork = await ArtworkService.incrementLikes(req.params.id)
+
+    if (!artwork) {
+      return res.status(404).json({
+        success: false,
+        message: 'Artwork not found',
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Like added successfully',
+      likes: artwork.likes,
+    })
+  })
+)
+
+/**
+ * @swagger
+ * /artworks/{id}/unlike:
+ *   post:
+ *     summary: Remover like de uma obra
+ *     tags:
+ *       - Obras
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Like removido com sucesso
+ */
+router.post(
+  '/:id/unlike',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const artwork = await ArtworkService.decrementLikes(req.params.id)
+
+    if (!artwork) {
+      return res.status(404).json({
+        success: false,
+        message: 'Artwork not found',
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Like removed successfully',
+      likes: artwork.likes,
+    })
+  })
+)
+
+/**
+ * @swagger
  * /artworks/featured:
  *   get:
  *     summary: Obter obras em destaque

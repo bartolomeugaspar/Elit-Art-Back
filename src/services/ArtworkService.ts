@@ -111,4 +111,37 @@ export class ArtworkService {
     if (error) throw new Error(error.message)
     return data || []
   }
+
+  static async incrementLikes(id: string): Promise<IArtwork | null> {
+    const artwork = await this.getArtworkById(id)
+    if (!artwork) return null
+
+    const { data, error } = await supabase
+      .from('artworks')
+      .update({ likes: (artwork.likes || 0) + 1 })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw new Error(error.message)
+    return data
+  }
+
+  static async decrementLikes(id: string): Promise<IArtwork | null> {
+    const artwork = await this.getArtworkById(id)
+    if (!artwork) return null
+
+    const currentLikes = artwork.likes || 0
+    const newLikes = Math.max(0, currentLikes - 1)
+
+    const { data, error } = await supabase
+      .from('artworks')
+      .update({ likes: newLikes })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw new Error(error.message)
+    return data
+  }
 }
