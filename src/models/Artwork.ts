@@ -4,7 +4,7 @@ export interface IArtwork {
   description: string
   artist_id: string
   artist_name: string
-  type: 'painting' | 'sculpture' | 'photography' | 'digital' | 'mixed_media' | 'other'
+  type: 'musica' | 'literatura' | 'teatro' | 'danca' | 'cinema' | 'desenho'
   year: number
   dimensions?: string
   medium?: string
@@ -22,7 +22,7 @@ export interface IArtworkInput {
   description: string
   artist_id: string
   artist_name: string
-  type: 'painting' | 'sculpture' | 'photography' | 'digital' | 'mixed_media' | 'other'
+  type: 'musica' | 'literatura' | 'teatro' | 'danca' | 'cinema' | 'desenho'
   year: number
   dimensions?: string
   medium?: string
