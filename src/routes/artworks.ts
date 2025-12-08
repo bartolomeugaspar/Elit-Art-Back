@@ -159,7 +159,7 @@ router.post(
   body('description').notEmpty().withMessage('Description is required'),
   body('artist_id').notEmpty().withMessage('Artist ID is required'),
   body('artist_name').notEmpty().withMessage('Artist name is required'),
-  body('type').isIn(['painting', 'sculpture', 'photography', 'digital', 'mixed_media', 'other']),
+  body('type').isIn(['musica', 'literatura', 'teatro', 'danca', 'cinema', 'desenho']),
   body('year').isInt({ min: 1900, max: new Date().getFullYear() }),
   body('image_url').notEmpty().withMessage('Image URL is required'),
   asyncHandler(async (req: AuthRequest, res: Response) => {
