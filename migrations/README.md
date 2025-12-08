@@ -49,6 +49,56 @@ FROM information_schema.check_constraints
 WHERE constraint_name = 'events_category_check';
 ```
 
+---
+
+## Migration: Add Show in Public to Artists
+
+**Data:** 2025-12-08  
+**Descrição:** Adiciona campo `show_in_public` para controlar quais artistas aparecem na seção pública
+
+**Arquivo:** `add_show_in_public_to_artists.sql`
+
+### O que essa migration faz:
+
+1. Adiciona coluna `show_in_public` (BOOLEAN, padrão true)
+2. Atualiza artistas existentes para `show_in_public = true`
+3. Adiciona comentário explicativo na coluna
+
+### Como executar:
+
+```bash
+# No SQL Editor do Supabase, execute o conteúdo do arquivo
+cat migrations/add_show_in_public_to_artists.sql
+```
+
+---
+
+## Script: Insert Team Leaders
+
+**Data:** 2025-12-08  
+**Descrição:** Insere membros administrativos (Faustino, Josemara, Luísa) com `show_in_public = false`
+
+**Arquivo:** `insert_team_leaders.sql`
+
+### O que esse script faz:
+
+1. Insere os 3 líderes administrativos na tabela `artists`
+2. Define `show_in_public = false` para que não apareçam em "Artistas do Movimento"
+3. Usa `ON CONFLICT` para atualizar se já existirem
+
+### Como executar:
+
+```bash
+# Execute DEPOIS da migration add_show_in_public_to_artists.sql
+# No SQL Editor do Supabase, execute o conteúdo do arquivo
+cat migrations/insert_team_leaders.sql
+```
+
+### Ordem de Execução:
+
+1. ✅ `add_show_in_public_to_artists.sql`
+2. ✅ `insert_team_leaders.sql`
+
 ## Rollback (se necessário)
 
 Caso precise reverter para as categorias antigas:

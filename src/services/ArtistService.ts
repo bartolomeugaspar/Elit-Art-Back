@@ -16,11 +16,17 @@ export class ArtistService {
     return artist
   }
 
-  static async getArtists(): Promise<IArtist[]> {
-    const { data: artists, error } = await supabase
+  static async getArtists(showAll: boolean = false): Promise<IArtist[]> {
+    let query = supabase
       .from('artists')
       .select('*')
-      .order('created_at', { ascending: false })
+    
+    // Se não for para mostrar todos, filtrar apenas os públicos
+    if (!showAll) {
+      query = query.eq('show_in_public', true)
+    }
+    
+    const { data: artists, error } = await query.order('created_at', { ascending: false })
 
     if (error) {
       throw new Error(error.message)

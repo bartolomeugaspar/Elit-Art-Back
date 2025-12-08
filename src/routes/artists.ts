@@ -11,9 +11,15 @@ const router = Router()
  * @swagger
  * /artists:
  *   get:
- *     summary: Listar todos os artistas
+ *     summary: Listar todos os artistas (públicos por padrão, todos se showAll=true com token)
  *     tags:
  *       - Artistas
+ *     parameters:
+ *       - in: query
+ *         name: showAll
+ *         schema:
+ *           type: boolean
+ *         description: Mostrar todos os artistas (requer token válido)
  *     responses:
  *       200:
  *         description: Lista de artistas
@@ -21,7 +27,10 @@ const router = Router()
 router.get(
   '/',
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const artists = await ArtistService.getArtists()
+    // Se showAll=true e tem token de autorização, mostrar todos
+    const hasAuthToken = req.headers.authorization?.startsWith('Bearer ')
+    const showAll = req.query.showAll === 'true' && hasAuthToken
+    const artists = await ArtistService.getArtists(showAll)
 
     res.status(200).json({
       success: true,

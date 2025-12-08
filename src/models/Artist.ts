@@ -8,6 +8,7 @@ export interface IArtist {
   phone: string
   image?: string
   role?: string
+  show_in_public?: boolean
   created_at: Date
   updated_at: Date
 }
@@ -21,4 +22,5 @@ export interface IArtistInput {
   phone: string
   image?: string
   role?: string
+  show_in_public?: boolean
 }
