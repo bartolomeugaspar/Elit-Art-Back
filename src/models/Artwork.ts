@@ -13,6 +13,8 @@ export interface IArtwork {
   price?: number
   is_available: boolean
   is_featured: boolean
+  views?: number
+  likes?: number
   created_at: Date
   updated_at: Date
 }
