@@ -10,7 +10,7 @@
  *         name: category
  *         schema:
  *           type: string
- *           enum: [Workshop, Exposição, Masterclass, Networking]
+ *           enum: [musica, literatura, teatro, danca, cinema, desenho]
  *         description: Filtrar por categoria
  *       - in: query
  *         name: status
@@ -103,7 +103,7 @@
  *                 type: string
  *               category:
  *                 type: string
- *                 enum: [Workshop, Exposição, Masterclass, Networking]
+ *                 enum: [musica, literatura, teatro, danca, cinema, desenho]
  *               date:
  *                 type: string
  *               time:

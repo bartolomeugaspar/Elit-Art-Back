@@ -1,4 +1,4 @@
-import { Router, Response } from 'express'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                import { Router, Response } from 'express'
 import { body, query, validationResult } from 'express-validator'
 import { EventService } from '../services/EventService'
 import { authenticate, authorize, AuthRequest } from '../middleware/auth'
@@ -19,7 +19,7 @@ const router = Router()
  *         name: category
  *         schema:
  *           type: string
- *           enum: ['Workshop', 'Exposição', 'Masterclass', 'Networking']
+ *           enum: ['musica', 'literatura', 'teatro', 'danca', 'cinema', 'desenho']
  *         description: Filtrar por categoria
  *       - in: query
  *         name: status
@@ -188,7 +188,7 @@ router.get(
  *                 type: string
  *               category:
  *                 type: string
- *                 enum: ['Workshop', 'Exposição', 'Masterclass', 'Networking']
+ *                 enum: ['musica', 'literatura', 'teatro', 'danca', 'cinema', 'desenho']
  *               date:
  *                 type: string
  *               time:
@@ -221,7 +221,7 @@ router.post(
   [
     body('title').trim().notEmpty().withMessage('Title is required'),
     body('description').trim().notEmpty().withMessage('Description is required'),
-    body('category').isIn(['Workshop', 'Exposição', 'Masterclass', 'Networking', 'Palestra', 'Performance', 'Lançamento', 'Encontro', 'Outro']).withMessage('Invalid category'),
+    body('category').isIn(['musica', 'literatura', 'teatro', 'danca', 'cinema', 'desenho']).withMessage('Invalid category'),
     body('date').notEmpty().withMessage('Date is required'),
     body('time').optional(),
     body('location').trim().notEmpty().withMessage('Location is required'),
@@ -309,7 +309,26 @@ router.post(
 router.put(
   '/:id',
   authenticate,
+  [
+    body('title').optional().trim().notEmpty().withMessage('Title cannot be empty'),
+    body('description').optional().trim().notEmpty().withMessage('Description cannot be empty'),
+    body('category').optional().isIn(['musica', 'literatura', 'teatro', 'danca', 'cinema', 'desenho']).withMessage('Invalid category'),
+    body('date').optional().notEmpty().withMessage('Date cannot be empty'),
+    body('time').optional(),
+    body('location').optional().trim().notEmpty().withMessage('Location cannot be empty'),
+    body('image').optional().trim().notEmpty().withMessage('Image URL cannot be empty'),
+    body('capacity').optional().isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
+    body('price').optional().isNumeric(),
+    body('is_free').optional().isBoolean(),
+    body('bank_details').optional().isObject(),
+  ],
   asyncHandler(async (req: AuthRequest, res: Response) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() })
+      return
+    }
+
     const event = await EventService.getEventById(req.params.id)
 
     if (!event) {

@@ -3,7 +3,7 @@ export interface IEvent {
   title: string
   description: string
   full_description?: string
-  category: 'Workshop' | 'Exposição' | 'Masterclass' | 'Networking' | 'Palestra' | 'Performance' | 'Lançamento' | 'Encontro' | 'Outro'
+  category: 'musica' | 'literatura' | 'teatro' | 'danca' | 'cinema' | 'desenho'
   date: string
   time: string
   location: string
@@ -30,7 +30,7 @@ export interface IEventInput {
   title: string
   description: string
   full_description?: string
-  category: 'Workshop' | 'Exposição' | 'Masterclass' | 'Networking' | 'Palestra' | 'Performance' | 'Lançamento' | 'Encontro' | 'Outro'
+  category: 'musica' | 'literatura' | 'teatro' | 'danca' | 'cinema' | 'desenho'
   date: string
   time: string
   location: string
