@@ -24,6 +24,7 @@ import pressRoutes from './routes/press'
 import forumRoutes from './routes/forum'
 import contactRoutes from './routes/contact'
 import whatsappRoutes from './routes/whatsapp'
+import financialReportsRoutes from './routes/financial-reports'
 
 dotenv.config()
 
@@ -89,6 +90,7 @@ app.use('/api/press', pressRoutes)
 app.use('/api/forum', forumRoutes)
 app.use('/api/contact', contactRoutes)
 app.use('/api/whatsapp', whatsappRoutes)
+app.use('/api/financial-reports', financialReportsRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,0 +1,305 @@
+import { supabase } from '../config/database'
+
+export interface EventFinancialSummary {
+  event_id: string
+  event_title: string
+  event_date: string
+  event_category: string
+  total_registrations: number
+  confirmed_registrations: number
+  pending_registrations: number
+  cancelled_registrations: number
+  total_revenue: number
+  confirmed_revenue: number
+  pending_revenue: number
+  event_price: number
+}
+
+export interface FinancialOverview {
+  total_revenue: number
+  confirmed_revenue: number
+  pending_revenue: number
+  total_registrations: number
+  confirmed_registrations: number
+  pending_registrations: number
+  events_with_revenue: number
+}
+
+export interface MonthlyRevenue {
+  month: string
+  year: number
+  total_revenue: number
+  confirmed_revenue: number
+  registrations_count: number
+}
+
+export class FinancialReportService {
+  /**
+   * Obtém o resumo financeiro geral
+   */
+  static async getFinancialOverview(
+    startDate?: string,
+    endDate?: string
+  ): Promise<FinancialOverview> {
+    let query = supabase
+      .from('registrations')
+      .select(`
+        payment_status,
+        event:events(id, title, price, date)
+      `)
+
+    if (startDate) {
+      query = query.gte('created_at', startDate)
+    }
+    if (endDate) {
+      query = query.lte('created_at', endDate)
+    }
+
+    const { data: registrations, error } = await query
+
+    if (error) throw error
+
+    const overview: FinancialOverview = {
+      total_revenue: 0,
+      confirmed_revenue: 0,
+      pending_revenue: 0,
+      total_registrations: registrations?.length || 0,
+      confirmed_registrations: 0,
+      pending_registrations: 0,
+      events_with_revenue: 0,
+    }
+
+    const eventsSet = new Set<string>()
+
+    registrations?.forEach((reg: any) => {
+      const price = reg.event?.price || 0
+
+      if (reg.payment_status === 'completed') {
+        overview.confirmed_revenue += price
+        overview.confirmed_registrations++
+      } else if (reg.payment_status === 'pending' || reg.payment_status === 'pending_approval') {
+        overview.pending_revenue += price
+        overview.pending_registrations++
+      }
+
+      overview.total_revenue += price
+
+      if (price > 0) {
+        eventsSet.add(reg.event?.id)
+      }
+    })
+
+    overview.events_with_revenue = eventsSet.size
+
+    return overview
+  }
+
+  /**
+   * Obtém o resumo financeiro por evento
+   */
+  static async getEventFinancialSummary(
+    startDate?: string,
+    endDate?: string
+  ): Promise<EventFinancialSummary[]> {
+    let query = supabase
+      .from('events')
+      .select(`
+        id,
+        title,
+        date,
+        category,
+        price,
+        registrations(id, payment_status, status)
+      `)
+      .order('date', { ascending: false })
+
+    if (startDate) {
+      query = query.gte('date', startDate)
+    }
+    if (endDate) {
+      query = query.lte('date', endDate)
+    }
+
+    const { data: events, error } = await query
+
+    if (error) throw error
+
+    const summaries: EventFinancialSummary[] = []
+
+    events?.forEach((event: any) => {
+      const registrations = event.registrations || []
+      const price = event.price || 0
+
+      const summary: EventFinancialSummary = {
+        event_id: event.id,
+        event_title: event.title,
+        event_date: event.date,
+        event_category: event.category,
+        total_registrations: registrations.length,
+        confirmed_registrations: 0,
+        pending_registrations: 0,
+        cancelled_registrations: 0,
+        total_revenue: 0,
+        confirmed_revenue: 0,
+        pending_revenue: 0,
+        event_price: price,
+      }
+
+      registrations.forEach((reg: any) => {
+        if (reg.status === 'cancelled') {
+          summary.cancelled_registrations++
+          return
+        }
+
+        summary.total_revenue += price
+
+        if (reg.payment_status === 'completed') {
+          summary.confirmed_registrations++
+          summary.confirmed_revenue += price
+        } else if (reg.payment_status === 'pending' || reg.payment_status === 'pending_approval') {
+          summary.pending_registrations++
+          summary.pending_revenue += price
+        }
+      })
+
+      summaries.push(summary)
+    })
+
+    return summaries
+  }
+
+  /**
+   * Obtém receitas mensais
+   */
+  static async getMonthlyRevenue(year?: number): Promise<MonthlyRevenue[]> {
+    const targetYear = year || new Date().getFullYear()
+
+    const { data: registrations, error } = await supabase
+      .from('registrations')
+      .select(`
+        created_at,
+        payment_status,
+        event:events(price)
+      `)
+      .gte('created_at', `${targetYear}-01-01`)
+      .lte('created_at', `${targetYear}-12-31`)
+
+    if (error) throw error
+
+    const monthlyData: { [key: string]: MonthlyRevenue } = {}
+
+    // Inicializar todos os meses
+    for (let i = 1; i <= 12; i++) {
+      const monthKey = `${targetYear}-${String(i).padStart(2, '0')}`
+      monthlyData[monthKey] = {
+        month: new Date(targetYear, i - 1).toLocaleString('pt-PT', { month: 'long' }),
+        year: targetYear,
+        total_revenue: 0,
+        confirmed_revenue: 0,
+        registrations_count: 0,
+      }
+    }
+
+    registrations?.forEach((reg: any) => {
+      const date = new Date(reg.created_at)
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      const price = reg.event?.price || 0
+
+      if (monthlyData[monthKey]) {
+        monthlyData[monthKey].registrations_count++
+        monthlyData[monthKey].total_revenue += price
+
+        if (reg.payment_status === 'completed') {
+          monthlyData[monthKey].confirmed_revenue += price
+        }
+      }
+    })
+
+    return Object.values(monthlyData)
+  }
+
+  /**
+   * Obtém detalhes de registros financeiros de um evento específico
+   */
+  static async getEventRegistrationDetails(eventId: string) {
+    const { data: registrations, error } = await supabase
+      .from('registrations')
+      .select(`
+        id,
+        full_name,
+        email,
+        phone_number,
+        payment_status,
+        payment_method,
+        status,
+        created_at,
+        event:events(id, title, price)
+      `)
+      .eq('event_id', eventId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    return registrations
+  }
+
+  /**
+   * Obtém estatísticas por método de pagamento
+   */
+  static async getPaymentMethodStats(startDate?: string, endDate?: string) {
+    let query = supabase
+      .from('registrations')
+      .select(`
+        payment_method,
+        payment_status,
+        event:events(price)
+      `)
+      .not('payment_method', 'is', null)
+
+    if (startDate) {
+      query = query.gte('created_at', startDate)
+    }
+    if (endDate) {
+      query = query.lte('created_at', endDate)
+    }
+
+    const { data: registrations, error } = await query
+
+    if (error) throw error
+
+    const stats: {
+      [key: string]: {
+        method: string
+        total_transactions: number
+        completed_transactions: number
+        total_revenue: number
+        confirmed_revenue: number
+      }
+    } = {}
+
+    registrations?.forEach((reg: any) => {
+      const method = reg.payment_method || 'Não especificado'
+      const price = reg.event?.price || 0
+
+      if (!stats[method]) {
+        stats[method] = {
+          method,
+          total_transactions: 0,
+          completed_transactions: 0,
+          total_revenue: 0,
+          confirmed_revenue: 0,
+        }
+      }
+
+      stats[method].total_transactions++
+      stats[method].total_revenue += price
+
+      if (reg.payment_status === 'completed') {
+        stats[method].completed_transactions++
+        stats[method].confirmed_revenue += price
+      }
+    })
+
+    return Object.values(stats)
+  }
+}
