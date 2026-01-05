@@ -229,12 +229,18 @@ export class EventService {
     }
 
     // Determine payment status based on event type and provided data
-    let paymentStatus: 'completed' | 'pending' | 'failed' = 'completed'
+    let paymentStatus: 'completed' | 'pending' | 'failed' | 'pending_approval' = 'completed'
     if (!event.is_free) {
-      // If event is not free and payment proof is provided, set to pending
-      if (registrationData?.proof_url) {
+      // Se for pagamento em dinheiro, status fica pending até confirmação no evento
+      if (registrationData?.payment_method === 'Cash') {
         paymentStatus = 'pending'
-      } else {
+      }
+      // Se houver comprovativo, precisa ser aprovado
+      else if (registrationData?.proof_url) {
+        paymentStatus = 'pending_approval'
+      } 
+      // Sem comprovativo e não é dinheiro, fica pending
+      else {
         paymentStatus = 'pending'
       }
     }
@@ -250,6 +256,9 @@ export class EventService {
         phone_number: registrationData?.phone_number,
         payment_method: registrationData?.payment_method,
         proof_url: registrationData?.proof_url,
+        payment_notes: registrationData?.payment_method === 'Cash' 
+          ? 'Pagamento em dinheiro - aguardando confirmação no evento' 
+          : registrationData?.payment_notes,
       })
       .select()
       .single()
@@ -274,7 +283,9 @@ export class EventService {
           event.title,
           event.date,
           event.time,
-          event.location
+          event.location,
+          registrationData?.payment_method,
+          event.is_free
         )
       } catch (emailError) {
         // Don't throw error, just log it - the registration was created successfully

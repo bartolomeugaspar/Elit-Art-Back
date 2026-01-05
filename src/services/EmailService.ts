@@ -168,9 +168,40 @@ export class EmailService {
     eventTitle: string,
     eventDate: string,
     eventTime: string,
-    eventLocation: string
+    eventLocation: string,
+    paymentMethod?: string,
+    isFree?: boolean
   ): Promise<void> {
     try {
+      // Mensagem específica baseada no método de pagamento
+      let paymentMessage = '';
+      if (isFree) {
+        paymentMessage = `
+          <div style="background: #d1fae5; padding: 15px; border-left: 4px solid #10b981; margin: 20px 0; border-radius: 4px;">
+            <p style="color: #065f46; font-size: 14px; margin: 0;">
+              ✅ <strong>Evento Gratuito:</strong> Sua inscrição está confirmada! Não é necessário pagamento.
+            </p>
+          </div>
+        `;
+      } else if (paymentMethod === 'Cash') {
+        paymentMessage = `
+          <div style="background: #dbeafe; padding: 15px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+            <p style="color: #1e40af; font-size: 14px; margin: 0; line-height: 1.6;">
+              💵 <strong>Pagamento em Dinheiro:</strong> Traga o valor exato no dia do evento. 
+              Sua inscrição ficará como "pendente" até a confirmação do pagamento pela nossa equipe.
+            </p>
+          </div>
+        `;
+      } else if (paymentMethod) {
+        paymentMessage = `
+          <div style="background: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+            <p style="color: #92400e; font-size: 14px; margin: 0;">
+              ⏳ <strong>Pagamento em Análise:</strong> Seu comprovativo está sendo verificado. Você receberá a confirmação em breve.
+            </p>
+          </div>
+        `;
+      }
+
       const mailOptions = {
         from: process.env.SMTP_FROM || 'noreply@elitArte.com',
         to: email,
@@ -205,9 +236,7 @@ export class EmailService {
                 </p>
               </div>
               
-              <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
-                Sua inscrição está sendo processada. Você receberá uma confirmação em breve.
-              </p>
+              ${paymentMessage}
               
               <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
                 Guarde este email como comprovante da sua inscrição.
