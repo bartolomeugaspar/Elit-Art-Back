@@ -1,13 +1,17 @@
 import { Router, Request, Response } from 'express'
 import { NotificationSettingsService } from '../services/NotificationSettingsService'
-import { authenticateToken } from '../middleware/auth'
+import { authenticate, AuthRequest } from '../middleware/auth'
 
 const router = Router()
 
 // Obter configurações do usuário
-router.get('/', authenticateToken, async (req: Request, res: Response) => {
+router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = (req as any).user.userId
+    const userId = req.user?.id
+    if (!userId) {
+      return res.status(401).json({ error: 'Não autenticado' })
+    }
+    
     const settings = await NotificationSettingsService.getUserSettings(userId)
     
     res.json(settings)
@@ -17,9 +21,13 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
 })
 
 // Atualizar configurações
-router.patch('/', authenticateToken, async (req: Request, res: Response) => {
+router.patch('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = (req as any).user.userId
+    const userId = req.user?.id
+    if (!userId) {
+      return res.status(401).json({ error: 'Não autenticado' })
+    }
+    
     const updates = req.body
     
     const settings = await NotificationSettingsService.updateSettings(userId, updates)
