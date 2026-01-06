@@ -4,6 +4,7 @@ import { EventService } from '../services/EventService'
 import { authenticate, authorize, AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
 import { PDFService } from '../services/PDFService'
+import { NotificationService } from '../services/NotificationService'
 
 const router = Router()
 
@@ -433,6 +434,9 @@ router.post(
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const { full_name, email, phone_number, payment_method, proof_url } = req.body
 
+    // Buscar detalhes do evento
+    const event = await EventService.getEventById(req.params.id)
+
     const registration = await EventService.registerUserForEvent(
       req.userId,
       req.params.id,
@@ -444,6 +448,21 @@ router.post(
         proof_url,
       }
     )
+
+    // Criar notificação para todos os admins
+    try {
+      await NotificationService.createNotificationForAdmins(
+        'registration',
+        'Nova Inscrição em Evento',
+        `${full_name} inscreveu-se em ${event?.title || 'um evento'}`,
+        '/admin/events',
+        registration.id,
+        'registration'
+      )
+    } catch (notifError) {
+      console.error('Erro ao criar notificação:', notifError)
+      // Não falhar a requisição se a notificação falhar
+    }
 
     res.status(201).json({
       success: true,
