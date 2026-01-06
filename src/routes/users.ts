@@ -185,6 +185,7 @@ router.put(
         name: req.body.name || user.name,
         role: req.body.role || user.role,
         is_active: req.body.is_active !== undefined ? req.body.is_active : user.is_active,
+        profile_image: req.body.profile_image !== undefined ? req.body.profile_image : user.profile_image,
       })
       .eq('id', req.params.id)
       .select()

@@ -88,8 +88,8 @@ router.post(
       return
     }
 
-    const { name, email, password } = req.body
-    const { user: newUser, token } = await AuthService.register(name, email, password)
+    const { name, email, password, profile_image } = req.body
+    const { user: newUser, token } = await AuthService.register(name, email, password, profile_image)
 
     // Enviar email e WhatsApp de boas-vindas com senha temporária (async, não bloqueia a resposta)
     EmailService.sendWelcomeEmail(newUser.email, newUser.name, password)

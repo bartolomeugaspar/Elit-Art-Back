@@ -13,7 +13,7 @@ export class AuthService {
     )
   }
 
-  static async register(name: string, email: string, password: string): Promise<{ user: IUser; token: string }> {
+  static async register(name: string, email: string, password: string, profileImage?: string): Promise<{ user: IUser; token: string }> {
     // Check if user already exists
     const { data: existingUser } = await supabase
       .from('users')
@@ -38,6 +38,7 @@ export class AuthService {
         role: 'user',
         is_email_verified: false,
         is_active: true,
+        profile_image: profileImage || null,
       })
       .select()
       .single()
