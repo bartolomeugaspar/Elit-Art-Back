@@ -9,7 +9,7 @@ export class AuthService {
     return jwt.sign(
       { userId, role },
       secret,
-      { expiresIn: process.env.JWT_EXPIRE || '7d' } as SignOptions
+      { expiresIn: '15m' } as SignOptions
     )
   }
 
