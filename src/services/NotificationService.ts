@@ -34,20 +34,35 @@ export class NotificationService {
       return
     }
 
-    // Criar notificação para cada admin
-    const notifications = admins.map(admin => ({
-      user_id: admin.id,
-      type,
-      title,
-      message,
-      link,
-      reference_id,
-      reference_type
-    }))
+    // Importar dinamicamente para evitar dependência circular
+    const { NotificationSettingsService } = await import('./NotificationSettingsService')
+
+    // Criar notificação apenas para admins que têm essa notificação habilitada
+    const notificationsToCreate = []
+    
+    for (const admin of admins) {
+      const shouldNotify = await NotificationSettingsService.shouldNotify(admin.id, type)
+      if (shouldNotify) {
+        notificationsToCreate.push({
+          user_id: admin.id,
+          type,
+          title,
+          message,
+          link,
+          reference_id,
+          reference_type
+        })
+      }
+    }
+
+    if (notificationsToCreate.length === 0) {
+      console.log(`Nenhum admin configurado para receber notificações do tipo: ${type}`)
+      return
+    }
 
     const { error } = await supabase
       .from('notifications')
-      .insert(notifications)
+      .insert(notificationsToCreate)
 
     if (error) {
       console.error('Erro ao criar notificações:', error)
@@ -115,17 +130,35 @@ export class NotificationService {
     if (error) throw error
   }
 
-  // Deletar notificações antigas (mais de 30 dias)
-  static async deleteOldNotifications(): Promise<void> {
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+  // Deletar notificações antigas (mais de X dias)
+  static async deleteOldNotifications(days: number = 14): Promise<number> {
+    const cutoffDate = new Date()
+    cutoffDate.setDate(cutoffDate.getDate() - days)
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('notifications')
       .delete()
-      .lt('created_at', thirtyDaysAgo.toISOString())
+      .lt('created_at', cutoffDate.toISOString())
+      .select()
 
     if (error) throw error
+    return data?.length || 0
+  }
+
+  // Deletar notificações lidas antigas (mais de X dias)
+  static async deleteOldReadNotifications(days: number = 7): Promise<number> {
+    const cutoffDate = new Date()
+    cutoffDate.setDate(cutoffDate.getDate() - days)
+
+    const { data, error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('read', true)
+      .lt('created_at', cutoffDate.toISOString())
+      .select()
+
+    if (error) throw error
+    return data?.length || 0
   }
 
   // Contar notificações não lidas

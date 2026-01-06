@@ -8,6 +8,7 @@ import { swaggerSpec } from './config/swagger'
 import { errorHandler } from './middleware/errorHandler'
 import { UploadService } from './services/UploadService'
 import { LogCleanupService } from './services/LogCleanupService'
+import { NotificationCleanupService } from './services/NotificationCleanupService'
 import authRoutes from './routes/auth'
 import artistRoutes from './routes/artists'
 import eventRoutes from './routes/events'
@@ -26,6 +27,7 @@ import contactRoutes from './routes/contact'
 import whatsappRoutes from './routes/whatsapp'
 import financialReportsRoutes from './routes/financial-reports'
 import notificationRoutes from './routes/notifications'
+import notificationSettingsRoutes from './routes/notification-settings'
 
 dotenv.config()
 
@@ -93,6 +95,7 @@ app.use('/api/contact', contactRoutes)
 app.use('/api/whatsapp', whatsappRoutes)
 app.use('/api/financial-reports', financialReportsRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/notification-settings', notificationSettingsRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -122,6 +125,9 @@ const startServer = async () => {
     
     // Start log cleanup scheduler (runs every 6 hours)
     LogCleanupService.startCleanupScheduler(6)
+    
+    // Start notification cleanup (runs daily at 3 AM)
+    NotificationCleanupService.startAutoCleanup()
     
     app.listen(PORT, () => {
     })
