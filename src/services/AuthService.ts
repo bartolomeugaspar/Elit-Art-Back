@@ -96,7 +96,7 @@ export class AuthService {
       ipAddress || 'Desconhecido',
       timestamp,
       userAgent
-    ).catch(err => console.error('Error sending login email:', err))
+    ).catch(() => {})
     
     // Send WhatsApp login notification
     import('../services/WhatsAppService').then(({ WhatsAppService }) => {
@@ -105,8 +105,8 @@ export class AuthService {
         user.name,
         ipAddress || 'Desconhecido',
         timestamp
-      ).catch(err => console.error('Error sending login WhatsApp:', err))
-    })
+      )
+    }).catch(() => {})
 
     return { user, token }
   }

@@ -500,7 +500,6 @@ export class EmailService {
       await transporter.sendMail(mailOptions)
     } catch (error) {
       // Log error but don't throw - login should succeed even if email fails
-      console.error('Failed to send login notification email:', error)
     }
   }
 

@@ -105,4 +105,74 @@ export class AuditService {
 
   // Audit logs are read-only and cannot be deleted
   // This ensures data integrity and compliance with audit trail requirements
+
+  // Limpar logs antigos (apenas para admins, com cuidado)
+  static async cleanupOldLogs(days: number = 30): Promise<number> {
+    try {
+      const cutoffDate = new Date()
+      cutoffDate.setDate(cutoffDate.getDate() - days)
+
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .delete()
+        .lt('created_at', cutoffDate.toISOString())
+        .select()
+
+      if (error) throw error
+      return data?.length || 0
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // Limpar logs por tipo de ação (LOGIN, USER_LIST, etc)
+  static async cleanupLogsByAction(action: string, days: number = 7): Promise<number> {
+    try {
+      const cutoffDate = new Date()
+      cutoffDate.setDate(cutoffDate.getDate() - days)
+
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .delete()
+        .eq('action', action)
+        .lt('created_at', cutoffDate.toISOString())
+        .select()
+
+      if (error) throw error
+      return data?.length || 0
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // Limpar todos os logs de LOGIN e USER_LIST
+  static async cleanupAuthLogs(days: number = 7): Promise<{ login: number, userList: number }> {
+    try {
+      const loginDeleted = await this.cleanupLogsByAction('LOGIN', days)
+      const userListDeleted = await this.cleanupLogsByAction('USER_LIST', days)
+
+      return {
+        login: loginDeleted,
+        userList: userListDeleted
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
+  // Limpar TODOS os logs (usar com muito cuidado!)
+  static async cleanupAllLogs(): Promise<number> {
+    try {
+      const { data, error } = await supabase
+        .from('audit_logs')
+        .delete()
+        .not('id', 'is', null)
+        .select()
+
+      if (error) throw error
+      return data?.length || 0
+    } catch (error) {
+      throw error
+    }
+  }
 }

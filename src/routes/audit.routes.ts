@@ -271,6 +271,138 @@ router.post('/cleanup/manual',
   })
 );
 
+/**
+ * @swagger
+ * /audit-logs/cleanup/auth:
+ *   delete:
+ *     summary: Limpar logs de autenticação (LOGIN e USER_LIST)
+ *     tags:
+ *       - Auditoria
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 7
+ *         description: Limpar logs mais antigos que X dias
+ *     responses:
+ *       200:
+ *         description: Logs de autenticação limpos
+ */
+router.delete(
+  '/cleanup/auth',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    try {
+      const days = parseInt(req.query.days as string) || 7
+      const result = await AuditService.cleanupAuthLogs(days)
+
+      res.json({
+        success: true,
+        message: `Logs de autenticação com mais de ${days} dias foram removidos`,
+        deleted: {
+          login: result.login,
+          userList: result.userList,
+          total: result.login + result.userList
+        }
+      })
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao limpar logs de autenticação'
+      })
+    }
+  })
+)
+
+/**
+ * @swagger
+ * /audit-logs/cleanup/action/{action}:
+ *   delete:
+ *     summary: Limpar logs por tipo de ação específica
+ *     tags:
+ *       - Auditoria
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: action
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Tipo de ação (LOGIN, USER_LIST, etc)
+ *       - in: query
+ *         name: days
+ *         schema:
+ *           type: integer
+ *           default: 7
+ *         description: Limpar logs mais antigos que X dias
+ *     responses:
+ *       200:
+ *         description: Logs removidos
+ */
+router.delete(
+  '/cleanup/action/:action',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    try {
+      const action = req.params.action
+      const days = parseInt(req.query.days as string) || 7
+      const deleted = await AuditService.cleanupLogsByAction(action, days)
+
+      res.json({
+        success: true,
+        message: `${deleted} logs da ação '${action}' com mais de ${days} dias foram removidos`,
+        deleted
+      })
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao limpar logs'
+      })
+    }
+  })
+)
+
+/**
+ * @swagger
+ * /audit-logs/cleanup/all:
+ *   delete:
+ *     summary: PERIGO - Limpar TODOS os logs de auditoria
+ *     tags:
+ *       - Auditoria
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Todos os logs foram removidos
+ */
+router.delete(
+  '/cleanup/all',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    try {
+      const deleted = await AuditService.cleanupAllLogs()
+
+      res.json({
+        success: true,
+        message: '⚠️ TODOS os logs de auditoria foram removidos',
+        deleted
+      })
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao limpar todos os logs'
+      })
+    }
+  })
+)
+
 // Audit logs are read-only and cannot be deleted automatically by users
 // This ensures data integrity and compliance with audit trail requirements
 // Only session logs (login/logout) older than 2 days are auto-deleted
