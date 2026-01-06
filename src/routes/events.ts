@@ -460,7 +460,6 @@ router.post(
         'registration'
       )
     } catch (notifError) {
-      console.error('Erro ao criar notificação:', notifError)
       // Não falhar a requisição se a notificação falhar
     }
 

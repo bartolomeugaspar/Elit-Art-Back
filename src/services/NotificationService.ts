@@ -56,7 +56,6 @@ export class NotificationService {
     }
 
     if (notificationsToCreate.length === 0) {
-      console.log(`Nenhum admin configurado para receber notificações do tipo: ${type}`)
       return
     }
 
@@ -65,7 +64,6 @@ export class NotificationService {
       .insert(notificationsToCreate)
 
     if (error) {
-      console.error('Erro ao criar notificações:', error)
       throw error
     }
   }

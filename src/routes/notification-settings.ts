@@ -12,7 +12,6 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
     
     res.json(settings)
   } catch (error) {
-    console.error('Erro ao buscar configurações:', error)
     res.status(500).json({ error: 'Erro ao buscar configurações' })
   }
 })
@@ -27,7 +26,6 @@ router.patch('/', authenticateToken, async (req: Request, res: Response) => {
     
     res.json(settings)
   } catch (error) {
-    console.error('Erro ao atualizar configurações:', error)
     res.status(500).json({ error: 'Erro ao atualizar configurações' })
   }
 })
