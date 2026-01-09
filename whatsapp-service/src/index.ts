@@ -47,7 +47,8 @@ whatsappClient.initialize().catch(err => {
 })
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ WhatsApp Service rodando na porta ${PORT}`)
   console.log(`📱 WhatsApp Status: http://localhost:${PORT}/api/whatsapp-api/status`)
+  console.log(`🌐 Ambiente: ${process.env.NODE_ENV || 'development'}`)
 })

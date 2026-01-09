@@ -15,8 +15,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
       - key: FRONTEND_URL
         value: https://elit-arte.vercel.app
       - key: PUPPETEER_CACHE_DIR
