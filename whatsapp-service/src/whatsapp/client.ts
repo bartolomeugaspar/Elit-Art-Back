@@ -1,5 +1,7 @@
 import { Client, LocalAuth } from 'whatsapp-web.js'
 import qrcode from 'qrcode-terminal'
+import * as fs from 'fs'
+import * as path from 'path'
 
 class WhatsAppClient {
   private static instance: WhatsAppClient
@@ -16,11 +18,15 @@ class WhatsAppClient {
   }> = []
 
   private constructor() {
+    // Detectar executável do Chrome
+    const executablePath = this.findChromeExecutable()
+    
     this.client = new Client({
       authStrategy: new LocalAuth({
         dataPath: '.wwebjs_auth'
       }),
       puppeteer: {
+        executablePath: executablePath,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -35,6 +41,27 @@ class WhatsAppClient {
     })
 
     this.setupEventHandlers()
+  }
+
+  private findChromeExecutable(): string | undefined {
+    // Tentar encontrar Chrome em locais comuns
+    const possiblePaths = [
+      '/opt/render/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chromium',
+      '/usr/bin/google-chrome',
+      process.env.PUPPETEER_EXECUTABLE_PATH,
+    ]
+
+    for (const chromePath of possiblePaths) {
+      if (chromePath && fs.existsSync(chromePath)) {
+        console.log(`✅ Chrome found at: ${chromePath}`)
+        return chromePath
+      }
+    }
+
+    console.log('⚠️ Chrome not found, using default')
+    return undefined
   }
 
   public static getInstance(): WhatsAppClient {
