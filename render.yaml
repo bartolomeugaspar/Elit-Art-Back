@@ -3,8 +3,8 @@ services:
     name: elit-arte-whatsapp
     runtime: node
     region: frankfurt
-    plan: starter
-      buildCommand: cd whatsapp-service && chmod +x build.sh && ./build.sh
+    plan: starter  # Considere atualizar para 'starter plus' (2GB RAM) se o problema persistir
+    buildCommand: cd whatsapp-service && chmod +x build.sh && ./build.sh
     startCommand: cd whatsapp-service && node dist/index.js
     envVars:
       - key: NODE_ENV
@@ -17,3 +17,5 @@ services:
         value: false
       - key: PUPPETEER_CACHE_DIR
         value: /opt/render/.cache/puppeteer
+      - key: NODE_OPTIONS
+        value: '--max-old-space-size=450'  # Limitar uso de memória do Node.js
