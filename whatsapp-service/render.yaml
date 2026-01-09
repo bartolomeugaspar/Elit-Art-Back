@@ -17,7 +17,5 @@ services:
         value: production
       - key: FRONTEND_URL
         value: https://elit-arte.vercel.app
-      - key: PUPPETEER_SKIP_DOWNLOAD
-        value: true
-      - key: PUPPETEER_EXECUTABLE_PATH
-        value: /usr/bin/chromium
+      - key: PUPPETEER_CACHE_DIR
+        value: /opt/render/project/src/whatsapp-service/.cache/puppeteer
