@@ -70,6 +70,34 @@ router.post('/initialize', async (req: Request, res: Response) => {
 
 /**
  * @swagger
+ * /whatsapp-api/messages:
+ *   get:
+ *     summary: Obter histórico de mensagens
+ *     description: Retorna as últimas mensagens enviadas e recebidas
+ *     tags: [WhatsApp API]
+ *     responses:
+ *       200:
+ *         description: Histórico de mensagens
+ */
+router.get('/messages', async (req: Request, res: Response) => {
+  try {
+    const messages = whatsappClient.getMessageHistory()
+    
+    res.json({
+      success: true,
+      messages: messages.sort((a, b) => b.timestamp - a.timestamp)
+    })
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao obter mensagens',
+      error: error.message
+    })
+  }
+})
+
+/**
+ * @swagger
  * /whatsapp-api/send:
  *   post:
  *     summary: Enviar mensagem WhatsApp

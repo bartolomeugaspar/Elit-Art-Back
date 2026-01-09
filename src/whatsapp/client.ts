@@ -6,6 +6,13 @@ class WhatsAppClient {
   private client: Client
   private isReady: boolean = false
   private isInitializing: boolean = false
+  private messageHistory: Array<{
+    id: string
+    from: string
+    body: string
+    timestamp: number
+    type: 'received' | 'sent'
+  }> = []
 
   private constructor() {
     this.client = new Client({
@@ -80,6 +87,20 @@ class WhatsAppClient {
     this.client.on('message', async (msg) => {
       // Log incoming messages for debugging
       console.log(`📨 Mensagem recebida de ${msg.from}: ${msg.body}`)
+      
+      // Store message in history
+      this.messageHistory.push({
+        id: msg.id._serialized || msg.id.id || Date.now().toString(),
+        from: msg.from,
+        body: msg.body,
+        timestamp: msg.timestamp * 1000 || Date.now(),
+        type: 'received'
+      })
+      
+      // Keep only last 100 messages to prevent memory issues
+      if (this.messageHistory.length > 100) {
+        this.messageHistory = this.messageHistory.slice(-100)
+      }
     })
   }
 
@@ -126,11 +147,30 @@ class WhatsAppClient {
       
       await this.client.sendMessage(chatId, message)
       console.log(`✅ WhatsApp enviado com sucesso para ${formattedPhone}`)
+      
+      // Store sent message in history
+      this.messageHistory.push({
+        id: Date.now().toString(),
+        from: chatId,
+        body: message,
+        timestamp: Date.now(),
+        type: 'sent'
+      })
+      
+      // Keep only last 100 messages
+      if (this.messageHistory.length > 100) {
+        this.messageHistory = this.messageHistory.slice(-100)
+      }
+      
       return true
     } catch (error: any) {
       console.error('❌ Erro ao enviar WhatsApp:', error.message)
       return false
     }
+  }
+
+  public getMessageHistory() {
+    return this.messageHistory
   }
 
   public isClientReady(): boolean {
