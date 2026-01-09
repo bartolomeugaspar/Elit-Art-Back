@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                import { Router, Response } from 'express'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  import { Router, Response } from 'express'
 import { body, query, validationResult } from 'express-validator'
 import { EventService } from '../services/EventService'
 import { authenticate, authorize, AuthRequest } from '../middleware/auth'
@@ -101,7 +101,7 @@ router.get(
     const event = await EventService.getEventById(req.params.id)
 
     if (!event) {
-      res.status(404).json({ success: false, message: 'Event not found' })
+      res.status(404).json({ success: false, message: 'Evento não encontrado' })
       return
     }
 
@@ -249,7 +249,7 @@ router.post(
 
     res.status(201).json({
       success: true,
-      message: 'Event created successfully',
+      message: 'Evento criado com sucesso',
       event,
     })
   })
@@ -333,12 +333,12 @@ router.put(
     const event = await EventService.getEventById(req.params.id)
 
     if (!event) {
-      res.status(404).json({ success: false, message: 'Event not found' })
+      res.status(404).json({ success: false, message: 'Evento não encontrado' })
       return
     }
 
     if (event.organizer_id !== req.userId && req.userRole !== 'admin') {
-      res.status(403).json({ success: false, message: 'Not authorized to update this event' })
+      res.status(403).json({ success: false, message: 'Não autorizado a atualizar este evento' })
       return
     }
 
@@ -346,7 +346,7 @@ router.put(
 
     res.status(200).json({
       success: true,
-      message: 'Event updated successfully',
+      message: 'Evento atualizado com sucesso',
       event: updatedEvent,
     })
   })
@@ -386,12 +386,12 @@ router.delete(
     const event = await EventService.getEventById(req.params.id)
 
     if (!event) {
-      res.status(404).json({ success: false, message: 'Event not found' })
+      res.status(404).json({ success: false, message: 'Evento não encontrado' })
       return
     }
 
     if (event.organizer_id !== req.userId && req.userRole !== 'admin') {
-      res.status(403).json({ success: false, message: 'Not authorized to delete this event' })
+      res.status(403).json({ success: false, message: 'Não autorizado a deletar este evento' })
       return
     }
 
@@ -543,12 +543,12 @@ router.get(
     const event = await EventService.getEventById(req.params.id)
 
     if (!event) {
-      res.status(404).json({ success: false, message: 'Event not found' })
+      res.status(404).json({ success: false, message: 'Evento não encontrado' })
       return
     }
 
     if (event.organizer_id !== req.userId && req.userRole !== 'admin') {
-      res.status(403).json({ success: false, message: 'Not authorized' })
+      res.status(403).json({ success: false, message: 'Não autorizado' })
       return
     }
 
@@ -738,14 +738,18 @@ router.get(
     try {
       const event = await EventService.getEventById(req.params.id)
       if (!event) {
-        res.status(404).json({ success: false, message: 'Event not found' })
+        res.status(404).json({ success: false, message: 'Evento não encontrado' })
         return
       }
 
       const registrations = await EventService.getEventRegistrations(req.params.id)
       
       if (!registrations || registrations.length === 0) {
-        res.status(404).json({ success: false, message: 'No registrations found for this event' })
+        res.status(404).json({ 
+          success: false, 
+          message: 'Ainda não há inscrições para este evento',
+          details: 'O PDF só pode ser gerado após o primeiro inscrito'
+        })
         return
       }
 

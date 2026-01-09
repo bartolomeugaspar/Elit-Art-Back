@@ -132,23 +132,16 @@ const startServer = async () => {
     // Start notification cleanup (runs daily at 3 AM)
     NotificationCleanupService.startAutoCleanup()
     
-    // Initialize WhatsApp client APENAS em produção se não for Vercel
+    // Initialize WhatsApp client APENAS se a variável ENABLE_WHATSAPP estiver definida
     // No Vercel, o WhatsApp roda num serviço separado na Render
-    if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+    if (process.env.ENABLE_WHATSAPP === 'true') {
       const whatsappClient = WhatsAppClient.getInstance()
       console.log('🚀 Inicializando cliente WhatsApp...')
       whatsappClient.initialize().catch(err => {
         console.error('⚠️ Erro ao inicializar WhatsApp (pode ser iniciado manualmente depois):', err.message)
       })
-    } else if (process.env.NODE_ENV !== 'production') {
-      // Em desenvolvimento local, inicializar normalmente
-      const whatsappClient = WhatsAppClient.getInstance()
-      console.log('🚀 Inicializando cliente WhatsApp (desenvolvimento)...')
-      whatsappClient.initialize().catch(err => {
-        console.error('⚠️ Erro ao inicializar WhatsApp:', err.message)
-      })
     } else {
-      console.log('ℹ️ WhatsApp client desabilitado no Vercel (use serviço separado na Render)')
+      console.log('ℹ️ WhatsApp desabilitado (defina ENABLE_WHATSAPP=true no .env para habilitar)')
     }
     
     app.listen(PORT, () => {
