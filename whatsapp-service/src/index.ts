@@ -10,8 +10,23 @@ const app = express()
 const PORT = process.env.PORT || 5001
 
 // Middleware
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://localhost:3001'
+].filter(Boolean)
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: (origin, callback) => {
+    // Permitir requests sem origin (mobile apps, curl, etc)
+    if (!origin) return callback(null, true)
+    
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true
 }))
 app.use(express.json())
@@ -51,4 +66,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ WhatsApp Service rodando na porta ${PORT}`)
   console.log(`📱 WhatsApp Status: http://localhost:${PORT}/api/whatsapp-api/status`)
   console.log(`🌐 Ambiente: ${process.env.NODE_ENV || 'development'}`)
+  console.log(`🔒 CORS: ${allowedOrigins.join(', ')}`)
 })
