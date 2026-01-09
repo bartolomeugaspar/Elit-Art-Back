@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "start:prod": "cd /opt/render/project/src/whatsapp-service && node dist/index.js"
   },
   "keywords": ["whatsapp", "elit-arte"],
   "author": "Elit'Arte Team",
