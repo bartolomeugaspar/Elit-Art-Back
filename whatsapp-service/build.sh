@@ -19,9 +19,4 @@ else
   exit 1
 fi
 
-echo "🌐 Checking for Chromium..."
-if command -v chromium &> /dev/null || command -v chromium-browser &> /dev/null; then
-  echo "✅ Chromium is installed"
-else
-  echo "⚠️ Chromium not found - will be installed via Aptfile"
-fi
+echo "ℹ️  Note: Chromium will be installed from Aptfile by Render"
