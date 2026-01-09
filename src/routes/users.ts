@@ -203,6 +203,59 @@ router.put(
 
 /**
  * @swagger
+ * /users/profile-image:
+ *   put:
+ *     summary: Atualizar foto de perfil do usuário logado
+ *     tags:
+ *       - Usuários
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profile_image:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Foto de perfil atualizada
+ *       401:
+ *         description: Não autenticado
+ */
+router.put(
+  '/profile-image',
+  authenticate,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { profile_image } = req.body
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .update({ profile_image })
+      .eq('id', req.userId)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile image updated successfully',
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profile_image: user.profile_image,
+      },
+    })
+  })
+)
+
+/**
+ * @swagger
  * /users/{id}:
  *   delete:
  *     summary: Deletar usuário
