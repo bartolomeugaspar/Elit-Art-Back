@@ -4,14 +4,6 @@ set -e
 echo "📦 Installing dependencies..."
 npm install --production=false
 
-echo "🌐 Installing Chromium for Puppeteer..."
-export PUPPETEER_CACHE_DIR="/opt/render/project/src/whatsapp-service/.cache/puppeteer"
-mkdir -p "$PUPPETEER_CACHE_DIR"
-npx puppeteer browsers install chrome
-
-echo "📁 Checking Chromium installation..."
-find "$PUPPETEER_CACHE_DIR" -name "chrome" -type f 2>/dev/null || echo "Chrome binary search completed"
-
 echo "🔨 Building TypeScript..."
 npm run build
 

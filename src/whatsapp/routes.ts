@@ -24,10 +24,11 @@ router.get('/status', async (req: Request, res: Response) => {
       status: {
         connected: status.ready,
         initializing: status.initializing,
+        qr: status.qr,
         message: status.ready 
           ? 'WhatsApp conectado e pronto' 
           : status.initializing 
-          ? 'WhatsApp inicializando... Escaneie o QR Code no console do servidor'
+          ? 'WhatsApp inicializando... Escaneie o QR Code'
           : 'WhatsApp desconectado'
       }
     })

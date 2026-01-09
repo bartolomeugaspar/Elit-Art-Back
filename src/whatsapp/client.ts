@@ -6,6 +6,7 @@ class WhatsAppClient {
   private client: Client
   private isReady: boolean = false
   private isInitializing: boolean = false
+  private currentQR: string | null = null
   private messageHistory: Array<{
     id: string
     from: string
@@ -45,6 +46,7 @@ class WhatsAppClient {
 
   private setupEventHandlers(): void {
     this.client.on('qr', (qr) => {
+      this.currentQR = qr
       console.log('\n' + '='.repeat(50))
       console.log('📲 ESCANEIE O QR CODE ABAIXO COM O WHATSAPP:')
       console.log('='.repeat(50) + '\n')
@@ -57,18 +59,21 @@ class WhatsAppClient {
     this.client.on('ready', () => {
       this.isReady = true
       this.isInitializing = false
+      this.currentQR = null
       console.log('\n' + '='.repeat(50))
       console.log('✅ WhatsApp conectado e pronto para enviar mensagens!')
       console.log('='.repeat(50) + '\n')
     })
 
     this.client.on('authenticated', () => {
+      this.currentQR = null
       console.log('🔐 WhatsApp autenticado com sucesso!')
     })
 
     this.client.on('auth_failure', (msg) => {
       this.isReady = false
       this.isInitializing = false
+      this.currentQR = null
       console.error('❌ Falha na autenticação WhatsApp:', msg)
     })
 
@@ -173,14 +178,19 @@ class WhatsAppClient {
     return this.messageHistory
   }
 
+  public getQRCode(): string | null {
+    return this.currentQR
+  }
+
   public isClientReady(): boolean {
     return this.isReady
   }
 
-  public async getStatus(): Promise<{ ready: boolean; initializing: boolean }> {
+  public async getStatus(): Promise<{ ready: boolean; initializing: boolean; qr: string | null }> {
     return {
       ready: this.isReady,
-      initializing: this.isInitializing
+      initializing: this.isInitializing,
+      qr: this.currentQR
     }
   }
 

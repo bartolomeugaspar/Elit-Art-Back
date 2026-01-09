@@ -4,7 +4,7 @@ services:
     runtime: node
     region: frankfurt
     plan: starter
-    buildCommand: cd whatsapp-service && chmod +x build.sh && ./build.sh
+      buildCommand: cd whatsapp-service && chmod +x build.sh && ./build.sh
     startCommand: cd whatsapp-service && node dist/index.js
     envVars:
       - key: NODE_ENV
