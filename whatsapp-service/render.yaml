@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: elit-arte-whatsapp
+    env: node
+    region: frankfurt
+    plan: starter
+    rootDir: whatsapp-service
+    buildCommand: npm install && npm run build
+    startCommand: node dist/index.js
+    healthCheckPath: /health
+    disk:
+      name: whatsapp-sessions
+      mountPath: /opt/render/project/src/.wwebjs_auth
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        value: https://elit-arte.vercel.app
