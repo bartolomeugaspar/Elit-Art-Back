@@ -9,6 +9,7 @@ import { errorHandler } from './middleware/errorHandler'
 import { UploadService } from './services/UploadService'
 import { LogCleanupService } from './services/LogCleanupService'
 import { NotificationCleanupService } from './services/NotificationCleanupService'
+import WhatsAppClient from './whatsapp/client'
 import authRoutes from './routes/auth'
 import artistRoutes from './routes/artists'
 import eventRoutes from './routes/events'
@@ -25,6 +26,7 @@ import pressRoutes from './routes/press'
 import forumRoutes from './routes/forum'
 import contactRoutes from './routes/contact'
 import whatsappRoutes from './routes/whatsapp'
+import whatsappApiRoutes from './whatsapp/routes'
 import financialReportsRoutes from './routes/financial-reports'
 import notificationRoutes from './routes/notifications'
 import notificationSettingsRoutes from './routes/notification-settings'
@@ -93,6 +95,7 @@ app.use('/api/press', pressRoutes)
 app.use('/api/forum', forumRoutes)
 app.use('/api/contact', contactRoutes)
 app.use('/api/whatsapp', whatsappRoutes)
+app.use('/api/whatsapp-api', whatsappApiRoutes)
 app.use('/api/financial-reports', financialReportsRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/notification-settings', notificationSettingsRoutes)
@@ -129,9 +132,20 @@ const startServer = async () => {
     // Start notification cleanup (runs daily at 3 AM)
     NotificationCleanupService.startAutoCleanup()
     
+    // Initialize WhatsApp client
+    const whatsappClient = WhatsAppClient.getInstance()
+    console.log('🚀 Inicializando cliente WhatsApp...')
+    whatsappClient.initialize().catch(err => {
+      console.error('⚠️ Erro ao inicializar WhatsApp (pode ser iniciado manualmente depois):', err.message)
+    })
+    
     app.listen(PORT, () => {
+      console.log(`✅ Servidor rodando na porta ${PORT}`)
+      console.log(`📚 Documentação API: http://localhost:${PORT}/api-docs`)
+      console.log(`📱 WhatsApp Status: http://localhost:${PORT}/api/whatsapp/status`)
     })
   } catch (error) {
+    console.error('❌ Erro ao iniciar servidor:', error)
     process.exit(1)
   }
 }

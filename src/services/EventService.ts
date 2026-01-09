@@ -258,7 +258,7 @@ export class EventService {
         proof_url: registrationData?.proof_url,
         payment_notes: registrationData?.payment_method === 'Cash' 
           ? 'Pagamento em dinheiro - aguardando confirmação no evento' 
-          : registrationData?.payment_notes,
+          : undefined,
       })
       .select()
       .single()

@@ -6,10 +6,10 @@ const router = express.Router()
 
 /**
  * @swagger
- * /whatsapp/test-connection:
+ * /whatsapp/status:
  *   get:
- *     summary: Testar conexão com Green-API
- *     description: Verifica se a instância WhatsApp está autorizada e conectada
+ *     summary: Verificar status do WhatsApp
+ *     description: Verifica se o WhatsApp está conectado e autorizado
  *     tags: [WhatsApp]
  *     security:
  *       - bearerAuth: []
@@ -17,9 +17,9 @@ const router = express.Router()
  *       200:
  *         description: Status da conexão
  *       403:
- *         description: Apenas administradores podem testar
+ *         description: Apenas administradores podem verificar
  */
-router.get('/test-connection', authenticate, authorize('admin'), async (req, res) => {
+router.get('/status', authenticate, authorize('admin'), async (req, res) => {
   try {
     const isConnected = await WhatsAppService.testConnection()
     
@@ -28,13 +28,45 @@ router.get('/test-connection', authenticate, authorize('admin'), async (req, res
       connected: isConnected,
       message: isConnected 
         ? 'WhatsApp conectado com sucesso' 
-        : 'WhatsApp não está conectado ou autorizado',
-      instanceId: process.env.GREEN_API_INSTANCE_ID || 'não configurado'
+        : 'WhatsApp não está conectado. Use /whatsapp/initialize para conectar',
+      service: 'whatsapp-web.js'
     })
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: 'Erro ao testar conexão',
+      message: 'Erro ao verificar status',
+      error: error.message
+    })
+  }
+})
+
+/**
+ * @swagger
+ * /whatsapp/initialize:
+ *   post:
+ *     summary: Inicializar WhatsApp
+ *     description: Inicia o cliente WhatsApp e exibe QR Code no console do servidor
+ *     tags: [WhatsApp]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cliente inicializado
+ *       403:
+ *         description: Apenas administradores podem inicializar
+ */
+router.post('/initialize', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    await WhatsAppService.initializeClient()
+    
+    res.json({
+      success: true,
+      message: 'Cliente WhatsApp inicializado. Verifique o console do servidor para escanear o QR Code.'
+    })
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao inicializar WhatsApp',
       error: error.message
     })
   }
@@ -109,7 +141,7 @@ router.post('/test-send', authenticate, authorize('admin'), async (req, res) => 
  * /whatsapp/info:
  *   get:
  *     summary: Obter informações da configuração WhatsApp
- *     description: Retorna informações sobre a configuração do WhatsApp (sem expor credenciais)
+ *     description: Retorna informações sobre a configuração do WhatsApp
  *     tags: [WhatsApp]
  *     security:
  *       - bearerAuth: []
@@ -119,15 +151,12 @@ router.post('/test-send', authenticate, authorize('admin'), async (req, res) => 
  */
 router.get('/info', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const configured = !!(process.env.GREEN_API_INSTANCE_ID && process.env.GREEN_API_TOKEN)
+    const isConnected = await WhatsAppService.testConnection()
     
     res.json({
       success: true,
-      configured,
-      provider: 'Green-API',
-      apiUrl: process.env.GREEN_API_URL || 'não configurado',
-      instanceId: process.env.GREEN_API_INSTANCE_ID || 'não configurado',
-      tokenConfigured: !!process.env.GREEN_API_TOKEN,
+      provider: 'whatsapp-web.js',
+      connected: isConnected,
       features: {
         welcomeMessages: true,
         passwordReset: true,
@@ -135,7 +164,8 @@ router.get('/info', authenticate, authorize('admin'), async (req, res) => {
         loginNotifications: true,
         contactReplies: true,
         eventNotifications: true
-      }
+      },
+      message: 'Sistema WhatsApp usando whatsapp-web.js com autenticação local'
     })
   } catch (error: any) {
     res.status(500).json({

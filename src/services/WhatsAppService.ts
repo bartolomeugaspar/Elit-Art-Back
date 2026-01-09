@@ -1,26 +1,17 @@
-import axios from 'axios'
+import WhatsAppClient from '../whatsapp/client'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
-// Green-API Configuration
-const GREEN_API_URL = process.env.GREEN_API_URL || 'https://7105.api.green-api.com'
-const GREEN_API_MEDIA_URL = process.env.GREEN_API_MEDIA_URL || 'https://7105.media.green-api.com'
-const GREEN_API_INSTANCE_ID = process.env.GREEN_API_INSTANCE_ID || '7105402510'
-const GREEN_API_TOKEN = process.env.GREEN_API_TOKEN || '030e2715493345b892fbb7210475bdeb29d58339cd084a889c'
-
 export class WhatsAppService {
+  private static client = WhatsAppClient.getInstance()
+
   /**
-   * Envia mensagem de texto via Green-API
-   * @param phoneNumber - Número de telefone (ex: 244XXXXXXXXX sem o +)
+   * Envia mensagem de texto via whatsapp-web.js
+   * @param phoneNumber - Número de telefone (ex: 244XXXXXXXXX ou 9XXXXXXXX)
    * @param message - Mensagem a enviar
    */
   private static async sendMessage(phoneNumber: string, message: string): Promise<void> {
-    if (!GREEN_API_INSTANCE_ID || !GREEN_API_TOKEN) {
-      console.log('⚠️ Green-API não configurado. Mensagem WhatsApp não enviada.')
-      return
-    }
-
     const cleanPhone = this.formatPhoneNumber(phoneNumber)
     if (!cleanPhone) {
       console.log('⚠️ Número de telefone inválido:', phoneNumber)
@@ -28,24 +19,12 @@ export class WhatsAppService {
     }
 
     try {
-      const url = `${GREEN_API_URL}/waInstance${GREEN_API_INSTANCE_ID}/sendMessage/${GREEN_API_TOKEN}`
-      
-      const payload = {
-        chatId: `${cleanPhone}@c.us`,
-        message: message
-      }
-
-      const response = await axios.post(url, payload, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (response.data && response.data.idMessage) {
-        console.log(`✅ WhatsApp enviado com sucesso para ${cleanPhone}`)
+      const sent = await this.client.sendMessage(cleanPhone, message)
+      if (!sent) {
+        console.log('⚠️ WhatsApp não está conectado. Mensagem não enviada.')
       }
     } catch (error: any) {
-      console.error('❌ Erro ao enviar WhatsApp via Green-API:', error.response?.data || error.message)
+      console.error('❌ Erro ao enviar WhatsApp:', error.message)
       // Não lançar erro para não bloquear o fluxo principal
     }
   }
@@ -302,21 +281,27 @@ export class WhatsAppService {
   }
 
   /**
-   * Testa a conexão com a Green-API
+   * Testa a conexão com o WhatsApp
    */
   static async testConnection(): Promise<boolean> {
-    if (!GREEN_API_INSTANCE_ID || !GREEN_API_TOKEN) {
+    try {
+      const status = await this.client.getStatus()
+      return status.ready
+    } catch (error: any) {
+      console.error('Erro ao testar conexão WhatsApp:', error.message)
       return false
     }
+  }
 
+  /**
+   * Inicializa o cliente WhatsApp
+   */
+  static async initializeClient(): Promise<void> {
     try {
-      const url = `${GREEN_API_URL}/waInstance${GREEN_API_INSTANCE_ID}/getStateInstance/${GREEN_API_TOKEN}`
-      const response = await axios.get(url)
-
-      return response.data?.stateInstance === 'authorized'
+      await this.client.initialize()
     } catch (error: any) {
-      console.error('Erro ao testar conexão Green-API:', error.message)
-      return false
+      console.error('Erro ao inicializar WhatsApp:', error.message)
+      throw error
     }
   }
 }

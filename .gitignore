@@ -15,3 +15,11 @@ yarn-error.log*
 *~
 .env.production
 uploads/
+
+# WhatsApp sessões e cache
+.wwebjs_auth/
+.wwebjs_cache/
+
+# PM2 logs
+logs/
+.pm2/
