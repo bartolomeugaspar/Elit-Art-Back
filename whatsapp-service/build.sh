@@ -4,9 +4,6 @@ set -e
 echo "📦 Installing dependencies..."
 npm install --production=false
 
-echo "🌐 Installing Chromium for Puppeteer..."
-npx puppeteer browsers install chrome
-
 echo "🔨 Building TypeScript..."
 npm run build
 
@@ -20,4 +17,11 @@ if [ -f "dist/index.js" ]; then
 else
   echo "❌ index.js not found!"
   exit 1
+fi
+
+echo "🌐 Checking for Chromium..."
+if command -v chromium &> /dev/null || command -v chromium-browser &> /dev/null; then
+  echo "✅ Chromium is installed"
+else
+  echo "⚠️ Chromium not found - will be installed via Aptfile"
 fi

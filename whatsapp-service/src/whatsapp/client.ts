@@ -44,13 +44,14 @@ class WhatsAppClient {
   }
 
   private findChromeExecutable(): string | undefined {
-    // Tentar encontrar Chrome em locais comuns
+    // Tentar encontrar Chrome em locais comuns (priorizando instalações do sistema)
     const possiblePaths = [
-      '/opt/render/.cache/puppeteer/chrome/linux-143.0.7499.169/chrome-linux64/chrome',
-      '/usr/bin/chromium-browser',
-      '/usr/bin/chromium',
-      '/usr/bin/google-chrome',
       process.env.PUPPETEER_EXECUTABLE_PATH,
+      '/usr/bin/chromium',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/google-chrome',
+      '/snap/bin/chromium',
     ]
 
     for (const chromePath of possiblePaths) {
@@ -60,7 +61,7 @@ class WhatsAppClient {
       }
     }
 
-    console.log('⚠️ Chrome not found, using default')
+    console.log('⚠️ Chrome not found in standard locations, puppeteer will try to use its own')
     return undefined
   }
 
