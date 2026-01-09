@@ -2,7 +2,10 @@
 set -e
 
 echo "📦 Installing dependencies..."
-npm install
+npm install --production=false
+
+echo "🌐 Installing Chromium for Puppeteer..."
+npx puppeteer browsers install chrome
 
 echo "🔨 Building TypeScript..."
 npm run build

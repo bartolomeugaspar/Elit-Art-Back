@@ -4,7 +4,7 @@ services:
     runtime: node
     region: frankfurt
     plan: starter
-    buildCommand: cd whatsapp-service && npm install --production=false && npm run build
+    buildCommand: cd whatsapp-service && chmod +x build.sh && ./build.sh
     startCommand: cd whatsapp-service && node dist/index.js
     envVars:
       - key: NODE_ENV
@@ -13,3 +13,7 @@ services:
         value: 10000
       - key: FRONTEND_URL
         value: https://elit-arte.vercel.app
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: false
+      - key: PUPPETEER_CACHE_DIR
+        value: /opt/render/.cache/puppeteer
