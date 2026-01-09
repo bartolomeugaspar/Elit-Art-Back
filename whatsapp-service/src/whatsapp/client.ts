@@ -34,7 +34,29 @@ class WhatsAppClient {
           '--disable-accelerated-2d-canvas',
           '--no-first-run',
           '--no-zygote',
-          '--disable-gpu'
+          '--disable-gpu',
+          '--disable-extensions',
+          '--disable-background-networking',
+          '--disable-default-apps',
+          '--disable-sync',
+          '--disable-translate',
+          '--hide-scrollbars',
+          '--metrics-recording-only',
+          '--mute-audio',
+          '--no-default-browser-check',
+          '--safebrowsing-disable-auto-update',
+          '--disable-features=TranslateUI',
+          '--disable-features=BlinkGenPropertyTrees',
+          '--disable-ipc-flooding-protection',
+          '--disable-renderer-backgrounding',
+          '--disable-backgrounding-occluded-windows',
+          '--disable-breakpad',
+          '--disable-component-extensions-with-background-pages',
+          '--disable-features=CalculateNativeWinOcclusion',
+          '--enable-features=NetworkService,NetworkServiceInProcess',
+          '--force-color-profile=srgb',
+          '--disable-features=AudioServiceOutOfProcess',
+          '--single-process'
         ],
         headless: true
       }
@@ -44,27 +66,7 @@ class WhatsAppClient {
   }
 
   private findChromeExecutable(): string | undefined {
-    // 1. Procurar no cache do Puppeteer
-    const cacheDir = process.env.PUPPETEER_CACHE_DIR || '/opt/render/project/src/whatsapp-service/.cache/puppeteer'
-    const chromeCachePath = path.join(cacheDir, 'chrome')
-    
-    if (fs.existsSync(chromeCachePath)) {
-      try {
-        // Procurar por versões do Chrome instaladas
-        const versions = fs.readdirSync(chromeCachePath)
-        for (const version of versions) {
-          const chromePath = path.join(chromeCachePath, version, 'chrome-linux64', 'chrome')
-          if (fs.existsSync(chromePath)) {
-            console.log(`✅ Chrome found at: ${chromePath}`)
-            return chromePath
-          }
-        }
-      } catch (err) {
-        console.log('⚠️ Error searching Puppeteer cache:', err)
-      }
-    }
-    
-    // 2. Tentar encontrar Chrome em locais do sistema
+    // Tentar encontrar Chrome em locais comuns (priorizando instalações do sistema)
     const possiblePaths = [
       process.env.PUPPETEER_EXECUTABLE_PATH,
       '/usr/bin/chromium',
@@ -81,7 +83,7 @@ class WhatsAppClient {
       }
     }
 
-    console.log('⚠️ Chrome not found, puppeteer will try to download it')
+    console.log('⚠️ Chrome not found in standard locations, puppeteer will try to use its own')
     return undefined
   }
 
