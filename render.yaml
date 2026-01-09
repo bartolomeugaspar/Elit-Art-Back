@@ -4,8 +4,8 @@ services:
     runtime: node
     region: frankfurt
     plan: starter
-    buildCommand: cd whatsapp-service && npm install && npm run build
-    startCommand: ./start.sh
+    buildCommand: cd whatsapp-service && npm install --production=false && npm run build
+    startCommand: cd whatsapp-service && node dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
