@@ -30,6 +30,8 @@ import whatsappApiRoutes from './whatsapp/routes'
 import financialReportsRoutes from './routes/financial-reports'
 import notificationRoutes from './routes/notifications'
 import notificationSettingsRoutes from './routes/notification-settings'
+import artistQuotasRoutes from './routes/artist-quotas'
+import artistPerformanceRoutes from './routes/artist-performance'
 
 dotenv.config()
 
@@ -99,6 +101,8 @@ app.use('/api/whatsapp-api', whatsappApiRoutes)
 app.use('/api/financial-reports', financialReportsRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/notification-settings', notificationSettingsRoutes)
+app.use('/api/artist-quotas', artistQuotasRoutes)
+app.use('/api/artist-performance', artistPerformanceRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
