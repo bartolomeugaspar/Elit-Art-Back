@@ -9,6 +9,22 @@ const router = express.Router();
 
 /**
  * @swagger
+ * /api/artist-quotas/debug/me:
+ *   get:
+ *     summary: Debug endpoint to check current user
+ *     tags: [ArtistQuotas]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/debug/me', authenticate, asyncHandler(async (req: AuthRequest, res: Response) => {
+  res.json({
+    user: req.user,
+    message: 'Token decodificado com sucesso'
+  });
+}));
+
+/**
+ * @swagger
  * /api/artist-quotas:
  *   post:
  *     summary: Create a new quota payment (Artist only)
@@ -90,8 +106,18 @@ router.post('/', authenticate, upload.single('proof_of_payment'), asyncHandler(a
 router.get('/my-quotas', authenticate, asyncHandler(async (req: AuthRequest, res: Response) => {
   const user = req.user;
   
+  // Debug logging
+  console.log('🔍 Debug /my-quotas - User:', JSON.stringify(user, null, 2));
+  
   if (user?.role !== 'artista') {
-    res.status(403).json({ error: 'Apenas artistas podem acessar esta rota' });
+    console.log('❌ Acesso negado - Role:', user?.role);
+    res.status(403).json({ 
+      error: 'Apenas artistas podem acessar esta rota',
+      debug: {
+        receivedRole: user?.role,
+        expectedRole: 'artista'
+      }
+    });
     return;
   }
 
