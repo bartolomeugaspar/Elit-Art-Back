@@ -32,6 +32,7 @@ import notificationRoutes from './routes/notifications'
 import notificationSettingsRoutes from './routes/notification-settings'
 import artistQuotasRoutes from './routes/artist-quotas'
 import artistPerformanceRoutes from './routes/artist-performance'
+import artistQuotaPaymentsRoutes from './routes/artist-quota-payments'
 
 dotenv.config()
 
@@ -103,6 +104,7 @@ app.use('/api/notifications', notificationRoutes)
 app.use('/api/notification-settings', notificationSettingsRoutes)
 app.use('/api/artist-quotas', artistQuotasRoutes)
 app.use('/api/artist-performance', artistPerformanceRoutes)
+app.use('/api/artist-quota-payments', artistQuotaPaymentsRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

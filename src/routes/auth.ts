@@ -165,8 +165,14 @@ router.post(
     body('password').notEmpty().withMessage('Password is required'),
   ],
   asyncHandler(async (req: AuthRequest, res: Response) => {
+    console.log('🔐 POST /auth/login - Nova requisição de login');
+    console.log('📧 Email:', req.body.email);
+    console.log('🌐 IP:', req.ip || req.socket.remoteAddress);
+    
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
+      console.log('❌ Validação falhou:', errors.array());
+      
       // Registrar tentativa de login falhada (validação)
       try {
         await AuditService.log({
@@ -188,11 +194,17 @@ router.post(
     const { email, password } = req.body
     
     try {
+      console.log('✅ Validação OK, tentando autenticar...');
+      
       // Get IP address and User-Agent
       const ipAddress = req.ip || req.socket.remoteAddress || req.headers['x-forwarded-for'] as string || 'Desconhecido'
       const userAgent = req.get('user-agent')
       
-      const { user, token } = await AuthService.login(email, password, ipAddress, userAgent)
+      const { user, token } = await AuthService.login(email, password, ipAddress, userAgent);
+      
+      console.log('✅ Login bem-sucedido!');
+      console.log('👤 User:', { id: user.id, name: user.name, email: user.email, role: user.role });
+      console.log('🔑 Token gerado:', token.substring(0, 50) + '...');
 
       // Registrar login bem-sucedido no audit log
       try {

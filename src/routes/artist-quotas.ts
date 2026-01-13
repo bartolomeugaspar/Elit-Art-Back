@@ -25,6 +25,62 @@ router.get('/debug/me', authenticate, asyncHandler(async (req: AuthRequest, res:
 
 /**
  * @swagger
+ * /api/artist-quotas/debug/check-artists:
+ *   get:
+ *     summary: Debug endpoint to check artists in database
+ *     tags: [ArtistQuotas]
+ */
+router.get('/debug/check-artists', asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { supabase } = await import('../config/database');
+  
+  // Get all users with all fields
+  const { data: users, error } = await supabase
+    .from('users')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+  
+  // Group by role
+  const byRole: Record<string, number> = {};
+  users?.forEach(user => {
+    const role = user.role || 'undefined';
+    byRole[role] = (byRole[role] || 0) + 1;
+  });
+  
+  const artistUsers = users?.filter(u => u.role === 'artista') || [];
+  
+  res.json({
+    total_users: users?.length || 0,
+    by_role: byRole,
+    all_users: users?.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      isActive: u.isActive,
+      hasPassword: !!u.password,
+      passwordLength: u.password?.length || 0,
+      created_at: u.created_at
+    })),
+    artists: artistUsers.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      isActive: u.isActive,
+      hasPassword: !!u.password
+    })),
+    message: artistUsers.length > 0 
+      ? `Encontrados ${artistUsers.length} artistas` 
+      : 'Nenhum usuário com role "artista" encontrado'
+  });
+}));
+
+/**
+ * @swagger
  * /api/artist-quotas:
  *   post:
  *     summary: Create a new quota payment (Artist only)
