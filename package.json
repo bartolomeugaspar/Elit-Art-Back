@@ -10,7 +10,14 @@
     "seed": "ts-node-dev --transpile-only src/seeds/seedData.ts",
     "seed:events": "ts-node-dev --transpile-only src/seeds/seedEvents.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "convert-artists": "ts-node scripts/convert-artists-to-users.ts",
+    "check-artists": "ts-node scripts/check-artists.ts",
+    "check-artist-data": "ts-node scripts/check-artist-data.ts",
+    "retry-failed": "ts-node scripts/retry-failed-conversions.ts",
+    "resend-emails": "ts-node scripts/resend-welcome-emails.ts",
+    "test-maria": "ts-node scripts/test-maria-profile.ts",
+    "test-endpoint": "ts-node scripts/test-profile-endpoint.ts"
   },
   "keywords": [
     "elit-Arte",

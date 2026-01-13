@@ -231,10 +231,20 @@ router.put(
   asyncHandler(async (req: AuthRequest, res: Response) => {
     const { profile_image } = req.body
 
+    if (!req.user?.id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Usuário não autenticado'
+      });
+    }
+
     const { data: user, error } = await supabase
       .from('users')
-      .update({ profile_image })
-      .eq('id', req.userId)
+      .update({ 
+        profile_image,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', req.user.id)
       .select()
       .single()
 
@@ -242,7 +252,7 @@ router.put(
 
     res.status(200).json({
       success: true,
-      message: 'Profile image updated successfully',
+      message: 'Foto de perfil atualizada com sucesso',
       user: {
         id: user.id,
         name: user.name,

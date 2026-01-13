@@ -9,6 +9,7 @@ import { errorHandler } from './middleware/errorHandler'
 import { UploadService } from './services/UploadService'
 import { LogCleanupService } from './services/LogCleanupService'
 import { NotificationCleanupService } from './services/NotificationCleanupService'
+import { initCronJobs } from './services/cronService'
 import WhatsAppClient from './whatsapp/client'
 import authRoutes from './routes/auth'
 import artistRoutes from './routes/artists'
@@ -33,6 +34,8 @@ import notificationSettingsRoutes from './routes/notification-settings'
 import artistQuotasRoutes from './routes/artist-quotas'
 import artistPerformanceRoutes from './routes/artist-performance'
 import artistQuotaPaymentsRoutes from './routes/artist-quota-payments'
+import paymentRemindersRoutes from './routes/payment-reminders'
+import performanceEvaluationsRoutes from './routes/performance-evaluations'
 
 dotenv.config()
 
@@ -105,6 +108,8 @@ app.use('/api/notification-settings', notificationSettingsRoutes)
 app.use('/api/artist-quotas', artistQuotasRoutes)
 app.use('/api/artist-performance', artistPerformanceRoutes)
 app.use('/api/artist-quota-payments', artistQuotaPaymentsRoutes)
+app.use('/api/payment-reminders', paymentRemindersRoutes)
+app.use('/api/performance-evaluations', performanceEvaluationsRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -137,6 +142,9 @@ const startServer = async () => {
     
     // Start notification cleanup (runs daily at 3 AM)
     NotificationCleanupService.startAutoCleanup()
+    
+    // Initialize cron jobs for payment reminders
+    initCronJobs()
     
     // Initialize WhatsApp client APENAS se a variável ENABLE_WHATSAPP estiver definida
     // No Vercel, o WhatsApp roda num serviço separado na Render

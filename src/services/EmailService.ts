@@ -677,4 +677,160 @@ export class EmailService {
     await Promise.allSettled(emailPromises)
     console.log(`✅ Notificações enviadas para todos os inscritos`)
   }
+
+  /**
+   * Notificar administrador sobre nova mensagem de contato
+   */
+  static async sendContactNotificationToAdmin(
+    contactName: string,
+    contactEmail: string,
+    contactPhone: string,
+    subject: string,
+    message: string
+  ): Promise<void> {
+    try {
+      const adminEmail = process.env.ADMIN_EMAIL || 'faustinodomingos83@hotmail.com'
+      const frontendUrl = process.env.FRONTEND_URL || 'https://elit-arte.vercel.app'
+
+      const mailOptions = {
+        from: process.env.SMTP_FROM || 'noreply@elitarte.com',
+        to: adminEmail,
+        subject: `Nova Mensagem de Contato - ${subject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+              <img src="https://elit-arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 100px; height: auto; margin-bottom: 15px; border-radius: 100%;">
+              <h1 style="color: #DAA520; margin: 0;">Elit'Arte</h1>
+              <p style="color: #F4A460; margin: 5px 0 0 0;">Nova Mensagem de Contato</p>
+            </div>
+            
+            <div style="background: #fafaebff; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #8B4513;">
+              <div style="background: #fff8dc; border-left: 4px solid #DAA520; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                <p style="color: #8B4513; font-size: 14px; margin: 0;">
+                  <strong>📩 Você recebeu uma nova mensagem através do formulário de contato do site.</strong>
+                </p>
+              </div>
+
+              <div style="background: #ffffff; border: 1px solid #DAA520; padding: 20px; border-radius: 6px; margin: 20px 0;">
+                <h3 style="color: #8B4513; margin: 0 0 15px 0; font-size: 16px;">Informações do Remetente</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 8px 0; color: #654321; font-size: 14px; width: 100px;"><strong>Nome:</strong></td>
+                    <td style="padding: 8px 0; color: #2D1810; font-size: 14px;">${contactName}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #654321; font-size: 14px;"><strong>Email:</strong></td>
+                    <td style="padding: 8px 0; color: #2D1810; font-size: 14px;">
+                      <a href="mailto:${contactEmail}" style="color: #8B4513;">${contactEmail}</a>
+                    </td>
+                  </tr>
+                  ${contactPhone ? `
+                  <tr>
+                    <td style="padding: 8px 0; color: #654321; font-size: 14px;"><strong>Telefone:</strong></td>
+                    <td style="padding: 8px 0; color: #2D1810; font-size: 14px;">
+                      <a href="tel:${contactPhone}" style="color: #8B4513;">${contactPhone}</a>
+                    </td>
+                  </tr>
+                  ` : ''}
+                  <tr>
+                    <td style="padding: 8px 0; color: #654321; font-size: 14px;"><strong>Assunto:</strong></td>
+                    <td style="padding: 8px 0; color: #2D1810; font-size: 14px;">${subject}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div style="background: #ffffff; border: 1px solid #DAA520; padding: 20px; border-radius: 6px; margin: 20px 0;">
+                <h3 style="color: #8B4513; margin: 0 0 15px 0; font-size: 16px;">Mensagem</h3>
+                <p style="color: #2D1810; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${message}</p>
+              </div>
+
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="${frontendUrl}/admin/dashboard" style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); color: #DAA520; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 15px; box-shadow: 0 4px 6px rgba(139, 69, 19, 0.3);">
+                  📧 Ver no Painel Admin
+                </a>
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #DAA520; margin: 20px 0;">
+              
+              <p style="color: #654321; font-size: 11px; text-align: center;">
+                © ${new Date().getFullYear()} Elit'Arte. Todos os direitos reservados.
+              </p>
+            </div>
+          </div>
+        `,
+      }
+
+      await transporter.sendMail(mailOptions)
+      console.log(`✅ Notificação de contato enviada ao administrador: ${adminEmail}`)
+    } catch (error) {
+      console.error('❌ Erro ao enviar notificação ao administrador:', error)
+      throw new Error('Failed to send contact notification to admin')
+    }
+  }
+
+  /**
+   * Enviar resposta para mensagem de contato
+   */
+  static async sendContactReply(
+    recipientEmail: string,
+    recipientName: string,
+    originalSubject: string,
+    originalMessage: string,
+    reply: string,
+    adminName: string
+  ): Promise<void> {
+    try {
+      const mailOptions = {
+        from: process.env.SMTP_FROM || 'noreply@elitarte.com',
+        to: recipientEmail,
+        subject: `Re: ${originalSubject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #8B4513 0%, #654321 100%); padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+              <img src="https://elit-arte.vercel.app/icon.jpeg" alt="Elit'Arte Logo" style="max-width: 100px; height: auto; margin-bottom: 15px; border-radius: 100%;">
+              <h1 style="color: #DAA520; margin: 0;">Elit'Arte</h1>
+              <p style="color: #F4A460; margin: 5px 0 0 0;">Resposta à sua Mensagem</p>
+            </div>
+            
+            <div style="background: #fafaebff; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #8B4513;">
+              <p style="color: #2D1810; font-size: 16px;">Olá <strong>${recipientName}</strong>,</p>
+              
+              <p style="color: #2D1810; font-size: 14px; line-height: 1.6;">
+                Obrigado por entrar em contato com a Elit'Arte. Aqui está a nossa resposta à sua mensagem:
+              </p>
+
+              <div style="background: #ffffff; border-left: 4px solid #DAA520; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <p style="color: #2D1810; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${reply}</p>
+                <p style="color: #654321; font-size: 12px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #DAA520;">
+                  <strong>${adminName}</strong><br>
+                  Equipa Elit'Arte
+                </p>
+              </div>
+
+              <div style="background: #f0f0f0; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                <p style="color: #654321; font-size: 12px; margin: 0 0 10px 0;"><strong>Sua mensagem original:</strong></p>
+                <p style="color: #2D1810; font-size: 13px; line-height: 1.6; margin: 0; white-space: pre-wrap;">${originalMessage}</p>
+              </div>
+
+              <p style="color: #654321; font-size: 13px; line-height: 1.6; margin-top: 20px;">
+                Se tiver mais alguma dúvida, não hesite em nos contactar novamente.
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #DAA520; margin: 20px 0;">
+              
+              <p style="color: #654321; font-size: 11px; text-align: center;">
+                © ${new Date().getFullYear()} Elit'Arte. Todos os direitos reservados.
+              </p>
+            </div>
+          </div>
+        `,
+      }
+
+      await transporter.sendMail(mailOptions)
+      console.log(`✅ Resposta enviada para: ${recipientEmail}`)
+    } catch (error) {
+      console.error('❌ Erro ao enviar resposta:', error)
+      throw new Error('Failed to send contact reply')
+    }
+  }
 }

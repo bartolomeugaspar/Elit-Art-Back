@@ -247,7 +247,7 @@ router.get('/', authenticate, asyncHandler(async (req: AuthRequest, res: Respons
  */
 router.get('/:id', authenticate, asyncHandler(async (req: AuthRequest, res: Response) => {
   const user = req.user;
-  const quota = await ArtistQuotaModel.findById(parseInt(req.params.id));
+  const quota = await ArtistQuotaModel.findById(req.params.id);
 
   if (!quota) {
     return res.status(404).json({ error: 'Quota não encontrada' });
@@ -315,14 +315,14 @@ router.patch('/:id/approve', authenticate, asyncHandler(async (req: AuthRequest,
     updateData.notes = notes;
   }
 
-  const updated = await ArtistQuotaModel.update(parseInt(req.params.id), updateData);
+  const updated = await ArtistQuotaModel.update(req.params.id, updateData);
 
   if (!updated) {
     res.status(404).json({ error: 'Quota não encontrada' });
     return;
   }
 
-  const quota = await ArtistQuotaModel.findById(parseInt(req.params.id));
+  const quota = await ArtistQuotaModel.findById(req.params.id);
   res.json(quota);
 }));
 
@@ -343,7 +343,7 @@ router.patch('/:id/approve', authenticate, asyncHandler(async (req: AuthRequest,
  */
 router.put('/:id', authenticate, upload.single('proof_of_payment'), asyncHandler(async (req: AuthRequest, res: Response) => {
   const user = req.user;
-  const quota = await ArtistQuotaModel.findById(parseInt(req.params.id));
+  const quota = await ArtistQuotaModel.findById(req.params.id);
 
   if (!quota) {
     return res.status(404).json({ error: 'Quota não encontrada' });
@@ -379,8 +379,8 @@ router.put('/:id', authenticate, upload.single('proof_of_payment'), asyncHandler
     updateData.proof_of_payment = await SupabaseStorageService.uploadImage(req.file);
   }
 
-  await ArtistQuotaModel.update(parseInt(req.params.id), updateData);
-  const updatedQuota = await ArtistQuotaModel.findById(parseInt(req.params.id));
+  await ArtistQuotaModel.update(req.params.id, updateData);
+  const updatedQuota = await ArtistQuotaModel.findById(req.params.id);
 
   res.json(updatedQuota);
 }));
@@ -402,7 +402,7 @@ router.put('/:id', authenticate, upload.single('proof_of_payment'), asyncHandler
  */
 router.delete('/:id', authenticate, asyncHandler(async (req: AuthRequest, res: Response) => {
   const user = req.user;
-  const quota = await ArtistQuotaModel.findById(parseInt(req.params.id));
+  const quota = await ArtistQuotaModel.findById(req.params.id);
 
   if (!quota) {
     return res.status(404).json({ error: 'Quota não encontrada' });
@@ -421,7 +421,7 @@ router.delete('/:id', authenticate, asyncHandler(async (req: AuthRequest, res: R
     await SupabaseStorageService.deleteImage(quota.proof_of_payment);
   }
 
-  await ArtistQuotaModel.delete(parseInt(req.params.id));
+  await ArtistQuotaModel.delete(req.params.id);
   res.json({ message: 'Quota excluída com sucesso' });
 }));
 

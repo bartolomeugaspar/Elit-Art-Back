@@ -57,7 +57,6 @@ export class SupabaseStorageService {
       const { error } = await supabase.storage
         .from(this.BUCKET_NAME)
         .remove([filePath])
-
       if (error) {
         return false
       }

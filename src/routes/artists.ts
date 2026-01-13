@@ -4,8 +4,113 @@ import { ArtistService } from '../services/ArtistService'
 import { authenticate, authorize } from '../middleware/auth'
 import { asyncHandler } from '../middleware/asyncHandler'
 import { AuthRequest } from '../types/auth'
+import { supabase } from '../config/database'
+import { getArtistProfile, updateArtistPassword } from '../controllers/artistController'
 
 const router = Router()
+
+/**
+ * @swagger
+ * /artists/profile/{id}:
+ *   get:
+ *     summary: Obter perfil do artista (dados do usuário)
+ *     tags:
+ *       - Artistas
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Dados do perfil do artista
+ *       403:
+ *         description: Sem permissão
+ *       404:
+ *         description: Artista não encontrado
+ */
+router.get('/profile/:id', authenticate, asyncHandler(getArtistProfile))
+
+/**
+ * @swagger
+ * /artists/profile/{id}/password:
+ *   put:
+ *     summary: Alterar senha do artista
+ *     tags:
+ *       - Artistas
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Senha alterada com sucesso
+ *       400:
+ *         description: Senha atual incorreta
+ *       403:
+ *         description: Sem permissão
+ *       404:
+ *         description: Usuário não encontrado
+ */
+router.put('/profile/:id/password', authenticate, asyncHandler(updateArtistPassword))
+
+/**
+ * @swagger
+ * /artists/profile/{id}/name:
+ *   put:
+ *     summary: Atualizar nome do artista
+ *     tags:
+ *       - Artistas
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Nome atualizado com sucesso
+ *       403:
+ *         description: Sem permissão
+ *       404:
+ *         description: Usuário não encontrado
+ */
+const { updateArtistName } = require('../controllers/artistController');
+router.put('/profile/:id/name', authenticate, asyncHandler(updateArtistName))
 
 /**
  * @swagger

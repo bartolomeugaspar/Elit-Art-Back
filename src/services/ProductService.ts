@@ -2,15 +2,17 @@ import { supabase } from '../config/database'
 import { IProduct, IProductInput } from '../models/Product'
 
 export class ProductService {
-  static async getAllProducts(category?: string, isActive: boolean = true): Promise<IProduct[]> {
+  static async getAllProducts(category?: string, isActive?: boolean): Promise<IProduct[]> {
     let query = supabase.from('products').select('*')
 
     if (category) {
       query = query.eq('category', category)
     }
 
-    if (isActive) {
-      query = query.eq('is_active', true)
+    // Only filter by is_active if explicitly set (true or false)
+    // If undefined, return all products regardless of status
+    if (isActive !== undefined) {
+      query = query.eq('is_active', isActive)
     }
 
     const { data, error } = await query.order('created_at', { ascending: false })

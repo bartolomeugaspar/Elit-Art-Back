@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware } from '../middleware/auth';
+import { authenticate } from '../middleware/auth';
 import { upload } from '../config/multer';
 import {
   createQuotaPayment,
@@ -14,7 +14,7 @@ import {
 const router = Router();
 
 // Todas as rotas requerem autenticação
-router.use(authMiddleware);
+router.use(authenticate);
 
 // Rotas de pagamentos de cota
 router.post('/', upload.single('comprovante'), createQuotaPayment);

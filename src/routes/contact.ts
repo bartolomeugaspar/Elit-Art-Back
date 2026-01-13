@@ -74,6 +74,22 @@ router.post(
       })
     }
 
+    // Enviar email de notificação ao administrador
+    try {
+      const { EmailService } = await import('../services/EmailService')
+      await EmailService.sendContactNotificationToAdmin(
+        name,
+        email,
+        phone || '',
+        subject,
+        message
+      )
+      console.log(`✅ Notificação de contato enviada ao administrador`)
+    } catch (emailError) {
+      console.error('⚠️ Erro ao enviar email ao administrador:', emailError)
+      // Não bloquear a resposta mesmo se o email falhar
+    }
+
     res.status(201).json({
       success: true,
       message: 'Mensagem enviada com sucesso! Entraremos em contato em breve.',

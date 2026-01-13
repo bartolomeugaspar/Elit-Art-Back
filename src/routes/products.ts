@@ -19,6 +19,11 @@ const router = Router()
  *         schema:
  *           type: string
  *           enum: [book, magazine, ticket, merchandise]
+ *       - in: query
+ *         name: includeInactive
+ *         schema:
+ *           type: boolean
+ *         description: Include inactive products (default false)
  *     responses:
  *       200:
  *         description: Lista de produtos
@@ -26,8 +31,9 @@ const router = Router()
 router.get(
   '/',
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { category } = req.query
-    const products = await ProductService.getAllProducts(category as string)
+    const { category, includeInactive } = req.query
+    const isActive = includeInactive === 'true' ? undefined : true
+    const products = await ProductService.getAllProducts(category as string, isActive)
 
     res.status(200).json({
       success: true,
@@ -135,7 +141,7 @@ router.post(
   authorize('admin'),
   body('name').notEmpty().withMessage('Name is required'),
   body('description').notEmpty().withMessage('Description is required'),
-  body('category').isIn(['book', 'magazine', 'ticket', 'merchandise']),
+  body('category').isIn(['hat', 'backpack', 'tshirt']),
   body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
   body('stock').isInt({ min: 0 }).withMessage('Stock must be a positive integer'),
   body('sku').notEmpty().withMessage('SKU is required'),
@@ -177,6 +183,22 @@ router.post(
  *         description: Produto não encontrado
  */
 router.patch(
+  '/:id',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const product = await ProductService.updateProduct(req.params.id, req.body)
+
+    res.status(200).json({
+      success: true,
+      message: 'Product updated successfully',
+      product,
+    })
+  })
+)
+
+// Also support PUT for update
+router.put(
   '/:id',
   authenticate,
   authorize('admin'),

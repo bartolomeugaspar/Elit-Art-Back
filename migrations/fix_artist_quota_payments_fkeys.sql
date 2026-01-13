@@ -1,5 +1,10 @@
--- Tabela de pagamentos de cotas de artistas
-CREATE TABLE IF NOT EXISTS artist_quota_payments (
+-- Script para corrigir as foreign keys da tabela artist_quota_payments
+-- Dropar a tabela existente e recriar com as referências corretas
+
+DROP TABLE IF EXISTS artist_quota_payments CASCADE;
+
+-- Recriar a tabela com referências corretas
+CREATE TABLE artist_quota_payments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   artist_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   valor DECIMAL(10, 2) NOT NULL,

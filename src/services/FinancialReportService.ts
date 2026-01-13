@@ -33,6 +33,33 @@ export interface MonthlyRevenue {
   registrations_count: number
 }
 
+export interface QuotaPaymentSummary {
+  payment_id: string
+  artist_id: string
+  artist_name: string
+  artist_email: string
+  valor: number
+  mes_referencia: string
+  metodo_pagamento: string
+  status: string
+  data_envio: string
+  data_aprovacao?: string
+  aprovado_por_nome?: string
+  observacoes?: string
+  notas_admin?: string
+}
+
+export interface QuotaPaymentOverview {
+  total_payments: number
+  pending_payments: number
+  approved_payments: number
+  rejected_payments: number
+  total_amount: number
+  approved_amount: number
+  pending_amount: number
+  rejected_amount: number
+}
+
 export class FinancialReportService {
   /**
    * Obtém o resumo financeiro geral
@@ -301,5 +328,132 @@ export class FinancialReportService {
     })
 
     return Object.values(stats)
+  }
+
+  /**
+   * Obtém resumo dos pagamentos de quotas de artistas
+   */
+  static async getQuotaPaymentsOverview(
+    startDate?: string,
+    endDate?: string
+  ): Promise<QuotaPaymentOverview> {
+    let query = supabase
+      .from('artist_quota_payments')
+      .select('*')
+
+    if (startDate) {
+      query = query.gte('created_at', startDate)
+    }
+    if (endDate) {
+      query = query.lte('created_at', endDate)
+    }
+
+    const { data: payments, error } = await query
+
+    if (error) throw error
+
+    const overview: QuotaPaymentOverview = {
+      total_payments: payments?.length || 0,
+      pending_payments: 0,
+      approved_payments: 0,
+      rejected_payments: 0,
+      total_amount: 0,
+      approved_amount: 0,
+      pending_amount: 0,
+      rejected_amount: 0,
+    }
+
+    payments?.forEach((payment: any) => {
+      const valor = parseFloat(payment.valor) || 0
+      overview.total_amount += valor
+
+      switch (payment.status) {
+        case 'pendente':
+          overview.pending_payments++
+          overview.pending_amount += valor
+          break
+        case 'aprovado':
+          overview.approved_payments++
+          overview.approved_amount += valor
+          break
+        case 'rejeitado':
+          overview.rejected_payments++
+          overview.rejected_amount += valor
+          break
+      }
+    })
+
+    return overview
+  }
+
+  /**
+   * Obtém lista detalhada dos pagamentos de quotas
+   */
+  static async getQuotaPaymentsList(
+    startDate?: string,
+    endDate?: string,
+    status?: string
+  ): Promise<QuotaPaymentSummary[]> {
+    let query = supabase
+      .from('artist_quota_payments')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (startDate) {
+      query = query.gte('mes_referencia', startDate)
+    }
+    if (endDate) {
+      query = query.lte('mes_referencia', endDate)
+    }
+    if (status) {
+      query = query.eq('status', status)
+    }
+
+    const { data: payments, error } = await query
+
+    if (error) throw error
+
+    // Buscar informações dos artistas e aprovadores separadamente
+    const artistIds = [...new Set(payments?.map((p: any) => p.artist_id).filter(Boolean))]
+    const approverIds = [...new Set(payments?.map((p: any) => p.aprovado_por).filter(Boolean))]
+    const allUserIds = [...new Set([...artistIds, ...approverIds])]
+
+    let usersMap: Record<string, any> = {}
+    
+    if (allUserIds.length > 0) {
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, name, email')
+        .in('id', allUserIds)
+      
+      if (users) {
+        users.forEach((user: any) => {
+          usersMap[user.id] = user
+        })
+      }
+    }
+
+    const summaries: QuotaPaymentSummary[] = payments?.map((payment: any) => {
+      const artist = usersMap[payment.artist_id]
+      const approver = usersMap[payment.aprovado_por]
+      
+      return {
+        payment_id: payment.id,
+        artist_id: payment.artist_id,
+        artist_name: artist?.name || 'N/A',
+        artist_email: artist?.email || 'N/A',
+        valor: parseFloat(payment.valor) || 0,
+        mes_referencia: payment.mes_referencia,
+        metodo_pagamento: payment.metodo_pagamento || 'N/A',
+        status: payment.status,
+        data_envio: payment.created_at,
+        data_aprovacao: payment.data_aprovacao,
+        aprovado_por_nome: approver?.name,
+        observacoes: payment.observacoes,
+        notas_admin: payment.notas_admin,
+      }
+    }) || []
+
+    return summaries
   }
 }

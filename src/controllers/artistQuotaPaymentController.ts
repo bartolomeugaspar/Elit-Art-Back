@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
-import { createClient } from '@supabase/supabase-js';
-import { uploadToSupabase } from '../utils/supabaseStorage';
-
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '../config/database';
+import { SupabaseStorageService } from '../services/SupabaseStorageService';
+import { 
+  sendEmail, 
+  emailNovoPagamentoPendente, 
+  emailPagamentoAprovado, 
+  emailPagamentoRejeitado 
+} from '../config/email';
 
 interface AuthRequest extends Request {
   user?: {
@@ -34,12 +36,7 @@ export const createQuotaPayment = async (req: AuthRequest, res: Response) => {
     let comprovanteUrl = comprovante_url;
     if (req.file) {
       try {
-        const { url } = await uploadToSupabase(
-          req.file.buffer,
-          req.file.originalname,
-          'artist-quota-comprovantes'
-        );
-        comprovanteUrl = url;
+        comprovanteUrl = await SupabaseStorageService.uploadImage(req.file);
       } catch (uploadError) {
         console.error('Erro ao fazer upload do comprovante:', uploadError);
         return res.status(500).json({
@@ -108,12 +105,32 @@ export const createQuotaPayment = async (req: AuthRequest, res: Response) => {
       .eq('id', artistId)
       .single();
 
-    // TODO: Notificar administradores por email
-    console.log('Novo pagamento de cota criado:', {
-      artist: artist?.name || artist?.email,
-      valor,
-      mes_referencia
-    });
+    // Notificar administradores por email
+    const { data: admins } = await supabase
+      .from('users')
+      .select('email, name')
+      .eq('role', 'admin');
+
+    if (admins && admins.length > 0) {
+      for (const admin of admins) {
+        try {
+          await sendEmail({
+            to: admin.email,
+            subject: '🔔 Novo Pagamento de Quota Pendente - Ação Necessária',
+            html: emailNovoPagamentoPendente(
+              admin.name || admin.email,
+              artist?.name || artist?.email || 'Artista',
+              artist?.email || '',
+              valor,
+              mes_referencia,
+              metodo_pagamento
+            )
+          });
+        } catch (emailError) {
+          console.error('Erro ao enviar email para admin:', emailError);
+        }
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -258,12 +275,7 @@ export const updateQuotaPayment = async (req: AuthRequest, res: Response) => {
     // Se houver arquivo, fazer upload
     if (req.file) {
       try {
-        const { url } = await uploadToSupabase(
-          req.file.buffer,
-          req.file.originalname,
-          'artist-quota-comprovantes'
-        );
-        updateData.comprovante_url = url;
+        updateData.comprovante_url = await SupabaseStorageService.uploadImage(req.file);
       } catch (uploadError) {
         console.error('Erro ao fazer upload:', uploadError);
         return res.status(500).json({
@@ -463,12 +475,23 @@ export const approveQuotaPayment = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // TODO: Notificar artista por email
-    console.log('Pagamento de cota aprovado:', {
-      artist: payment.artist?.name || payment.artist?.email,
-      valor: payment.valor,
-      mes_referencia: payment.mes_referencia
-    });
+    // Notificar artista por email
+    if (payment.artist?.email) {
+      try {
+        await sendEmail({
+          to: payment.artist.email,
+          subject: '✅ Pagamento de Quota Aprovado - Elit-Art',
+          html: emailPagamentoAprovado(
+            payment.artist.name || payment.artist.email,
+            payment.valor,
+            payment.mes_referencia,
+            new Date().toISOString()
+          )
+        });
+      } catch (emailError) {
+        console.error('Erro ao enviar email de aprovação:', emailError);
+      }
+    }
 
     res.json({
       success: true,
@@ -557,11 +580,23 @@ export const rejectQuotaPayment = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // TODO: Notificar artista por email
-    console.log('Pagamento de cota rejeitado:', {
-      artist: payment.artist?.name || payment.artist?.email,
-      motivo: motivo_rejeicao
-    });
+    // Notificar artista por email
+    if (payment.artist?.email) {
+      try {
+        await sendEmail({
+          to: payment.artist.email,
+          subject: '❌ Pagamento de Quota Não Aprovado - Elit-Art',
+          html: emailPagamentoRejeitado(
+            payment.artist.name || payment.artist.email,
+            payment.valor,
+            payment.mes_referencia,
+            motivo_rejeicao
+          )
+        });
+      } catch (emailError) {
+        console.error('Erro ao enviar email de rejeição:', emailError);
+      }
+    }
 
     res.json({
       success: true,

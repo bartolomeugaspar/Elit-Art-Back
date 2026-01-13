@@ -3,6 +3,7 @@ import { query, validationResult } from 'express-validator'
 import { authenticate, authorize, AuthRequest } from '../middleware/auth'
 import { asyncHandler } from '../middleware/errorHandler'
 import { FinancialReportService } from '../services/FinancialReportService'
+import { PDFReportService } from '../services/PDFReportService'
 
 const router = Router()
 
@@ -232,6 +233,265 @@ router.get(
       count: paymentStats.length,
       paymentMethods: paymentStats,
     })
+  })
+)
+
+/**
+ * @swagger
+ * /financial-reports/quotas/overview:
+ *   get:
+ *     summary: Obter resumo dos pagamentos de quotas de artistas
+ *     tags:
+ *       - Relatórios Financeiros
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data de início (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data de fim (YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: Resumo dos pagamentos de quotas
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão
+ */
+router.get(
+  '/quotas/overview',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { startDate, endDate } = req.query
+
+    const quotasOverview = await FinancialReportService.getQuotaPaymentsOverview(
+      startDate as string,
+      endDate as string
+    )
+
+    res.status(200).json({
+      success: true,
+      overview: quotasOverview,
+    })
+  })
+)
+
+/**
+ * @swagger
+ * /financial-reports/quotas:
+ *   get:
+ *     summary: Obter lista detalhada de pagamentos de quotas
+ *     tags:
+ *       - Relatórios Financeiros
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data de início (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data de fim (YYYY-MM-DD)
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pendente, aprovado, rejeitado]
+ *         description: Filtrar por status
+ *     responses:
+ *       200:
+ *         description: Lista de pagamentos de quotas
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão
+ */
+router.get(
+  '/quotas',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { startDate, endDate, status } = req.query
+
+    const quotaPayments = await FinancialReportService.getQuotaPaymentsList(
+      startDate as string,
+      endDate as string,
+      status as string
+    )
+
+    res.status(200).json({
+      success: true,
+      count: quotaPayments.length,
+      payments: quotaPayments,
+    })
+  })
+)
+
+/**
+ * @swagger
+ * /financial-reports/download-pdf:
+ *   get:
+ *     summary: Download relatório financeiro completo em PDF
+ *     tags:
+ *       - Relatórios Financeiros
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data de início (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data de fim (YYYY-MM-DD)
+ *       - in: query
+ *         name: year
+ *         schema:
+ *           type: integer
+ *         description: Ano para receitas mensais (padrão é o ano atual)
+ *       - in: query
+ *         name: includeQuotas
+ *         schema:
+ *           type: boolean
+ *         description: Incluir pagamentos de quotas no relatório (padrão true)
+ *     responses:
+ *       200:
+ *         description: PDF do relatório financeiro
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão
+ */
+router.get(
+  '/download-pdf',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { startDate, endDate, year, includeQuotas } = req.query
+    const shouldIncludeQuotas = includeQuotas !== 'false'
+
+    // Buscar todos os dados necessários
+    const [overview, eventSummaries, monthlyRevenue] = await Promise.all([
+      FinancialReportService.getFinancialOverview(startDate as string, endDate as string),
+      FinancialReportService.getEventFinancialSummary(startDate as string, endDate as string),
+      FinancialReportService.getMonthlyRevenue(year ? parseInt(year as string) : undefined),
+    ])
+
+    let quotasOverview
+    let quotaPayments
+
+    if (shouldIncludeQuotas) {
+      ;[quotasOverview, quotaPayments] = await Promise.all([
+        FinancialReportService.getQuotaPaymentsOverview(startDate as string, endDate as string),
+        FinancialReportService.getQuotaPaymentsList(startDate as string, endDate as string),
+      ])
+    }
+
+    // Gerar PDF
+    await PDFReportService.generateFinancialReport(
+      res,
+      overview,
+      eventSummaries,
+      monthlyRevenue,
+      quotasOverview,
+      quotaPayments,
+      startDate as string,
+      endDate as string
+    )
+  })
+)
+
+/**
+ * @swagger
+ * /financial-reports/quotas/download-pdf:
+ *   get:
+ *     summary: Download relatório de quotas em PDF
+ *     tags:
+ *       - Relatórios Financeiros
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data de início (YYYY-MM-DD)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Data de fim (YYYY-MM-DD)
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pendente, aprovado, rejeitado]
+ *         description: Filtrar por status
+ *     responses:
+ *       200:
+ *         description: PDF do relatório de quotas
+ *         content:
+ *           application/pdf:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Sem permissão
+ */
+router.get(
+  '/quotas/download-pdf',
+  authenticate,
+  authorize('admin'),
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { startDate, endDate, status } = req.query
+
+    // Buscar dados de quotas
+    const [overview, payments] = await Promise.all([
+      FinancialReportService.getQuotaPaymentsOverview(startDate as string, endDate as string),
+      FinancialReportService.getQuotaPaymentsList(
+        startDate as string,
+        endDate as string,
+        status as string
+      ),
+    ])
+
+    // Gerar PDF
+    await PDFReportService.generateQuotasReport(
+      res,
+      overview,
+      payments,
+      startDate as string,
+      endDate as string
+    )
   })
 )
 

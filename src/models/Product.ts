@@ -2,7 +2,7 @@ export interface IProduct {
   id: string
   name: string
   description: string
-  category: 'book' | 'magazine' | 'ticket' | 'merchandise'
+  category: 'hat' | 'backpack' | 'tshirt'
   price: number
   discount_price?: number
   image_url: string
@@ -22,7 +22,7 @@ export interface IProduct {
 export interface IProductInput {
   name: string
   description: string
-  category: 'book' | 'magazine' | 'ticket' | 'merchandise'
+  category: 'hat' | 'backpack' | 'tshirt'
   price: number
   discount_price?: number
   image_url: string
