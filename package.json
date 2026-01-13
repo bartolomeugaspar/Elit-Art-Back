@@ -17,7 +17,8 @@
     "retry-failed": "ts-node scripts/retry-failed-conversions.ts",
     "resend-emails": "ts-node scripts/resend-welcome-emails.ts",
     "test-maria": "ts-node scripts/test-maria-profile.ts",
-    "test-endpoint": "ts-node scripts/test-profile-endpoint.ts"
+    "test-endpoint": "ts-node scripts/test-profile-endpoint.ts",
+    "send-quota-reminder": "ts-node scripts/send-quota-reminder.ts"
   },
   "keywords": [
     "elit-Arte",

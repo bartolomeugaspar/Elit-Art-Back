@@ -132,7 +132,7 @@ export const emailCredenciaisArtista = (nomeCompleto: string, email: string, sen
           </ul>
           
           <center>
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/login" class="button">Acessar Plataforma</a>
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/login" class="button">Acessar Plataforma</a>
           </center>
           
           <p style="margin-top: 30px;">Se tiver alguma dúvida, não hesite em entrar em contato conosco.</p>
@@ -446,6 +446,134 @@ export const emailPagamentoRejeitado = (
           <p style="margin-top: 30px;">Se tiver dúvidas, entre em contato conosco.</p>
           
           <p>Atenciosamente,<br><strong>Equipe Elit-Art</strong></p>
+        </div>
+        <div class="footer">
+          <p>Este é um e-mail automático, por favor não responda.</p>
+          <p>&copy; ${new Date().getFullYear()} Elit-Art - Todos os direitos reservados</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+/**
+ * Template de email para avisar artista sobre pagamento de cota mensal
+ */
+export const emailAvisoPagamentoCota = (
+  artistaNome: string,
+  mesReferencia: string,
+  valorCota: number,
+  dataLimite?: string
+): string => {
+  const mesAtual = new Date(mesReferencia + '-01').toLocaleDateString('pt-PT', { year: 'numeric', month: 'long' });
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+        }
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f9f9f9;
+        }
+        .header {
+          background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+          color: white;
+          padding: 20px;
+          text-align: center;
+          border-radius: 5px 5px 0 0;
+        }
+        .content {
+          background-color: white;
+          padding: 30px;
+          border-radius: 0 0 5px 5px;
+        }
+        .info-box {
+          background-color: #e3f2fd;
+          padding: 20px;
+          margin: 20px 0;
+          border-left: 4px solid #2196F3;
+          border-radius: 4px;
+        }
+        .highlight-box {
+          background-color: #fff3cd;
+          padding: 15px;
+          margin: 20px 0;
+          border-left: 4px solid #ffc107;
+          border-radius: 4px;
+        }
+        .button {
+          display: inline-block;
+          padding: 12px 30px;
+          background: linear-gradient(135deg, #D2691E 0%, #DAA520 100%);
+          color: white;
+          text-decoration: none;
+          border-radius: 5px;
+          margin-top: 20px;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 20px;
+          color: #666;
+          font-size: 12px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>💳 Aviso de Pagamento de Quota</h1>
+        </div>
+        <div class="content">
+          <h2>Olá, ${artistaNome}!</h2>
+          
+          <p>Esperamos que esteja tudo bem! Este é um lembrete amigável sobre o pagamento da sua quota mensal na plataforma Elit-Art.</p>
+          
+          <div class="info-box">
+            <h3>📋 Detalhes da Quota:</h3>
+            <p><strong>📅 Mês de Referência:</strong> ${mesAtual}</p>
+            <p><strong>💰 Valor da Quota:</strong> ${parseFloat(valorCota.toString()).toFixed(2)} Kz</p>
+            ${dataLimite ? `<p><strong>⏰ Data Limite:</strong> ${new Date(dataLimite).toLocaleDateString('pt-PT')}</p>` : ''}
+          </div>
+          
+          <div class="highlight-box">
+            <p style="margin: 0; font-size: 15px;">
+              <strong>⚡ Ação Necessária:</strong> Para manter seu perfil ativo e em dia com suas obrigações, 
+              por favor efetue o pagamento da quota referente ao mês de ${mesAtual}.
+            </p>
+          </div>
+          
+          <p><strong>📝 Como Pagar:</strong></p>
+          <ol>
+            <li>Acesse sua área de artista na plataforma</li>
+            <li>Vá para a seção de "Pagamentos de Quotas"</li>
+            <li>Selecione o mês de referência e faça o upload do comprovante</li>
+            <li>Aguarde a aprovação da administração</li>
+          </ol>
+          
+          <center>
+            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/artist/quota-payments" class="button">Efetuar Pagamento</a>
+          </center>
+          
+          <p style="margin-top: 30px;">
+            <strong>💡 Dica:</strong> Manter suas quotas em dia garante que você continue aproveitando todos os benefícios 
+            da plataforma Elit-Art e mantém sua conta em bom estado.
+          </p>
+          
+          <p>Se você já realizou este pagamento, por favor desconsidere este e-mail.</p>
+          
+          <p>Caso tenha dúvidas ou precise de assistência, não hesite em nos contactar.</p>
+          
+          <p style="margin-top: 30px;">Atenciosamente,<br><strong>Equipe Elit-Art</strong></p>
         </div>
         <div class="footer">
           <p>Este é um e-mail automático, por favor não responda.</p>
