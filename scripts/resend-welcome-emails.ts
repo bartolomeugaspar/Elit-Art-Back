@@ -36,6 +36,8 @@ function generateTemporaryPassword(length: number = 12): string {
  * Lista de emails dos usuários que foram criados mas não receberam email
  */
 const emailsToResend = [
+  'mariagoreth93811@gmail.com',
+  'Justinosingorres@gmail.com',
   'veramiguelita@gmail.com',
   'mariannafeitio0@gmail.com',
   'deliano053@gmail.com',
