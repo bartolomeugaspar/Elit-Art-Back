@@ -107,7 +107,7 @@ router.post(
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
-        profile_image: newUser.profile_image,
+        profileImage: newUser.profileImage,
       },
       token,
     })
@@ -227,7 +227,7 @@ router.post(
           name: user.name,
           email: user.email,
           role: user.role,
-          profile_image: user.profile_image,
+          profileImage: user.profileImage,
         },
         token,
       })
@@ -335,7 +335,7 @@ router.get('/me', authenticate, asyncHandler(async (req: AuthRequest, res: Respo
       name: user.name,
       email: user.email,
       role: user.role,
-      profile_image: user.profile_image,
+      profileImage: user.profileImage,
     },
   })
 }))
